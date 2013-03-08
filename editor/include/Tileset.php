@@ -28,6 +28,11 @@ class Tileset{
 		}
 	}
 	
+	/**
+	 * Get pathing of a given tile
+	 * @param int $pTileX
+	 * @param int $pTileY
+	 */
 	public function getTilePathing($pTileX, $pTileY){
 		return $this->mTile[$pTileX][$pTileY];
 	}
