@@ -6,6 +6,8 @@ class Window{
 	
 	private $width, $height, $maxWidth, $maxHeight, $minWidth, $minHeight;
 	
+	private $centerThis = false;
+	
 	private $headerColor;
 	
 	function __construct($id, $title, $content){
@@ -67,7 +69,17 @@ class Window{
 			$wHeaderColorClass = " cge_EditorWindowHeader_" . $this->headerColor;
 		}
 		
+		$wCenter = $this->centerThis;
+		
 		include("template/window.php");
+	}
+	
+	public function center($pCenter = null){
+		if($pCenter === null){
+			return $this->centerThis;
+		}else{
+			$this->centerThis = $pCenter;
+		}
 	}
 	
 	/**

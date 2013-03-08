@@ -14,5 +14,12 @@
 </div>
 
 <script type="text/javascript">
+
+<?php
+	if($wCenter):
+	?>
+	cge_centerWindow('<?php echo $wId; ?>');<?php 
+	endif;
+	?>
 	cge_setWindowHandlerState('<?php echo $wId; ?>', true);
 </script>

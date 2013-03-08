@@ -17,37 +17,14 @@
 	<title><?php cge_print("title"); ?></title>
 </head>
 
-
 <body>
 
 <div id="topBarWrapper">
 	<div id="topBarContent">
 		<nav id="topBarNavigation">
-			<ul>
-				<li>
-					<a href="#">Map</a>
-					
-					<ul class="topBarSubNavigation">
-						<li><a href="#" class="cge_new">New Map</a></li>
-						<li><a href="#" class="cge_delete">Delete Map</a></li>
-						<li><a href="#" class="cge_close">Close</a></li>
-					</ul>
-				</li>
-				<li>
-					<a href="javascript:;" class="noClick">Windows</a>
-					<ul style="position: absolute; top: 40px;" class="topBarSubNavigation" id="cge_EditorWindowList">
-						<li>
-							<a id="cge_EditorWindowHandler_cge_Log" href="#" onclick="cge_openWindow('cge_Log'); return false;">Log</a>
-						</li>
-						<li>
-							<a id="cge_EditorWindowHandler_cge_Feedback" href="#" onclick="cge_openWindow('cge_Feedback'); return false;">Send Feedback</a>
-						</li>
-					</ul>
-				</li>
-				<li>
-					<a href="#">Logout</a>
-				</li>
-			</ul>
+			<?php 
+			$nav->printList();
+			?>
 		</nav>
 	</div>
 </div>

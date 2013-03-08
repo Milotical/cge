@@ -25,10 +25,10 @@ $cge_mapLayer0->addRow(array(1, 0), array(1, 0), array(1, 0), array(1, 0));
 $cge_activeMapData->addLayer($cge_mapLayer0);
 
 $cge_mapLayer1 = new MapLayer();
-$cge_mapLayer1->addRow(array(0, 5), array(0, 0), array(0, 0), array(0, 0));
-$cge_mapLayer1->addRow(array(0, 0), array(0, 0), array(0, 0), array(0, 0));
-$cge_mapLayer1->addRow(array(0, 0), array(0, 0), array(0, 0), array(0, 0));
-$cge_mapLayer1->addRow(array(0, 0), array(0, 0), array(0, 0), array(0, 0));
+$cge_mapLayer1->addRow(array(0, 5), array(-1, -1), array(-1, -1), array(-1, -1));
+$cge_mapLayer1->addRow(array(-1, -1), array(-1, -1), array(-1, -1), array(-1, -1));
+$cge_mapLayer1->addRow(array(-1, -1), array(-1, -1), array(-1, -1), array(-1, -1));
+$cge_mapLayer1->addRow(array(-1, -1), array(-1, -1), array(-1, -1), array(-1, -1));
 
 $cge_activeMapData->addLayer($cge_mapLayer1);
 

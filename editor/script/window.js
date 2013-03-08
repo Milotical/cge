@@ -55,6 +55,15 @@ function cge_openWindow(pWindowId){
 	}
 }
 
+function cge_centerWindow(pWindowId){
+	cge_resizeWindowWrapper();
+	
+	var currentWindow = $("#" + pWindowId);
+
+	currentWindow.css("left", $("#cge_editorWindowWrapper").width()/2 - currentWindow.width()/2 + "px");
+	currentWindow.css("top", $("#cge_editorWindowWrapper").height()/2 - currentWindow.height()/2 + "px");
+}
+
 function cge_setWindowHandlerState(pWindowId, pState){
 	if(pState){
 		$("#cge_EditorWindowHandler_" + pWindowId).addClass("cge_checkmark");

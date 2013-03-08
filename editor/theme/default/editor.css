@@ -18,6 +18,55 @@ body{
 	max-height: 200px;
 }
 
+a.cge_projectListItem{
+	background-color: #FFFFFF;
+	background-position: center 0;
+	padding: 36px 15px 0 15px;
+	text-align: center;
+	max-width: 100px;
+	border-radius: 5px;
+	color: #000000 !important;
+	display: inline-block;
+	
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
+}
+
+a.cge_projectListItem:hover{
+	background-color: #a8dff4;
+}
+
+span.cge_Log{
+	background-color: #FFFFFF;
+	
+	padding: 2px 0;
+	display: block;
+	cursor: default;
+	
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
+}
+
+span.cge_Log:hover{
+	background-color: #EEEEEE;
+}
+
+span.cge_LogDebug{
+	color: #99CC00;
+}
+
+span.cge_LogWarning{
+	color: #FFBB33;
+}
+
+span.cge_LogError{
+	color: #FF4444;
+}
+
 /*
  * Navigation
  */
@@ -25,6 +74,12 @@ body{
 	background: #ffffff;
 	height: 40px;
 	border-bottom: 2px solid #CCCCCC;
+
+	width: 100%;
+	
+	position: fixed;
+	top: 0;
+	left: 0;
 }
 
 #topBarWrapperContent{
@@ -105,6 +160,7 @@ ul.topBarSubNavigation li a:hover, ul.topBarSubNavigation li a:active{
 }
 
 #cge_editorWindowWrapper{
+	margin-top: 42px;
 	position: relative;
 	overflow: auto;
 }
@@ -258,9 +314,18 @@ a.cge_delete{
 	background-repeat: no-repeat;
 }
 
+a.cge_folder{
+	background-image: url('icon/folder.png');
+	background-repeat: no-repeat;
+}
 
 a.cge_checkmark{
 	background-image: url('icon/checkmark.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_plus{
+	background-image: url('icon/plus.png');
 	background-repeat: no-repeat;
 }
 

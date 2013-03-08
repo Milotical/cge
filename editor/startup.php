@@ -31,3 +31,11 @@ $cge_defaultDatabase->connect();
 
 #Load window module
 require_once("include/Window.php");
+
+#Load project module
+require_once("include/Project.php");
+
+#Set up the navigation
+require_once("include/NavigationTop.php");
+
+require_once("template/NavigationTopDefault.php");
