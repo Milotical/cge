@@ -1,0 +1,267 @@
+body{
+	background: #FFFFFF;
+	color: #000000;
+	font: 12px/16px 'Helvetica', Arial, sans-seif;
+	margin: 0;
+}
+
+/*
+ * Specific css
+ */
+#cge_Feedback textarea{
+	width: 100%;
+	max-width: 100%;
+	min-width: 100%;
+
+	height: 200px;
+	min-height: 200px;
+	max-height: 200px;
+}
+
+/*
+ * Navigation
+ */
+#topBarWrapper{
+	background: #ffffff;
+	background: -moz-linear-gradient(top, #ffffff 0%, #f3f3f3 50%, #ededed 51%, #ffffff 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(50%,#f3f3f3), color-stop(51%,#ededed), color-stop(100%,#ffffff));
+	background: -webkit-linear-gradient(top, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
+	background: -o-linear-gradient(top, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
+	background: -ms-linear-gradient(top, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
+	background: linear-gradient(to bottom, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 );
+
+	height: 26px;
+	border-bottom: 2px solid #CCCCCC;
+}
+
+#topBarWrapperContent{
+	padding: 0;
+	margin: 0;
+}
+
+#topBarWrapper nav ul{
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+#topBarWrapper nav ul li{
+	display: block;
+	position: relative;
+	margin: 0;
+}
+
+#topBarWrapper nav ul li a{
+	padding: 5px 15px;
+	color: #000000;
+	text-decoration: none;
+	float: left;
+	border-right: 1px solid #CCCCCC;
+}
+
+#topBarWrapper nav ul li a:hover, #topBarWrapper nav ul li a:active{
+	background-color: #EEEEEE;
+}
+
+#topBarWrapper nav ul li ul{
+	display: none;
+
+	background: #ffffff;
+	background: -moz-linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed));
+	background: -webkit-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
+	background: -o-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
+	background: -ms-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
+	background: linear-gradient(to bottom, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 );
+	
+	border: 1px solid #CCCCCC;
+	border-top-width: 2px;
+
+	z-index: 100;
+	position: absolute;
+	top: 26px;
+	left: 0;
+}
+
+#topBarWrapper nav ul li:hover ul{
+	display: block;
+
+}
+
+#topBarWrapper nav ul li:hover ul li{
+	float: none;
+}
+
+#topBarWrapper nav ul li:hover ul li a{
+	border: 0;
+	width: 150px;
+	padding: 7.5px 35px;
+}
+
+#topBarWrapper nav ul li:hover ul li a.checked{
+	background: url('icon/checkmark.png') no-repeat;
+}
+
+#topBarWrapper nav ul li:hover ul li a:hover, #topBarWrapper nav ul li:hover ul li a:active{
+	background-color: #a8dff4 !important;
+}
+
+#cge_editorWindowWrapper{
+	position: relative;
+	overflow: auto;
+}
+
+/*
+* Generic
+*/
+a:link, a:visited{
+	color: #33B5E5;
+	text-decoration: none;
+}
+
+a:hover, a:active{
+	color: #0099CC;
+}
+
+/*
+ * Window class
+ */
+div.cge_EditorWindow{
+	background: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	position: absolute;
+	border-radius: 3px;
+	
+	z-index: 5;
+}
+
+div.cge_EditorWindow header{
+	background: #EEEEEE;
+	margin: 0;
+	margin-bottom: 10px;
+	padding: 7.5px 5px;
+	border-top: 5px solid #222;
+	position: relative;
+	cursor: move;
+}
+
+div.cge_EditorWindow header.cge_EditorWindowHeader_red{
+	border-top-color: #FF4444;
+}
+
+div.cge_EditorWindow header.cge_EditorWindowHeader_blue{
+	border-top-color: #33B5E5;
+}
+
+div.cge_EditorWindow header.cge_EditorWindowHeader_purple{
+	border-top-color: #AA66CC;
+}
+
+div.cge_EditorWindow header.cge_EditorWindowHeader_green{
+	border-top-color: #99CC00;
+}
+
+div.cge_EditorWindow header.cge_EditorWindowHeader_yellow{
+	border-top-color: #FFBB33;
+}
+
+div.cge_EditorWindow header h2{
+	margin: 0;
+	font-size: 18px;
+	line-height: 18px;
+}
+
+div.cge_EditorWindow div.cge_EditorWindowContent{
+	padding: 5px;
+	scroll: auto;
+}
+
+div.cge_EditorWindowControlPane{
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+
+div.cge_WindowMaximized{
+	width: 100%;
+	height: 100%;
+	max-width: 100% !important;
+	max-height: 100% !important;
+	z-index: 100;
+	scroll: auto;
+}
+
+div.cge_WindowMaximized header{
+	cursor: default !important;
+}
+
+div.cge_windowSettings{
+	display: none;
+}
+
+/*
+ * Input related
+ */
+textarea, input{
+	background: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	margin-bottom: 5px;
+}
+
+textarea{
+	display: block;
+}
+
+input.cge_btn{
+	background: #EEEEEE;
+	border: 0;
+	padding: 10px 5px;
+	cursor: default;
+}
+
+input.cge_btn:hover{
+	background-color: #E6E6E6;
+}
+
+a.cge_btn{
+	display: inline-block;
+	background: #EEEEEE;
+	cursor: default;
+}
+
+a.cge_btn:hover{
+	background-color: #E6E6E6;
+}
+
+a.cge_btn_icon{
+	width: 32px;
+	height: 32px;
+}
+
+a.cge_new{
+	background-image: url('icon/new.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_delete{
+	background-image: url('icon/delete.png');
+	background-repeat: no-repeat;
+}
+
+
+a.cge_checkmark{
+	background-image: url('icon/checkmark.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_close{
+	background-image: url('icon/close.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_maximize{
+	background-image: url('icon/maximize.png');
+	background-repeat: no-repeat;
+}
