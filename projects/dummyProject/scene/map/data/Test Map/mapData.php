@@ -30,6 +30,8 @@ $cge_mapLayer1->addRow(array(0, 0), array(0, 0), array(0, 0), array(0, 0));
 $cge_mapLayer1->addRow(array(0, 0), array(0, 0), array(0, 0), array(0, 0));
 $cge_mapLayer1->addRow(array(0, 0), array(0, 0), array(0, 0), array(0, 0));
 
+$cge_activeMapData->addLayer($cge_mapLayer1);
+
 
 /*========================================================================================*\
  * Objects/Sprites
