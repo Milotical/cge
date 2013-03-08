@@ -26,6 +26,7 @@
 			<ul>
 				<li>
 					<a href="#">Map</a>
+					
 					<ul class="topBarSubNavigation">
 						<li><a href="#" class="cge_new">New Map</a></li>
 						<li><a href="#" class="cge_delete">Delete Map</a></li>
@@ -34,7 +35,7 @@
 				</li>
 				<li>
 					<a href="javascript:;" class="noClick">Windows</a>
-					<ul class="topBarSubNavigation" id="cge_EditorWindowList">
+					<ul style="position: absolute; top: 40px;" class="topBarSubNavigation" id="cge_EditorWindowList">
 						<li>
 							<a id="cge_EditorWindowHandler_cge_Log" href="#" onclick="cge_openWindow('cge_Log'); return false;">Log</a>
 						</li>

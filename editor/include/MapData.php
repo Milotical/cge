@@ -3,6 +3,7 @@ class MapData {
 	private $mName;
 	private $mX, $mY;
 	private $mLayer = array();
+	private $mTileset;
 	
 	/**
 	 * Create a MapData-object
@@ -37,6 +38,15 @@ class MapData {
 			}
 		}else{
 			//TODO: Throw warning because the given object is no instance of MapLayer
+			return false;
+		}
+	}
+	
+	public function setTileset($pTileset){
+		if(is_a($pTileset, "Tileset")){
+			$this->mTileset = $pTileset;
+		}else{
+			//TODO: Throw warning because the given object is no instance of Tileset
 			return false;
 		}
 	}

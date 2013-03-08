@@ -1,5 +1,5 @@
 body{
-	background: #FFFFFF;
+	background: #EEEEEE;
 	color: #000000;
 	font: 12px/16px 'Helvetica', Arial, sans-seif;
 	margin: 0;
@@ -23,15 +23,7 @@ body{
  */
 #topBarWrapper{
 	background: #ffffff;
-	background: -moz-linear-gradient(top, #ffffff 0%, #f3f3f3 50%, #ededed 51%, #ffffff 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(50%,#f3f3f3), color-stop(51%,#ededed), color-stop(100%,#ffffff));
-	background: -webkit-linear-gradient(top, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	background: -o-linear-gradient(top, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	background: -ms-linear-gradient(top, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	background: linear-gradient(to bottom, #ffffff 0%,#f3f3f3 50%,#ededed 51%,#ffffff 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 );
-
-	height: 26px;
+	height: 40px;
 	border-bottom: 2px solid #CCCCCC;
 }
 
@@ -41,70 +33,74 @@ body{
 }
 
 #topBarWrapper nav ul{
-	list-style-type: none;
+	list-style: none outside none;
 	padding: 0;
 	margin: 0;
+	position: relative;
 }
 
 #topBarWrapper nav ul li{
-	display: block;
-	position: relative;
 	margin: 0;
+	float: left;
+	position: relative;
 }
 
 #topBarWrapper nav ul li a{
-	padding: 5px 15px;
+	background-color: #FFFFFF;
+	padding: 12px 15px;
 	color: #000000;
+	font-weight: bold;
+	font-size: 14px;
+	line-height: 40px;
 	text-decoration: none;
-	float: left;
 	border-right: 1px solid #CCCCCC;
+
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
 }
 
 #topBarWrapper nav ul li a:hover, #topBarWrapper nav ul li a:active{
-	background-color: #EEEEEE;
+	background-color: #a8dff4;
 }
 
-#topBarWrapper nav ul li ul{
+ul.topBarSubNavigation{
 	display: none;
 
 	background: #ffffff;
-	background: -moz-linear-gradient(top, #ffffff 0%, #f6f6f6 47%, #ededed 100%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(47%,#f6f6f6), color-stop(100%,#ededed));
-	background: -webkit-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
-	background: -o-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
-	background: -ms-linear-gradient(top, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
-	background: linear-gradient(to bottom, #ffffff 0%,#f6f6f6 47%,#ededed 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed',GradientType=0 );
 	
 	border: 1px solid #CCCCCC;
+	border-bottom-width: 2px;
 	border-top-width: 2px;
 
 	z-index: 100;
-	position: absolute;
-	top: 26px;
+	position: absolute !important;
+	top: 40px;
 	left: 0;
 }
 
-#topBarWrapper nav ul li:hover ul{
+#topBarWrapper nav ul li:hover ul.topBarSubNavigation{
 	display: block;
-
 }
 
-#topBarWrapper nav ul li:hover ul li{
-	float: none;
+ul.topBarSubNavigation li{
+	float: none !important;
 }
 
-#topBarWrapper nav ul li:hover ul li a{
+ul.topBarSubNavigation li a{
 	border: 0;
-	width: 150px;
-	padding: 7.5px 35px;
+	display: block;
+	min-width: 150px;	
+	padding: 0px 35px !important;
+	background-position: 0 3px;
 }
 
-#topBarWrapper nav ul li:hover ul li a.checked{
+ul.topBarSubNavigation li a.checked{
 	background: url('icon/checkmark.png') no-repeat;
 }
 
-#topBarWrapper nav ul li:hover ul li a:hover, #topBarWrapper nav ul li:hover ul li a:active{
+ul.topBarSubNavigation li a:hover, ul.topBarSubNavigation li a:active{
 	background-color: #a8dff4 !important;
 }
 
@@ -215,24 +211,36 @@ textarea{
 }
 
 input.cge_btn{
-	background: #EEEEEE;
+	background-color: #DFDFDF;
 	border: 0;
-	padding: 10px 5px;
+	font-size: 14px;
+	font-weight: bold;
+	padding: 15px 30px;
 	cursor: default;
+	
+	transition: background-color 0.5s, color 0.5s;
+	-moz-transition: background-color 0.5s, color 0.5s;
+	-webkit-transition: background-color 0.5s, color 0.5s;
+	-o-transition: background-color 0.5s, color 0.5s;
 }
 
 input.cge_btn:hover{
-	background-color: #E6E6E6;
+	background-color: #a8dff4;
 }
 
 a.cge_btn{
 	display: inline-block;
 	background: #EEEEEE;
 	cursor: default;
+	
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
 }
 
 a.cge_btn:hover{
-	background-color: #E6E6E6;
+	background-color: #C6C6C6;
 }
 
 a.cge_btn_icon{

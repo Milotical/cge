@@ -66,7 +66,7 @@ function cge_setWindowHandlerState(pWindowId, pState){
 
 function cge_resizeWindowWrapper(){
 	$("#cge_editorWindowWrapper").width($(window).width() + "px");
-	$("#cge_editorWindowWrapper").height(($(window).height() - 28) + "px");
+	$("#cge_editorWindowWrapper").height(($(window).height() - 42) + "px");
 	
 	$("div.cge_WindowMaximized").width(($(window).width() - 2) + "px");
 	$("div.cge_WindowMaximized").height(($("#cge_editorWindowWrapper").height() - 2) + "px");
