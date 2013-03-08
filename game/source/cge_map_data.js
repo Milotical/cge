@@ -1,6 +1,6 @@
 
 
-function create_map_data_object(scene_data, html_id){
+function cge_create_map_data_object(scene_data, html_id){
 	var o = new Object;
 	o.layers = scene_data["layers"];
 	o.tileset_name = scene_data["tileset_name"];

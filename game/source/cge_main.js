@@ -49,13 +49,16 @@ function create_game_object(html_id, system_infos){
 		scene_data["tileset_row_width"] = 8;
 		scene_data["sprites"] = [];
 		scene_data["sprites"][1] = [];
-		this.map_data = create_map_data_object(scene_data, this.html_id);
+		this.map_data = cge_create_map_data_object(scene_data, this.html_id);
 		
 		this.scene_start = function(){
 			this.map_data.draw_tiled_map(0,0);
 		};
 		this.scene_update = function(){
 			this.map_data.draw_tiled_map(0,0);
+		};
+		this.scene_end = function(){
+			
 		};
 		// --------------
 		
