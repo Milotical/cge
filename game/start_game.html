@@ -1,0 +1,25 @@
+<html>
+	<head>
+		<script type="text/javascript" src="jquery/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="jquery/jquery-ui-1.8.16.custom.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="jquery/jquery-ui-1.8.16.custom.css"/>
+		<script type="text/javascript" src="source/cge_main.js"></script>
+		<script type="text/javascript" src="source/cge_map_data.js"></script>
+		<script type="text/javascript" src="source/cge_sprite.js"></script>
+		<script type="text/javascript">
+			var game;
+			var system_info;
+			
+			$(document).ready(function(){
+				system_info = [];
+				system_info["resolution"] = [640, 480];
+				system_info["fps"] = 30;
+				
+				game = create_game_object("game_div",system_info);
+			});
+		</script>	
+	</head>
+	<body>
+		<div id="game_div"></div>
+	</body>
+</html>
