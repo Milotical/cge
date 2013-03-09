@@ -1,6 +1,6 @@
 
 
-function cge_create_map_data_object(scene_data, html_id){
+function cge_create_map_data_object(scene_data, sprite_data_object){
 	var o = new Object;
 	o.layers = scene_data["layers"];
 	o.tileset_name = scene_data["tileset_name"];
@@ -8,11 +8,9 @@ function cge_create_map_data_object(scene_data, html_id){
 	o.tileset_zoom_factor = scene_data["tileset_zoom_factor"];
 	o.tileset_row_width = scene_data["tileset_row_width"];
 	o.sprites = scene_data["sprites"];
-	o.html_id = html_id;
+	o.sprite_data_object = sprite_data_object;
 	
-	o.draw_tiled_map = function(scroll_x, scroll_y){
-		var canv = $('#'+this.html_id+'_canvas');
-		var ctx = canv[0].getContext('2d');
+	o.draw_tiled_map = function(ctx, scroll_x, scroll_y){
 		var img = new Image();
 		img.src = this.tileset_name;
 		//ctx.drawImage(img, x_on_image, y_on_image, width_on_image, height_on_image, x, y, width, height)
