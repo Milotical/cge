@@ -1,9 +1,26 @@
 <?php
+#Start a session
+session_start();
+
+if(!isset($cge_editorBasePath)){
+	$cge_editorBasePath = "";
+}
+
+#Load project module
+require_once($cge_editorBasePath . "include/Project.php");
+
+#Load a selected project
+if(isset($_GET["project"]) && !isset($_SESSION["cge_loadedProject"])){
+	if(Project::dirIsProject($_GET["project"])){
+		$_SESSION["cge_loadedProject"] = $_GET["project"];
+	}
+}
+
 #Get the settings
-require_once("settings.php");
+require_once($cge_editorBasePath . "settings.php");
 
 #Load the log module and create instance
-require_once("include/Log.php");
+require_once($cge_editorBasePath . "include/Log.php");
 $cge_defaultLog = new Log($cge_LogLevel);
 
 #Load language file. From this point on cge_getString() and cge_print() will be available
@@ -15,7 +32,7 @@ if(file_exists("lang/cge_lang_" . $cge_Language . ".php")){
 }
 
 #Load template module and create instance
-require_once("include/TemplateFactory.php");
+require_once($cge_editorBasePath . "include/TemplateFactory.php");
 $cge_TemplateFactory = new TemplateFactory();
 $cge_TemplateFactory->setLog($cge_defaultLog);
 
@@ -30,12 +47,7 @@ $cge_defaultDatabase->setLog($cge_defaultLog);
 $cge_defaultDatabase->connect();
 
 #Load window module
-require_once("include/Window.php");
+require_once($cge_editorBasePath . "include/Window.php");
 
-#Load project module
-require_once("include/Project.php");
-
-#Set up the navigation
-require_once("include/NavigationTop.php");
-
-require_once("template/NavigationTopDefault.php");
+#Setup variables
+$cge_startScript = "";

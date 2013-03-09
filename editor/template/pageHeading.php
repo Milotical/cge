@@ -14,6 +14,12 @@
 	<script src="script/editor.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/window.js" type="text/javascript" charset="utf-8"></script>
 	
+	<script type="text/javascript">
+		$(window).load(function(){
+			<?php echo $cge_startScript; ?>
+		});
+	</script>
+	
 	<title><?php cge_print("title"); ?></title>
 </head>
 
@@ -27,6 +33,10 @@
 			?>
 		</nav>
 	</div>
+</div>
+
+<div id="cge_editorLoadingInidicatorWrapper">
+
 </div>
 
 <div id="cge_editorWindowWrapper">

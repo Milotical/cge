@@ -6,14 +6,18 @@ class Window{
 	
 	private $width, $height, $maxWidth, $maxHeight, $minWidth, $minHeight;
 	
-	private $centerThis = false;
+	private $mPositionAnchor = false;
 	
 	private $headerColor;
 	
-	function __construct($id, $title, $content){
-		$this->id = $id;
-		$this->title = $title;
-		$this->content = $content;
+	private $mBasePath;
+	
+	function __construct($pId, $pTtitle, $pContent, $pBasePath = ""){
+		$this->id = $pId;
+		$this->title = $pTtitle;
+		$this->content = $pContent;
+		
+		$this->mBasePath = $pBasePath;
 	}
 	
 	public function printWindow(){
@@ -69,16 +73,20 @@ class Window{
 			$wHeaderColorClass = " cge_EditorWindowHeader_" . $this->headerColor;
 		}
 		
-		$wCenter = $this->centerThis;
+		$wAnchor = $this->mPositionAnchor;
 		
-		include("template/window.php");
+		include($this->mBasePath . "template/window.php");
+	}
+	
+	public function setPositionAnchor($pAnchor, $pMargin = 26){
+		$this->mPositionAnchor = $pAnchor;
 	}
 	
 	public function center($pCenter = null){
 		if($pCenter === null){
-			return $this->centerThis;
+			return $this->mCenter;
 		}else{
-			$this->centerThis = $pCenter;
+			$this->mCenter = $pCenter;
 		}
 	}
 	

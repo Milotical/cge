@@ -1,6 +1,19 @@
 /**
  * Functions for windows used in the cge_Editor
  */
+function cge_loadWinodw(pWindowName){
+	if($("#" + pWindowName).length <= 0){
+		cge_setLoading(true);
+		$.get("ajax/getWindow.php", {w: pWindowName}, function(data){
+			cge_setLoading(false);
+			$("#cge_editorWindowWrapper").append(data);
+			cge_enableWindowFunctions();
+		});
+	}else{
+		cge_openWindow(pWindowName);
+	}
+}
+
 function cge_enableWindowFunctions(){
 	$("div.cge_EditorWindow").draggable({
 		handle: "header",
@@ -52,6 +65,16 @@ function cge_openWindow(pWindowId){
 		cge_setWindowHandlerState(pWindowId, true);
 	}else{
 		cge_closeWindow(pWindowId);
+	}
+}
+
+function cge_positionWindow(pWindowId, pAnchor, pMargin){
+	if(pAnchor == 'center'){
+		cge_centerWindow(pWindowId);
+	}
+	
+	if(pAnchor == 'right'){
+		currentWindow.css("left", $("#cge_editorWindowWrapper").width() - currentWindow.width() - pMargin + "px");
 	}
 }
 

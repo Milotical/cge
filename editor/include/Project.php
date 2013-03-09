@@ -15,5 +15,12 @@ class Project{
 		return $projectList;
 	}
 	
+	public static function dirIsProject($pDirName, $pProjectDirectory = "../projects"){
+		if(file_exists($pProjectDirectory. "/" . $pDirName . "/cge_ProjectConfig.php")){
+			return true;
+		}else{
+			return false;
+		}
+	}
 }
 ?>

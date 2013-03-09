@@ -16,9 +16,9 @@
 <script type="text/javascript">
 
 <?php
-	if($wCenter):
+	if($wAnchor):
 	?>
-	cge_centerWindow('<?php echo $wId; ?>');<?php 
+	cge_positionWindow('<?php echo $wId; ?>','<?php echo $wAnchor; ?>', 26);<?php 
 	endif;
 	?>
 	cge_setWindowHandlerState('<?php echo $wId; ?>', true);
