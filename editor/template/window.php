@@ -6,8 +6,11 @@
 		</div>
 	</header>
 	
-	<div class="cge_EditorWindowContent">
-		<?php echo $wContent; ?>
+	<div class="cge_EditorWindowContentWrapper" style="height: <?php echo $wContentWrapperHeight; ?>px;">
+		<div class="cge_EditorWindowContent">
+			<?php echo $wContent; ?>
+		</div>
+		<div style="clear: both;"></div>
 	</div>
 	
 	<div class="cge_windowSettings"></div>

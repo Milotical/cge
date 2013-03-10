@@ -16,6 +16,13 @@ if(isset($_GET["project"]) && !isset($_SESSION["cge_loadedProject"])){
 	}
 }
 
+#Load the project
+if(isset($_SESSION["cge_loadedProject"])){
+	include_once($cge_editorBasePath . "../projects/" . $_SESSION["cge_loadedProject"] . "/cge_ProjectConfig.php");
+	
+	$cge_LoadedProject = new Project($cge_ProjectName, $cge_editorBasePath . "../projects");
+}
+
 #Get the settings
 require_once($cge_editorBasePath . "settings.php");
 

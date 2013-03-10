@@ -7,7 +7,8 @@ function cge_getString($string){
 					 "Version" => "Version",
 					 "version" => "version",
 					 "File" => "File",
-					 "Send Feedback" => "Send Feedback"
+					 "Send Feedback" => "Send Feedback",
+					 "WindowNotFound" => "The requested window could not be found."
 	);
 	
 	if(isset($strings[$string])){

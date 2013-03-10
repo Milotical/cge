@@ -1,6 +1,6 @@
 <?php
 
-$errorMessage = '
+$content = '
 <div class="cge_editorForm>
 	<form onsubmit="return false;">
 		<div class="cge_editorFormRow">
@@ -19,11 +19,11 @@ $errorMessage = '
 ';
 
 
-$projectListWindow = new Window("cge_NewProjectWindow", cge_getString('New Project'), $errorMessage, $cge_editorBasePath);
+$projectListWindow = new Window("cge_NewProjectWindow", cge_getString('New Project'), $content, $cge_editorBasePath);
 $projectListWindow->setTop(24);
 $projectListWindow->setLeft(24);
-$projectListWindow->setWidth(600);
-$projectListWindow->setHeight(400);
+$projectListWindow->setWidth(500);
+$projectListWindow->setHeight(270);
 $projectListWindow->setHeaderColor("blue");
 $projectListWindow->setPositionAnchor('center');
 $projectListWindow->printWindow();

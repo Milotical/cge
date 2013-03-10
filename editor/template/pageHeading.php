@@ -29,8 +29,8 @@
 	<div id="topBarContent">
 		<nav id="topBarNavigation">
 			<?php 
-			$nav->printList();
-			?>
+			$nav->printList();?>
+			
 		</nav>
 	</div>
 </div>

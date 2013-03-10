@@ -67,6 +67,7 @@ class Window{
 			$style .= 'min-height: ' . $this->minHeight . 'px;';
 		}
 		
+		$wContentWrapperHeight = $this->height - 38;
 		$wStyles = ' style="' . $style . '"';
 		$wHeaderColorClass = "";
 		if(isset($this->headerColor)){
