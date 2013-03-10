@@ -38,7 +38,7 @@ function cge_create_sprites_data(){
 	};
 	
 	// draws images to canvas element
-	o.draw_images = function(ctx, z_min, z_max, y_min, y_max){
+	o.update_images = function(ctx, z_min, z_max, y_min, y_max){
 		if(z_min == null)
 			z_min = this.min_z;
 		if(z_max == null)
@@ -52,7 +52,7 @@ function cge_create_sprites_data(){
 				for(var y=y_min; y <= y_max; y++){
 					if(this.images[z][y]){
 						for (var i in this.images[z][y]){
-							this.images[z][y][i].draw(ctx);
+							this.images[z][y][i].update(ctx);
 						}
 					}
 				}
@@ -99,6 +99,7 @@ function cge_create_image(sprite_data_object, image_source, width, height, x, y,
 	o.zoom_y = 1.0;
 	o.sprite_data_object = sprite_data_object;
 	o.removed = false;
+	o.visible = true;
 	
 	o.set_y = function(new_y){
 		this.sprite_data_object.remove_image(this);
@@ -109,6 +110,11 @@ function cge_create_image(sprite_data_object, image_source, width, height, x, y,
 		this.sprite_data_object.remove_image(this);
 		this.z = new_z;
 		this.sprite_data_object.add_image(this);
+	};
+	
+	o.update = function(ctx){
+		if(this.visible)
+			this.draw(ctx);
 	};
 	
 	// draws image to canvas (automatically called)
@@ -152,9 +158,9 @@ function cge_create_sprite(sprite_data_object, image_source, width, height, rows
 		img.src = this.image_source;
 		var width_image = this.get_width();
 		var height_image = this.get_height();
-		var x_image = this.col_index*width_image
-		var y_image = this.row_index*height_image
-		ctx.drawImage(img, x_image, y_image, width_image, height_image, this.x, this.y, width_image*this.x_zoom, height_image*this.y_zoom);
+		var x_image = this.col_index*width_image;
+		var y_image = this.row_index*height_image;
+		ctx.drawImage(img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
 	};
 	
 	o.get_width = function(){
@@ -167,28 +173,102 @@ function cge_create_sprite(sprite_data_object, image_source, width, height, rows
 	return o;
 }
 
-/*function create_sprite_object(id, image_source, width, height){
-	o = new Object;
-	o.x = 0;
-	o.y = 0;
-	o.z = 2
-	o.image_source = image_source;
-	o.width = width;
-	o.height = height;
-	o.number_x_frames = 4;
-	o.number_y_frames = 4;
-	o.x_index = 0;
-	o.y_index = 0;
-	o.zoom_x = 1.0;
-	o.zoom_y = 1.0;
-	o.id = id;
+function cge_create_anim_sprite(sprite_data_object, image_source, width, height, rows, cols, x, y, z, frame_sequence, add_image){
+	var o = cge_create_sprite(sprite_data_object, image_source, width, height, rows, cols, x, y, z, add_image);
+	if(frame_sequence == null)
+		frame_seqence = [[0,0]];
+	o.frame_sequence = frame_sequence;
+	o.frame_sequence_index  = 0;
+	o.basic_frame_time = 30;
+	o.sleep = false;
+	o.repeat = false;
+	o.time_index  = 0;
+	o.clear_after_finished = true;
+	o.col_index = o.frame_sequence[0][0];
+	o.row_index = o.frame_sequence[0][1];
 	
-	o.draw = function(ctx, display_grid_size){
+	o.update = function(ctx){
+		if(!this.sleep){
+			this.time_index++;
+			var current_sequence_frame = this.frame_sequence[this.frame_sequence_index];
+			var frame_time = this.basic_frame_time;
+			if(current_sequence_frame["time"] != null)
+				frame_time = current_sequence_frame["time"];
+			//alert("t="+this.time_index);
+			if(this.time_index >= frame_time){
+				var new_sequence_frame = this.frame_sequence[this.frame_sequence_index+1];
+				if(new_sequence_frame != null){
+					this.time_index = 0;
+					this.frame_sequence_index++;
+					this.col_index = new_sequence_frame[0];
+					this.row_index = new_sequence_frame[1];
+				}else if(this.repeat){
+					new_sequence_frame = this.frame_sequence[0];
+					this.time_index = 0;
+					this.frame_sequence_index = 0;
+					this.col_index = new_sequence_frame[0];
+					this.row_index = new_sequence_frame[1];
+				}else{
+					if(this.clear_after_finished)
+						this.visible = false;
+				  this.sleep = true;
+				}
+			}
+		}
+		if(this.visible)
+			this.draw(ctx);
+	};
+	
+	// draws image to canvas (automatically called)
+	o.draw = function(ctx){
 		var img = new Image();
 		img.src = this.image_source;
-		
-		ctx.drawImage(img, x_image, y_image, width_image, height_image, x, y, width_image*this.x_zoom, height_image*this.y_zoom);
-	}
+		var width_image = this.get_width();
+		var height_image = this.get_height();
+		var x_image = this.col_index*width_image;
+		var y_image = this.row_index*height_image;
+		ctx.drawImage(img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+	};
 	
 	return o;
-}*/
+}
+
+function cge_create_character(sprite_data_object, image_source, width, height, rows, cols, x, y, z, faceing){
+	if(rows == null)
+		rows = 4;
+	if(cols == null)
+		cols = 4;
+	if(faceing == null)
+		faceing = 0;
+	var o = cge_create_anim_sprite(sprite_data_object, image_source, width, height, rows, cols, x, y, z, frame_sequence, add_image);
+	o.faceing = faceing;
+	o.moves = [];
+	o.repeat_moves = false;
+	o.clear_after_finished = false;
+	o.sleep = true;
+	
+	o.update_anim = o.update;
+	o.update = function(ctx){
+		if(this.moves.length == 0){
+			this.frame_sequence = [[0,this.faceing]];
+			this.repeat = false;
+			this.sleep = false;
+		}else{
+			this.moves[0].update();
+		}
+		this.update_anim(ctx);
+	};
+	
+	// draws image to canvas (automatically called)
+	o.draw = function(ctx){
+		var img = new Image();
+		img.src = this.image_source;
+		var width_image = this.get_width();
+		var height_image = this.get_height();
+		var x_image = this.col_index*width_image;
+		var y_image = this.row_index*height_image;
+		ctx.drawImage(img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+	};
+	
+	return o;
+}

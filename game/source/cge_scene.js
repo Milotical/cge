@@ -27,20 +27,21 @@ function cge_create_scene(main_object){
 		this.map_data = cge_create_map_data_object(scene_data, this.sprites_data);
 		
 		this.start = function(){
-			var canv = $('#'+this.main_object.html_id+'_canvas');
-			var ctx = canv[0].getContext('2d');
-			this.map_data.draw_tiled_map(ctx,0,0);
 			this.test_image = this.new_image("Poyo.png",100,100,0,0,102);
 			this.test_image2 = this.new_image("Poyo.png",100,100,50,50,101);
 			this.test_image3 = this.new_image("Poyo.png",100,100,100,30,-1);
 			this.test_image2.set_z(103);
+			this.test_image4 = this.new_sprite("Poyo.png", 228, 940, 10, 2, 200, 200, 101);
+			this.test_image5 = this.new_anim_sprite("Poyo.png", 228, 940, 10, 2, 200, 10, 101, [[0,3],[1,3]]);
+			this.test_image5.repeat = true;
 		};
 		this.update = function(){
 			var canv = $('#'+this.main_object.html_id+'_canvas');
 			var ctx = canv[0].getContext('2d');
-			this.sprites_data.draw_images(ctx, null, -1);
+			ctx.clearRect ( 0 , 0 , this.main_object.resolution[0] , this.main_object.resolution[1] );
+			this.sprites_data.update_images(ctx, null, -1);
 			this.map_data.draw_tiled_map(ctx,0,0);
-			this.sprites_data.draw_images(ctx, 100);
+			this.sprites_data.update_images(ctx, this.map_data.layers.length-1);
 		};
 		this.end = function(){
 			
@@ -49,7 +50,13 @@ function cge_create_scene(main_object){
 		
 		o.new_image = function(image_source, width, height, x, y, z){
 			return cge_create_image(this.sprites_data, image_source, width, height,x,y,z);
-		}
+		};
+		o.new_sprite = function(image_source, width, height, rows, cols, x, y, z){
+			return cge_create_sprite(this.sprites_data, image_source, width, height, rows, cols, x, y, z);
+		};
+		o.new_anim_sprite = function(image_source, width, height, rows, cols, x, y, z, frame_sequence){
+			return cge_create_anim_sprite(this.sprites_data, image_source, width, height, rows, cols, x, y, z,frame_sequence);
+		};
 		
 		this.alive = true;
 		this.start();
