@@ -1,14 +1,58 @@
 
 
-function cge_create_map_data_object(scene_data, sprite_data_object){
+function cge_create_map_data_object(map_data, sprite_data_object){
 	var o = new Object;
-	o.layers = scene_data["layers"];
-	o.tileset_name = scene_data["tileset_name"];
-	o.tileset_grid_size = scene_data["tileset_grid_size"];
-	o.tileset_zoom_factor = scene_data["tileset_zoom_factor"];
-	o.tileset_row_width = scene_data["tileset_row_width"];
-	o.sprites = scene_data["sprites"];
-	o.sprite_data_object = sprite_data_object;
+	o.layers = map_data["layers"];
+	o.tileset_name = map_data["tileset_name"];
+	o.tileset_grid_size = map_data["tileset_grid_size"];
+	o.tileset_zoom_factor = map_data["tileset_zoom_factor"];
+	o.tileset_row_width = map_data["tileset_row_width"];
+	o.sprites_data = sprite_data_object;
+	o.sprites_data.move_interpreter.map_data = this;
+	o.scroll_x = 0;
+	o.scroll_y = 0;
+	o.images_deleted = false;
+	o.images = [];
+	o.events = [];
+	o.loaded = true;
+	
+	o.add_chara = function(chara_data){
+		var chara_sprite = cge_create_character(this.sprites_data, chara_data["source"], chara_data["width"], chara_data["height"], chara_data["rows"], chara_data["cols"], chara_data["x"], chara_data["y"], chara_data["z"], chara_data["face"]);
+		var m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
+		chara_sprite.add_move(m);
+		m = cge_create_move(this.sprites_data.move_interpreter , "move", chara_sprite, [300,[-0.7,0.7]]);
+		chara_sprite.add_move(m);
+		m = cge_create_move(this.sprites_data.move_interpreter , "move", chara_sprite, [300,2]);
+		chara_sprite.add_move(m);
+		m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
+		chara_sprite.add_move(m);
+		m = cge_create_move(this.sprites_data.move_interpreter , "turn", chara_sprite, [1]);
+		chara_sprite.add_move(m);
+		this.images.push(chara_sprite);
+	};
+	
+	for(var chara in map_data["chara"]){
+		o.add_chara(map_data["chara"][chara]);
+	}
+	
+	o.restore_images = function(){
+		if(this.images_deleted){
+			for (var i in this.images){
+				this.sprites_data.add_image(i);
+			}
+		}
+	};
+	
+	o.delete_images = function(){
+		for (var i in this.images){
+			i.remove();
+		}
+		this.images_deleted = true;
+	};
+	
+	o.update = function(ctx){
+		this.draw_tiled_map(ctx, this.scroll_x, this.scroll_y);
+	};
 	
 	o.draw_tiled_map = function(ctx, scroll_x, scroll_y){
 		var img = new Image();
@@ -27,6 +71,7 @@ function cge_create_map_data_object(scene_data, sprite_data_object){
 					}
 				}
 			}
+			this.sprites_data.update_images(ctx, z, z);
 		}
 	};
 	
