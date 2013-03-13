@@ -7,8 +7,9 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 	o.tileset_grid_size = map_data["tileset_grid_size"];
 	o.tileset_zoom_factor = map_data["tileset_zoom_factor"];
 	o.tileset_row_width = map_data["tileset_row_width"];
+	o.tileset_passable = map_data["tileset_passable"];
 	o.sprites_data = sprite_data_object;
-	o.sprites_data.move_interpreter.map_data = this;
+	o.sprites_data.move_interpreter.map_data = o;
 	o.scroll_x = 0;
 	o.scroll_y = 0;
 	o.images_deleted = false;
@@ -18,16 +19,23 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 	
 	o.add_chara = function(chara_data){
 		var chara_sprite = cge_create_character(this.sprites_data, chara_data["source"], chara_data["width"], chara_data["height"], chara_data["rows"], chara_data["cols"], chara_data["x"], chara_data["y"], chara_data["z"], chara_data["face"]);
-		var m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
-		chara_sprite.add_move(m);
-		m = cge_create_move(this.sprites_data.move_interpreter , "move", chara_sprite, [300,[-0.7,0.7]]);
-		chara_sprite.add_move(m);
-		m = cge_create_move(this.sprites_data.move_interpreter , "move", chara_sprite, [300,2]);
+		if(chara_data["moves"] != null){
+			for(var i=0; i < chara_data["moves"].length; i++){
+				var m = cge_create_move(this.sprites_data.move_interpreter , chara_data["moves"][i][0], chara_sprite, chara_data["moves"][i][1], chara_data["moves"][i][2]);
+				chara_sprite.add_move(m);
+			}
+		}
+		//var m;
+		//m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
+		//chara_sprite.add_move(m);
+	//	m = cge_create_move(this.sprites_data.move_interpreter , "walk", chara_sprite, [300,[-0.7,0.7]]);
+	//	chara_sprite.add_move(m);
+		/*m = cge_create_move(this.sprites_data.move_interpreter , "walk", chara_sprite, [600,3]);
 		chara_sprite.add_move(m);
 		m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
 		chara_sprite.add_move(m);
 		m = cge_create_move(this.sprites_data.move_interpreter , "turn", chara_sprite, [1]);
-		chara_sprite.add_move(m);
+		chara_sprite.add_move(m);*/
 		this.images.push(chara_sprite);
 	};
 	
@@ -73,6 +81,20 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 			}
 			this.sprites_data.update_images(ctx, z, z);
 		}
+	};
+	
+	o.passable = function(x, y, dir){
+		var gs = this.tileset_grid_size*this.tileset_zoom_factor;
+		x = parseInt(x/gs);
+		y = parseInt(y/gs);
+		for(var z=0; z < this.layers.length; z++){
+			if(this.layers[z] != null && this.layers[z][y] != null && this.layers[z][y][x] != null){
+				if(this.tileset_passable[this.layers[z][y][x]] != null && this.tileset_passable[this.layers[z][y][x]][dir]==1){
+					return false;
+				}
+			}
+		}
+		return true;
 	};
 	
 	return o;

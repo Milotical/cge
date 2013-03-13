@@ -30,10 +30,10 @@ function create_game_object(html_id, system_infos){
 	// main loop
 	o.update = function(){
 		var new_date = new Date();
-		if((new_date.getTime() - this.death_timer_date.getTime()) > this.death_timer){
+		/*if((new_date.getTime() - this.death_timer_date.getTime()) > this.death_timer){
 			alert("Error: Game Timeout ("+(new_date.getTime() - this.death_timer_date.getTime())/1000+" sec delay for main-loop). Game terminated!");
 			this.alive = false;
-		}
+		}*/
 		if((new_date.getTime() - this.frame_counter_date) >= 1000){
 			$("#"+this.html_id+"_fps").html('fps: '+(this.frame_counter));
 			this.frame_counter = 0;

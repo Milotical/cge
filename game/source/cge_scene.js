@@ -16,14 +16,18 @@ function cge_create_scene(main_object){
 		var scene_data = [];
 		scene_data["layers"] = [];
 		scene_data["layers"][0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
-		scene_data["layers"][1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,7,0,0,0,0,0,0,0,7,0,0,0,0,0,0,0,0,0,0,0]];
+		scene_data["layers"][1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
 		scene_data["layers"][2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
 		scene_data["tileset_name"] = "Testset.png";
 		scene_data["tileset_grid_size"] = 32;
 		scene_data["tileset_zoom_factor"] = 1.0;
 		scene_data["tileset_row_width"] = 8;
+		scene_data["tileset_passable"] = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
 		scene_data["chara"] = [];
-		scene_data["chara"][0] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 310, "y" : 70, "z" : 1, "face" : 0};
+		scene_data["chara"][0] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 320, "y" : 64, "z" : 1, "face" : 0};
+		scene_data["chara"][0]["moves"] = [["walk",[600,3]]];
+		scene_data["chara"][1] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 224, "y" : 64, "z" : 1, "face" : 0};
+		scene_data["chara"][1]["moves"] = [["walk",[600,1]]];
 		
 		this.sprites_data = cge_create_sprites_data();
 		this.map_data = cge_create_map_data_object(scene_data, this.sprites_data);
@@ -32,7 +36,7 @@ function cge_create_scene(main_object){
 		
 		this.start = function(){
 			this.map_data.restore_images();
-			this.test_image = this.new_image("Poyo.png",100,100,1,200.1,102);
+		//	this.test_image = this.new_image("Poyo.png",100,100,1,200.1,102);
 			/*this.test_image2 = this.new_image("Poyo.png",100,100,50,250,101);
 			this.test_image3 = this.new_image("Poyo.png",100,100,100,230,-1);
 			this.test_image2.set_z(103);
@@ -46,9 +50,8 @@ function cge_create_scene(main_object){
 			ctx.clearRect ( 0 , 0 , this.main_object.resolution[0] , this.main_object.resolution[1] );
 			this.sprites_data.update_images(ctx, null, -1);
 			this.map_data.update(ctx);
-			this.sprites_data.update();
-			
 			this.sprites_data.update_images(ctx, this.map_data.layers.length);
+			this.sprites_data.update();
 		};
 		this.end = function(){
 			this.test_image.remove();

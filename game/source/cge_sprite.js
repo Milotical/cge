@@ -18,14 +18,6 @@ function cge_create_sprites_data(){
 		if(this.images[image.z][y] == null)
 			this.images[image.z][y] = [];
 		this.images[image.z][y].push(image);
-		if(image.z < this.min_z)
-			this.min_z = image.z;
-		if(image.z > this.max_z)
-			this.max_z = image.z;
-		if(y < this.min_y)
-			this.min_y = y;
-		if(y > this.max_y)
-			this.max_y = y;
 	};
 	
 	// remove image (automatocally called when image was removed)
@@ -41,22 +33,17 @@ function cge_create_sprites_data(){
 	};
 	
 	// draws images to canvas element
-	o.update_images = function(ctx, z_min, z_max, y_min, y_max){
+	o.update_images = function(ctx, z_min, z_max){
 		if(z_min == null)
-			z_min = this.min_z;
+			z_min = Number.NEGATIVE_INFINITY;
 		if(z_max == null)
-			z_max = this.max_z;
-		if(y_min == null)
-			y_min = this.min_y;
-		if(y_max == null)
-			y_max = this.max_y;
-		for(var z=z_min; z <= z_max; z++){
-			if(this.images[z]){
-				for(var y=y_min; y <= y_max; y++){
-					if(this.images[z][y]){
-						for (var i in this.images[z][y]){
-							this.images[z][y][i].update(ctx);
-						}
+			z_max = Number.POSITIVE_INFINITY;
+		for(var z in this.images){
+			if(z >= z_min && z <= z_max){
+				for(var y in this.images[z]){
+					var clone_images = this.images[z][y].slice(0);
+					for (var i in clone_images){
+						clone_images[i].update(ctx);
 					}
 				}
 			}
@@ -96,6 +83,19 @@ function cge_create_spriteset(){
 	
 	o.remove_all = function(){
 		this.sprites = [];
+	};
+	
+	o.check_collision = function(chara, dir){
+		var return_value = false;
+		var b;
+		var c = chara.get_hitbox();
+		for(var i=0; i < this.sprites.length; i++){
+			b = this.sprites[i].get_hitbox();
+			if(!(chara.x+c.width <= this.sprites[i].x || chara.x >= this.sprites[i].x+b.width || chara.y+c.height <= this.sprites[i].y || chara.y >= this.sprites[i].y+b.height) && chara != this.sprites[i]){
+				return_value = true;
+			}
+		}
+		return return_value;
 	};
 	
 	return o;
@@ -297,7 +297,7 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	if(cols == null)
 		cols = 4;
 	if(faceing == null)
-		faceing = 0;
+		faceing = 2;
 	var o = cge_create_anim_sprite(sprite_data_object, image_source, width, height, rows, cols, x, y, z, [[0,0]]);
 	o.faceing = faceing;
 	o.moves = [];
@@ -313,6 +313,7 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	//o.show_hitbox = false;
 	o.basic_frame_time = 10;
 	o.col_spritesets = [];
+	o.map_collider = true;
 	
 	o.load_sequence = function(sequence_key, faceing){
 		if(faceing == null)
@@ -328,14 +329,14 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 		return this.hitbox;
 	};
 	
-	o.write_sequence(0, "stand",[[0,0]]);
-	o.write_sequence(1, "stand",[[0,1]]);
-	o.write_sequence(2, "stand",[[0,2]]);
-	o.write_sequence(3, "stand",[[0,3]]);
-	o.write_sequence(0, "walk",[[0,0],[1,0],[2,0],[3,0]]);
-	o.write_sequence(1, "walk",[[0,1],[1,1],[2,1],[3,1]]);
-	o.write_sequence(2, "walk",[[0,2],[1,2],[2,2],[3,2]]);
-	o.write_sequence(3, "walk",[[0,3],[1,3],[2,3],[3,3]]);
+	o.write_sequence(2, "stand",[[0,0]]);
+	o.write_sequence(3, "stand",[[0,1]]);
+	o.write_sequence(1, "stand",[[0,2]]);
+	o.write_sequence(0, "stand",[[0,3]]);
+	o.write_sequence(2, "walk",[[0,0],[1,0],[2,0],[3,0]]);
+	o.write_sequence(3, "walk",[[0,1],[1,1],[2,1],[3,1]]);
+	o.write_sequence(1, "walk",[[0,2],[1,2],[2,2],[3,2]]);
+	o.write_sequence(0, "walk",[[0,3],[1,3],[2,3],[3,3]]);
 	
 	o.update_anim = o.update;
 	o.update = function(ctx){
@@ -345,6 +346,7 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 			}
 			this.update_anim(ctx);
 		}
+		
 	};
 	
 	o.moves_ready = function(){
