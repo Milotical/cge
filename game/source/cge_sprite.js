@@ -85,13 +85,14 @@ function cge_create_spriteset(){
 		this.sprites = [];
 	};
 	
-	o.check_collision = function(chara, dir){
+	o.check_collision = function(new_r, chara, dir){
 		var return_value = false;
 		var b;
 		var c = chara.get_hitbox();
 		for(var i=0; i < this.sprites.length; i++){
 			b = this.sprites[i].get_hitbox();
-			if(!(chara.x+c.width <= this.sprites[i].x || chara.x >= this.sprites[i].x+b.width || chara.y+c.height <= this.sprites[i].y || chara.y >= this.sprites[i].y+b.height) && chara != this.sprites[i]){
+			if(!(new_r[0]+c.width <= this.sprites[i].x || new_r[0] >= this.sprites[i].x+b.width || new_r[1]+c.height <= this.sprites[i].y || new_r[1] >= this.sprites[i].y+b.height) && chara != this.sprites[i]){
+				//alert(chara.x+" "+c.width+" "+chara.y+" "+c.height+" ; "+this.sprites[i].x+" "+b.width+" "+this.sprites[i].y+" "+b.height);
 				return_value = true;
 			}
 		}
@@ -372,6 +373,11 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	
 	o.add_move = function(move){
 		this.moves.push(move);
+	};
+	
+	o.add_col_spriteset = function(set_id){
+		this.col_spritesets.push(this.sprite_data_object .spritesets[set_id]);
+		this.sprite_data_object.spritesets[set_id].add_sprite(this);
 	};
 	
 	return o;

@@ -25,6 +25,13 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 				chara_sprite.add_move(m);
 			}
 		}
+		if(chara_data["blocking_classes"] != null){
+			for(var i=0; i < chara_data["blocking_classes"].length; i++){
+				if(this.sprites_data.spritesets[chara_data["blocking_classes"][i]] == null)
+					this.sprites_data.create_spriteset(chara_data["blocking_classes"][i]); 
+				chara_sprite.add_col_spriteset(chara_data["blocking_classes"][i]);
+			}
+		}
 		//var m;
 		//m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
 		//chara_sprite.add_move(m);
