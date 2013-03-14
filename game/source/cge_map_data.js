@@ -8,6 +8,8 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 	o.tileset_zoom_factor = map_data["tileset_zoom_factor"];
 	o.tileset_row_width = map_data["tileset_row_width"];
 	o.tileset_passable = map_data["tileset_passable"];
+	o.variables = {};
+	o.temp_variables = {};
 	o.sprites_data = sprite_data_object;
 	o.sprites_data.move_interpreter.map_data = o;
 	o.scroll_x = 0;

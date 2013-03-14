@@ -5,10 +5,14 @@ function cge_create_scene(main_object){
 	o.alive = false;									
 	o.new_scene_id = 0;
 	o.main_object = main_object;
+	o.variables = {};
+	o.temp_variables = {};
 	
 	o.start = function(){ };
 	o.update = function(){ };
 	o.end = function(){ };
+	
+	o.main_object.trigger_data.remove_all_scene_events();
 	
 	// order new scene from the server
 	o.order_new_scene_data = function(){
@@ -26,17 +30,26 @@ function cge_create_scene(main_object){
 		scene_data["chara"] = [];
 		
 		for(var i=0; i<40; i++){
+			//scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : i*10, "y" : i*10, "z" : 1, "face" : 0};
 			scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 0};
-			scene_data["chara"][i]["moves"] = [["walk",[parseInt(Math.random()*200),"random"],0]];
+			//scene_data["chara"][i]["moves"] = [["walk",[parseInt(Math.random()*200),"random","frames"],0]];
+			scene_data["chara"][i]["moves"] = [ ["walk",[100,"towards_chara","dist",0],0]];
+			
 			scene_data["chara"][i]["blocking_classes"] = ["std"];
 		}
 		
-		
-		/*scene_data["chara"][1] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 124, "y" : 30, "z" : 1, "face" : 0};
-		scene_data["chara"][1]["moves"] = [["walk",[100,1]],["stand"],["wait",[100]],["walk",[100,3]],["stand"]];
+		/*scene_data["chara"][0] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 234, "y" : 172, "z" : 1, "face" : 2};
+		scene_data["chara"][0]["moves"] = [["wait",[100]],["walk",[32,"angle","dist_away_point",-90,[234,172,100]]],["stand"],["wait",[100]],["walk",[100,1,"frames"]],["stand"]];
+		scene_data["chara"][0]["blocking_classes"] = ["std"];
+		/*scene_data["chara"][1] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 334, "y" : 172, "z" : 1, "face" : 2};
+		scene_data["chara"][1]["moves"] = [["walk",[32,"towards_point","dist",[320,240]]],["stand"],["wait",[100]],["walk",[100,3,"frames"]],["stand"]];
 		scene_data["chara"][1]["blocking_classes"] = ["std"];
-		*/
-		this.sprites_data = cge_create_sprites_data();
+		/*scene_data["chara"][2] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 224, "y" : 100, "z" : 1, "face" : 2};
+		scene_data["chara"][2]["moves"] = [["walk",[100,2]],["stand"],["wait",[100]],["walk",[100,3]],["stand"]];
+		scene_data["chara"][2]["blocking_classes"] = ["std"];*/
+		
+		this.sprites_data = cge_create_sprites_data(this.main_object);
+		this.main_object.trigger_data.remove_all_map_events();
 		this.map_data = cge_create_map_data_object(scene_data, this.sprites_data);
 		
 		this.ta = [];
@@ -50,6 +63,8 @@ function cge_create_scene(main_object){
 			this.test_image4 = this.new_sprite("Poyo.png", 228, 940, 10, 2, 200, 200, 101);*/
 			//this.test_image5 = this.new_anim_sprite("Poyo.png", 228, 940, 10, 2, 200, 310, 101, [[0,3],[1,3]]);
 			//this.test_image5.repeat = true;
+			this.main_object.trigger_data.update("start_scene");
+			this.main_object.trigger_data.update("start_map");
 		};
 		this.update = function(){
 			var canv = $('#'+this.main_object.html_id+'_canvas');
@@ -61,6 +76,8 @@ function cge_create_scene(main_object){
 			this.sprites_data.update();
 		};
 		this.end = function(){
+			this.main_object.trigger_data.update("end_map");
+			this.main_object.trigger_data.update("end_scene");
 			this.test_image.remove();
 			delete  this.test_image;
 			this.test_image2.remove();

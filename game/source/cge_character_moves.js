@@ -3,23 +3,28 @@
 	List of Move-ids and their effects:
 	
 	-wait 															: 	waits a number of frames
-	-move														:	moves character a given number of frames in a specific direction (without any change in its animation)
-	-move_steps											:	moves character a given number of  steps in a specific direction (without any change in its animation) ~ Only valid for grid-walking
-	-move_distance										:	moves character a given distance in pixels in a specific direction (without any change in its animation) ~ Only valid for free walking
-	-walk															:	character walks a given number of frames in a specific direction
+	-move														:	moves character in a specific direction (without any change in its animation)
+	-walk															:	character walks in a specific direction (without any change in its animation)
 	-stand														: 	character shows stand-anim (e.g. stops walk anim)
+	-turn															:	changes the faceing direction of character
 	-change_sequence 								:	changes the animation sequence of the character
 	-change_image										:	changes the image file of the character
-	-turn															:	changes the faceing direction of character
+	-change_speed										:	changes the move-speed of the character
+	-change_map_col									:	changes the map-col properties of the chatacter
+	-change_trough										:	changes the general collision properties
+	-change_var												:	changes a gam variable
 	-change_zoom										:	change zoom of the character
 	-load_sequence										:	loads a special sequence of the character
 	-execute_function									:	executes a given javascript function
 */
 
-function cge_create_move_interpreter(){
+
+// creates the object that interprets move-commands
+function cge_create_move_interpreter(trigger_data){
 	var o = new Object;
 	o.map_data = null;
 	o.grid_walk = false;
+	o.trigger_data = trigger_data;
 	
 	o.update = function(chara, move){
 		switch(move["id"]){
@@ -31,47 +36,20 @@ function cge_create_move_interpreter(){
 				chara.load_sequence("stand");
 				move.ready = true;
 				break;
-			case "walk" : // p = [#franes, direction]
+			case "walk" : // p = [stop_parameter, direction, stop_event, (direction_parameter, stop_event_parameter)]
 				if(move.frame_index == 0){
-					move.special_attr = this.get_direction_from_direction_parameter(move.para[1]);
+					move.special_attr = this.get_direction_from_direction_parameter(move.para[1],move.para[3], chara);
 					chara.faceing = this.get_faceing_from_direction(move.special_attr);
 					chara.load_sequence("walk");
 				}
 				this.move_update(chara, move, move.special_attr);
-				if(move.frame_index >= move.para[0]){
-					if(!this.grid_walk || (parseInt(chara.x)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0 && parseInt(chara.y)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0)){
-						move.ready = true;
-					}
-				}
 				break;
-			case "move": // p = [#franes, direction]
+			case "move": // p =  [stop_parameter, direction, stop_event, (direction_parameter, stop_event_parameter)]
 				this.move_update(chara, move);
-				if(move.frame_index >= move.para[0]){
-					if(!this.grid_walk || (parseInt(chara.x)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0 && parseInt(chara.y)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0)){
-						move.ready = true;
-					}
-				}
 				break;
-			case "move_distance" : // p = [distance in px, direction]
-				this.move_update(chara, move);
-				move.special_counter += chara.speed;
-				if(move.special_counter == move.para[0]){
-					move.ready = true;
-					move.special_counter = 0;
-				}
-				break;
-			case "move_steps": // only valid for grid walking // p = [#steps, direction]
-				this.move_update(chara, move);
-				if(parseInt(chara.x)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0 && parseInt(chara.y)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0){
-					move.special_counter++;
-					if(move.special_counter == move.para[0]){
-						move.ready = true;
-						move.special_counter = 0;
-					}
-				}
-				break;
-			case "turn":
-				chara.faceing = move.para[0];
+			case "turn": // p = [direction, (direction_parameter)]
+				var dir = this.get_direction_from_direction_parameter(move.para[0], move.para[1], move);
+				chara.faceing = this.get_faceing_from_direction(dir);;
 				chara.load_sequence("stand");
 				move.ready = true;
 				break;
@@ -95,6 +73,22 @@ function cge_create_move_interpreter(){
 					chara.height = move.para[2];
 				move.ready = true;
 				break;
+			case "change_speed" :
+				chara.speed = move.para[0];
+				move.ready = true;
+				break;
+			case "change_map_col" :	
+				chara.map_collider = move.para[0];
+				move.ready = true;
+				break;
+			case "change_trough" :
+				chara.trough = move.para[0];
+				move.ready = true;
+				break;
+			case "change_var" :
+				// ...
+				move.ready = true;
+				break;
 			case "load_sequence": // p = [sequence key, (faceing)]
 				chara.load_sequence(move.para[0], move.para[1]);
 				move.ready = true;
@@ -113,7 +107,7 @@ function cge_create_move_interpreter(){
 		}
 	};
 	
-	o.get_direction_from_direction_parameter = function(dir_para){
+	o.get_direction_from_direction_parameter = function(dir_para, dir_para2, chara){
 		var dir = dir_para;
 		if (!(dir instanceof Array)){
 			switch(dir){
@@ -139,17 +133,69 @@ function cge_create_move_interpreter(){
 					break;
 				case "random_sharp" :	
 					dir = parseInt(Math.random()*4);
-					dir = this.get_direction_from_direction_parameter(dir);
+					dir = this.get_direction_from_direction_parameter(dir, dir_para2, chara);
+					break;
+				case "towards_point" :
+					var dx = dir_para2[0]-chara.x;
+					var dy = dir_para2[1]-chara.y;
+					var r = Math.sqrt(dx*dx+dy*dy);
+					dir = [(dx)/r, (dy)/r];
+					break;
+				case "away_point" :
+					var dx = chara.x-dir_para2[0];
+					var dy = chara.y-dir_para2[1];
+					var r = Math.sqrt(dx*dx+dy*dy);
+					dir = [(dx)/r, (dy)/r];
+					break;
+				case "towards_chara" :
+					var chara2 = this.map_data.images[dir_para2];
+					var dx = chara2.x-chara.x;
+					var dy = chara2.y-chara.y;
+					var r = Math.sqrt(dx*dx+dy*dy);
+					dir = [(dx)/r, (dy)/r];
+					break;
+				case "away_chara" :
+					var chara2 = this.map_data.images[dir_para2];
+					var dx = chara.x-chara2.x;
+					var dy = chara.y-chara2.y;
+					var r = Math.sqrt(dx*dx+dy*dy);
+					dir = [(dx)/r, (dy)/r];
+					break;
+				case "angle" :
+					dir = this.get_direction_from_direction_parameter(chara.faceing, dir_para2, chara);
+					var sin = Math.sin(dir_para2*Math.PI/180);
+					var cos = Math.cos(dir_para2*Math.PI/180);
+					dir = [dir[0]*cos-dir[1]*sin, dir[0]*sin+dir[1]*cos];
+					break;
+				case "forward" :
+					dir = this.get_direction_from_direction_parameter(chara.faceing, chara, move);
+					break;
+				case "backward" :
+					dir = this.get_direction_from_direction_parameter(this.get_opposite_faceing(chara.faceing), chara, move);
 					break;
 				default :
 					alert("Warning: Move with unknown Direction ID '"+dir+"' was called.");
 			}
 		}else if(dir[2] != null){
-			var r = Math.sqrt(dir[0]+dir[1]);
+			var r = Math.sqrt(dir[0]*dir[0]+dir[1]*dir[1]);
 			dir = [dir[0]/r, dir[1]/r];
 		}
 		return dir;
 	};
+	
+	o.get_opposite_faceing = function(faceing){
+		switch(dir){
+			case 0 :
+				return 3;
+			case 1 :
+				return 2;
+			case 2 :
+				return 1;
+			case 3 :
+				return 0;
+		}
+		return 0;
+	}
 	
 	o.move_update = function(chara, move, dir){
 		// Calculate velocity from speed and direction
@@ -239,9 +285,114 @@ function cge_create_move_interpreter(){
 				}
 			}
 		}
+		if(blocked){
+			this.trigger_data.update("blocked");
+		}
+		switch(move.para[2]){
+			case "frames" :
+				if(move.frame_index >= move.para[0]){
+					if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist" :
+				if(!this.grid_walk){
+					move.special_counter += chara.speed;
+				}else if(this.grid_walk && this.check_grid_walk_point(chara.x, chara.y)){
+					move.special_counter++;
+				}
+				if(move.special_counter == move.para[0]){
+					move.ready = true;
+					move.special_counter = 0;
+				}
+				break;
+			case "dist_away_point" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dx = move.para[4][0]-chara.x;
+					var dy = move.para[4][1]-chara.y;
+					var dist = move.para[4][2];
+					if(dx*dx+dy*dy >= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist_towards_point" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dx = move.para[4][0]-chara.x;
+					var dy = move.para[4][1]-chara.y;
+					var dist = move.para[4][2];
+					if(dx*dx+dy*dy <= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist_away_x" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dx = move.para[4][0]-chara.x;
+					var dist = move.para[4][1];
+					if(dx*dx >= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist_away_y" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dy = move.para[4][0]-chara.y;
+					var dist = move.para[4][1];
+					if(dy*dy >= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist_towards_x" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dx = move.para[4][0]-chara.x;
+					var dist = move.para[4][1];
+					if(dx*dx <= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist_towards_y" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dy = move.para[4][0]-chara.y;
+					var dist = move.para[4][1];
+					if(dy*dy <= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "dist_away_x" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					var dx = move.para[4][0]-chara.x;
+					var dist = move.para[4][1];
+					if(dx*dx >= dist*dist){
+						move.ready = true;
+					}
+				}
+				break;
+			case "blocked" 	:
+				if(!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y)){
+					if(blocked){
+						move.ready = true;
+					}
+				}
+				break;
+			default :
+				alert("Warning: Move with unknown Stop Event ID '"+move.para[2]+"' was called.");
+				move.ready = true;
+				break;
+		}
+	};
+	
+	o.check_grid_walk_point = function(x, y){
+		return (parseInt(x)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0 && parseInt(y)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0);
 	};
 	
 	o.check_collision = function(new_r, chara, velocity, coord_index){
+		if(chara.trough)
+			return false;
 		var return_value = true;
 		var map_collision = false;
 		var x0, y0, xi, yi;
@@ -325,6 +476,7 @@ function cge_create_move_interpreter(){
 	return o;
 }
 
+// creates a move-command
 function cge_create_move(move_interpreter, id, chara, parameter, repeat){
 	var o = new Object;
 	o.chara = chara;

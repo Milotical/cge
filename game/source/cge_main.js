@@ -9,6 +9,7 @@ function create_game_object(html_id, system_infos){
 	o.resolution = system_info["resolution"]; 			// array defining the resolution
 	o.alive = true;															// defines if game is running
 	o.frame_duration = 1000.0/system_info["fps"];		// defines the waiting time between 2 frames
+	o.trigger_data = cge_create_trigger_data();
 	o.scene = cge_create_scene(o);
 	o.death_timer_date = new Date();
 	o.death_timer = system_info["death_timer"];
@@ -48,10 +49,28 @@ function create_game_object(html_id, system_infos){
 				this.scene.end();
 			this.scene.order_new_scene_data(this.new_scene_id);
 		}
-		if(!this.alive)
+		this.trigger_data.update("auto");
+		if(!this.alive){
 			clearInterval(this.interval_id);
+			this.trigger_data.update("end_game");
+		}	
 	};
 	o.create_canvas_element();
+	$(document).bind('keypress', function(e) {
+		var code = e.keyCode ? e.keyCode : e.which;
+		o.trigger_data.update("keypress_"+code);
+	});
+	$(document).bind('keyup', function(e) {
+		var code = e.keyCode ? e.keyCode : e.which;
+		o.trigger_data.update("keyup_"+code);
+	});
+	$(document).bind('keydown', function(e) {
+		var code = e.keyCode ? e.keyCode : e.which;
+		o.trigger_data.update("keydown_"+code);
+	});
+	
+	o.trigger_data.update("start_game");
 	o.interval_id = setInterval(function(){o.update()}, o.frame_duration);
+	
 	return o;
 }

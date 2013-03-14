@@ -1,20 +1,20 @@
 
 // created sprites data object which manages images, sprites etc.
-function cge_create_sprites_data(){
+function cge_create_sprites_data(main_object){
 	var o = new Object();
-	o.images = [];
+	o.images = {};
 	o.min_z = 0;
 	o.max_z = 0;
 	o.min_y = 0;
 	o.max_y = 0;
-	o.move_interpreter = cge_create_move_interpreter();
+	o.move_interpreter = cge_create_move_interpreter(main_object.trigger_data);
 	o.spritesets = [];
 	
 	// add image (automatically called when image etc. was created)
 	o.add_image = function(image){
 		var y = parseInt(image.y);
 		if(this.images[image.z] == null)
-			this.images[image.z] = [];
+			this.images[image.z] = {};
 		if(this.images[image.z][y] == null)
 			this.images[image.z][y] = [];
 		this.images[image.z][y].push(image);
@@ -38,10 +38,14 @@ function cge_create_sprites_data(){
 			z_min = Number.NEGATIVE_INFINITY;
 		if(z_max == null)
 			z_max = Number.POSITIVE_INFINITY;
-		for(var z in this.images){
+		var image_z_keys = Object.keys(this.images);
+		image_z_keys.sort(function(a,b){return (a-b);});
+		for(var z in image_z_keys){
 			if(z >= z_min && z <= z_max){
-				for(var y in this.images[z]){
-					var clone_images = this.images[z][y].slice(0);
+				var image_y_keys = Object.keys(this.images[image_z_keys[z]]);
+				image_y_keys.sort(function(a,b){return (a-b);});
+				for(var y in image_y_keys){
+					var clone_images = this.images[image_z_keys[z]][image_y_keys[y]].slice(0);
 					for (var i in clone_images){
 						clone_images[i].update(ctx);
 					}
@@ -156,8 +160,8 @@ function cge_create_image(sprite_data_object, image_source, width, height, x, y,
 	};
 	
 	o.update = function(ctx){
-		if(!this.updated && this.visible)
-			this.draw(ctx);
+		//if(!this.updated && this.visible)
+		this.draw(ctx);
 		this.updated = true;
 	};
 	
@@ -261,10 +265,10 @@ function cge_create_anim_sprite(sprite_data_object, image_source, width, height,
 					}
 				}
 			}
-			if(this.visible)
-				this.draw(ctx);
 			this.updated = true;	
 		}
+		if(this.visible)
+			this.draw(ctx);
 	};
 	
 	o.set_sequence = function(new_sequence, repeat){
@@ -306,15 +310,17 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	o.sleep = false;
 	o.repeat = true;
 	o.special_sequences = [[],[],[],[]];
-	o.speed = 1;
+	o.speed = 2;
 	o.map_collision = true;
 	o.chara_collision_condition = "all";
 	o.hitbox = cge_create_rect(0,0,32,32);
-	o.show_hitbox = true;
-	//o.show_hitbox = false;
+	//o.show_hitbox = true;
+	o.show_hitbox = false;
 	o.basic_frame_time = 10;
 	o.col_spritesets = [];
 	o.map_collider = true;
+	o.trough = false;
+	o.variables = {};
 	
 	o.load_sequence = function(sequence_key, faceing){
 		if(faceing == null)
@@ -380,5 +386,6 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 		this.sprite_data_object.spritesets[set_id].add_sprite(this);
 	};
 	
+	o.load_sequence("stand");
 	return o;
 }
