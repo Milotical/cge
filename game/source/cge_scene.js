@@ -11,7 +11,7 @@ function cge_create_scene(main_object){
 	o.start = function(){ };
 	o.update = function(){ };
 	o.end = function(){ };
-	
+	o.ctx = null;
 	o.main_object.trigger_data.remove_all_scene_events();
 	
 	// order new scene from the server
@@ -29,7 +29,7 @@ function cge_create_scene(main_object){
 		scene_data["tileset_passable"] = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
 		scene_data["chara"] = [];
 		
-		for(var i=0; i<40; i++){
+		for(var i=0; i<60; i++){
 			//scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : i*10, "y" : i*10, "z" : 1, "face" : 0};
 			scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 0};
 			//scene_data["chara"][i]["moves"] = [["walk",[parseInt(Math.random()*200),"random","frames"],0]];
@@ -65,16 +65,19 @@ function cge_create_scene(main_object){
 			//this.test_image5.repeat = true;
 			this.main_object.trigger_data.update("start_scene");
 			this.main_object.trigger_data.update("start_map");
+			var canv = $('#'+this.main_object.html_id+'_canvas');
+			this.ctx = canv[0].getContext('2d');
 		};
 		this.update = function(){
-			var canv = $('#'+this.main_object.html_id+'_canvas');
-			var ctx = canv[0].getContext('2d');
-			ctx.clearRect ( 0 , 0 , this.main_object.resolution[0] , this.main_object.resolution[1] );
-			this.sprites_data.update_images(ctx, null, -1);
-			this.map_data.update(ctx);
-			this.sprites_data.update_images(ctx, this.map_data.layers.length);
-			this.sprites_data.update();
+			this.sprites_data.update_images();
+			//this.sprites_data.update_images(this.ctx, null, -1);
+			//this.map_data.update(this.ctx);
+			//this.sprites_data.update_images(this.ctx, this.map_data.layers.length);
+			this.sprites_data.draw_images(this.ctx, null, -1);
+			this.map_data.draw_tiled_map(this.ctx);
+			this.sprites_data.draw_images(this.ctx, this.map_data.layers.length);
 		};
+		
 		this.end = function(){
 			this.main_object.trigger_data.update("end_map");
 			this.main_object.trigger_data.update("end_scene");

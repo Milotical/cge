@@ -2,29 +2,24 @@
 // created sprites data object which manages images, sprites etc.
 function cge_create_sprites_data(main_object){
 	var o = new Object();
-	o.images = {};
+	o.images = [];
 	o.min_z = 0;
 	o.max_z = 0;
 	o.min_y = 0;
 	o.max_y = 0;
+	o.main_object = main_object;
 	o.move_interpreter = cge_create_move_interpreter(main_object.trigger_data);
 	o.spritesets = [];
 	
 	// add image (automatically called when image etc. was created)
 	o.add_image = function(image){
-		var y = parseInt(image.y);
-		if(this.images[image.z] == null)
-			this.images[image.z] = {};
-		if(this.images[image.z][y] == null)
-			this.images[image.z][y] = [];
-		this.images[image.z][y].push(image);
+		this.images.push(image);
 	};
 	
 	// remove image (automatocally called when image was removed)
 	o.remove_image = function(image){
-		var a = this.images[image.z][parseInt(image.y)];
-		var index = a.indexOf(image);
-		this.images[image.z][parseInt(image.y)].splice(index, 1);
+		var index = this.images.indexOf(image);
+		this.images.splice(index, 1);
 	};
 	
 	// forgets all images
@@ -32,48 +27,46 @@ function cge_create_sprites_data(main_object){
 		this.images = [];
 	};
 	
+	o.update_images = function(){
+		for(var i=0; i < this.images.length; i++){
+			this.images[i].update();
+		}
+	};
 	// draws images to canvas element
-	o.update_images = function(ctx, z_min, z_max){
+	o.draw_images = function(ctx, z_min, z_max){
 		if(z_min == null)
 			z_min = Number.NEGATIVE_INFINITY;
 		if(z_max == null)
 			z_max = Number.POSITIVE_INFINITY;
-		var image_z_keys = Object.keys(this.images);
-		image_z_keys.sort(function(a,b){return (a-b);});
-		for(var z in image_z_keys){
-			if(z >= z_min && z <= z_max){
-				var image_y_keys = Object.keys(this.images[image_z_keys[z]]);
-				image_y_keys.sort(function(a,b){return (a-b);});
-				for(var y in image_y_keys){
-					var clone_images = this.images[image_z_keys[z]][image_y_keys[y]].slice(0);
-					for (var i in clone_images){
-						clone_images[i].update(ctx);
-					}
+		this.images.sort(function(a,b){ 
+			if(a.z != b.z){
+				return a.z-b.z;
+			}else{
+				return a.y-b.y;
+			}
+		});
+		for(var i=0; i < this.images.length; i++){
+			if(this.images[i].z >= z_min){
+				if(this.images[i].z <= z_max){
+					this.images[i].draw(ctx);
+				}else{
+					break;
 				}
 			}
 		}
 	};
 	
 	o.create_spriteset = function(id){
-		o.spritesets[id] = cge_create_spriteset();
-	};
-	
-	o.update = function(){
-		for (var z in this.images) {
-		  for(var y in this.images[z]){
-			for(var i in this.images[z][y]){
-				this.images[z][y][i].updated = false;
-			}
-		  }
-		}
+		o.spritesets[id] = cge_create_spriteset(this.main_object.trigger_data);
 	};
 	
 	return o;
 }
 
-function cge_create_spriteset(){
+function cge_create_spriteset(trigger_data){
 	var o = new Object;
 	o.sprites = [];
+	o.trigger_data = trigger_data;
 	
 	o.add_sprite = function(sprite){
 		this.sprites.push(sprite);
@@ -96,7 +89,7 @@ function cge_create_spriteset(){
 		for(var i=0; i < this.sprites.length; i++){
 			b = this.sprites[i].get_hitbox();
 			if(!(new_r[0]+c.width <= this.sprites[i].x || new_r[0] >= this.sprites[i].x+b.width || new_r[1]+c.height <= this.sprites[i].y || new_r[1] >= this.sprites[i].y+b.height) && chara != this.sprites[i]){
-				//alert(chara.x+" "+c.width+" "+chara.y+" "+c.height+" ; "+this.sprites[i].x+" "+b.width+" "+this.sprites[i].y+" "+b.height);
+				this.trigger_data.update("collision",[chara, this.sprites[i]]);
 				return_value = true;
 			}
 		}
@@ -148,22 +141,11 @@ function cge_create_image(sprite_data_object, image_source, width, height, x, y,
 	o.visible = true;
 	o.updated = false
 	
-	o.set_y = function(new_y){
-		this.sprite_data_object.remove_image(this);
-		this.y = new_y;
-		this.sprite_data_object.add_image(this);
-	};
 	o.set_z = function(new_z){
-		this.sprite_data_object.remove_image(this);
 		this.z = new_z;
-		this.sprite_data_object.add_image(this);
 	};
 	
-	o.update = function(ctx){
-		//if(!this.updated && this.visible)
-		this.draw(ctx);
-		this.updated = true;
-	};
+	o.update = function(ctx){ };
 	
 	// draws image to canvas (automatically called)
 	o.draw = function(ctx){
@@ -236,39 +218,32 @@ function cge_create_anim_sprite(sprite_data_object, image_source, width, height,
 	o.row_index = o.frame_sequence[0][1];
 	
 	o.update = function(ctx){
-		if(!this.updated){
-			if(!this.sleep){
-				this.time_index++;
-				var current_sequence_frame = this.frame_sequence[this.frame_sequence_index];
-				var frame_time = this.basic_frame_time;
-				if(current_sequence_frame["time"] != null)
-					frame_time = current_sequence_frame["time"];
-				//alert("t="+this.time_index);
-				if(this.time_index >= frame_time){
-					var new_sequence_frame = this.frame_sequence[this.frame_sequence_index+1];
-					//alert(new_sequence_frame);
-					if(new_sequence_frame != null){
-						this.time_index = 0;
-						this.frame_sequence_index++;
-						this.col_index = new_sequence_frame[0];
-						this.row_index = new_sequence_frame[1];
-					}else if(this.repeat){
-						new_sequence_frame = this.frame_sequence[0];
-						this.time_index = 0;
-						this.frame_sequence_index = 0;
-						this.col_index = new_sequence_frame[0];
-						this.row_index = new_sequence_frame[1];
-					}else{
-						if(this.clear_after_finished)
-							this.visible = false;
-					  this.sleep = true;
-					}
+		if(!this.sleep){
+			this.time_index++;
+			var current_sequence_frame = this.frame_sequence[this.frame_sequence_index];
+			var frame_time = this.basic_frame_time;
+			if(current_sequence_frame["time"] != null)
+				frame_time = current_sequence_frame["time"];
+			if(this.time_index >= frame_time){
+				var new_sequence_frame = this.frame_sequence[this.frame_sequence_index+1];
+				if(new_sequence_frame != null){
+					this.time_index = 0;
+					this.frame_sequence_index++;
+					this.col_index = new_sequence_frame[0];
+					this.row_index = new_sequence_frame[1];
+				}else if(this.repeat){
+					new_sequence_frame = this.frame_sequence[0];
+					this.time_index = 0;
+					this.frame_sequence_index = 0;
+					this.col_index = new_sequence_frame[0];
+					this.row_index = new_sequence_frame[1];
+				}else{
+					if(this.clear_after_finished)
+						this.visible = false;
+				  this.sleep = true;
 				}
 			}
-			this.updated = true;	
 		}
-		if(this.visible)
-			this.draw(ctx);
 	};
 	
 	o.set_sequence = function(new_sequence, repeat){
@@ -347,13 +322,10 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	
 	o.update_anim = o.update;
 	o.update = function(ctx){
-		if(!this.updated){
-			if(!this.moves_ready()){
-				this.moves[0].update();
-			}
-			this.update_anim(ctx);
+		if(!this.moves_ready()){
+			this.moves[0].update();
 		}
-		
+		this.update_anim(ctx);
 	};
 	
 	o.moves_ready = function(){

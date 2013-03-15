@@ -34,17 +34,6 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 				chara_sprite.add_col_spriteset(chara_data["blocking_classes"][i]);
 			}
 		}
-		//var m;
-		//m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
-		//chara_sprite.add_move(m);
-	//	m = cge_create_move(this.sprites_data.move_interpreter , "walk", chara_sprite, [300,[-0.7,0.7]]);
-	//	chara_sprite.add_move(m);
-		/*m = cge_create_move(this.sprites_data.move_interpreter , "walk", chara_sprite, [600,3]);
-		chara_sprite.add_move(m);
-		m = cge_create_move(this.sprites_data.move_interpreter , "wait", chara_sprite, [60]);
-		chara_sprite.add_move(m);
-		m = cge_create_move(this.sprites_data.move_interpreter , "turn", chara_sprite, [1]);
-		chara_sprite.add_move(m);*/
 		this.images.push(chara_sprite);
 	};
 	
@@ -68,10 +57,10 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 	};
 	
 	o.update = function(ctx){
-		this.draw_tiled_map(ctx, this.scroll_x, this.scroll_y);
+		this.draw_tiled_map(ctx);
 	};
 	
-	o.draw_tiled_map = function(ctx, scroll_x, scroll_y){
+	o.draw_tiled_map = function(ctx){
 		var img = new Image();
 		img.src = this.tileset_name;
 		//ctx.drawImage(img, x_on_image, y_on_image, width_on_image, height_on_image, x, y, width, height)
@@ -82,13 +71,14 @@ function cge_create_map_data_object(map_data, sprite_data_object){
 						var x_tileset = ((this.layers[z][y][x]-1)%this.tileset_row_width)*this.tileset_grid_size;
 						var y_tileset = (parseInt((this.layers[z][y][x]-1)/this.tileset_row_width))*this.tileset_grid_size;
 						var size_display = this.tileset_grid_size*this.tileset_zoom_factor;
-						var x_display = x*size_display-scroll_x;
-						var y_display = y*size_display-scroll_y;
+						var x_display = x*size_display;
+						var y_display = y*size_display;
 						ctx.drawImage(img, x_tileset, y_tileset, this.tileset_grid_size, this.tileset_grid_size, x_display, y_display, size_display, size_display);
 					}
 				}
 			}
-			this.sprites_data.update_images(ctx, z, z);
+			//this.sprites_data.update_images(ctx, z, z);
+			this.sprites_data.draw_images(ctx, z, z);
 		}
 	};
 	

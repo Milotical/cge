@@ -74,22 +74,47 @@ function cge_create_trigger_data(){
 	return o;
 }
 
-function create_event(){
+function create_event(event_interpreter, effects, conditions, parallel, related_chara){
 	var o = new Object;
+	o.effects = effects;
+	o.conditions = conditions;
+	o.parallel = parallel;
+	o.effect_index = 0;
+	o.chara = related_chara;
+	o.interpreter = event_interpreter;
 	
 	o.update = function(para){
 		if(this.conditions_fullfilled){
-			this.execute();
+			if(this.parallel){
+				this.execute_effect(this.effect_index, para);
+				this.effect_index++;
+				if(this.effect_index >= effects.length)
+					this.effect_index = 0;
+			}else{
+				for(var i=0; i < effects.length; i++){
+					this.execute_effect(i, para);
+				}
+			}
 		}
 	};
 	
-	o.conditions_fullfilled = function(){
-		return false;
+	o.execute_effect = function(index, para){
+		this.interpreter.execute(this, this.effects[index], para);
 	};
 	
-	o.execute = function(){
+	o.conditions_fullfilled = function(){
+		for(var i=0; i < this.conditions.length; i++){
+			if(!this.check_condition(this.condition[i])){
+				return false;
+			}
+		}
+		return true;
+	};
+	
+	o.check_condition = function(cond){
 		
-	}
+		return false;
+	};
 	
 	return o;
 }

@@ -13,23 +13,34 @@ function create_game_object(html_id, system_infos){
 	o.scene = cge_create_scene(o);
 	o.death_timer_date = new Date();
 	o.death_timer = system_info["death_timer"];
+	o.ctx;
+	o.ctx_buffer;
+	o.canv;
 	
 	// creates the canvas element
 	o.create_canvas_element = function(){
 		var div = $('#'+this.html_id);
 		var canvas_width = this.resolution[0];
 		var canvas_height = this.resolution[1];
-		div.append('<canvas id="'+html_id+'_canvas" class="game_canvas" style="border-style:solid;border-width:10px;"></canvas>');
+		div.append('<canvas id="'+html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:10px;"></canvas>');
+		div.append('<canvas id="'+html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');
 		this.frame_counter = 0;
 		this.frame_counter_date = new Date();
 		div.append('<br /><div id="'+o.html_id+'_fps">fps: </div>');
-		canv = $('#'+this.html_id+'_canvas');
+		var canv = $('#'+this.html_id+'_canvas');
 		canv.attr("width",canvas_width+"px");
 		canv.attr("height",canvas_height+"px");
+		this.buffer = canv[0];
+		this.ctx_buffer = canv[0].getContext('2d');
+		canv = $('#'+this.html_id+'_canvas_visible');
+		canv.attr("width",canvas_width+"px");
+		canv.attr("height",canvas_height+"px");
+		this.ctx = canv[0].getContext('2d');
 	};
 		
 	// main loop
 	o.update = function(){
+		this.ctx_buffer.clearRect ( 0 , 0 , this.resolution[0] , this.resolution[1] );
 		var new_date = new Date();
 		/*if((new_date.getTime() - this.death_timer_date.getTime()) > this.death_timer){
 			alert("Error: Game Timeout ("+(new_date.getTime() - this.death_timer_date.getTime())/1000+" sec delay for main-loop). Game terminated!");
@@ -41,7 +52,7 @@ function create_game_object(html_id, system_infos){
 			this.frame_counter_date = new_date;
 		}
 		this.frame_counter ++;
-		this.death_timer_date = new_date;
+		//this.death_timer_date = new_date;
 		if(this.scene.alive){
 			this.scene.update();
 		}else{
@@ -50,12 +61,16 @@ function create_game_object(html_id, system_infos){
 			this.scene.order_new_scene_data(this.new_scene_id);
 		}
 		this.trigger_data.update("auto");
+		this.ctx.clearRect ( 0 , 0 , this.resolution[0] , this.resolution[1] );
+		this.ctx.drawImage(this.buffer, 0,0);
 		if(!this.alive){
 			clearInterval(this.interval_id);
 			this.trigger_data.update("end_game");
 		}	
 	};
+	
 	o.create_canvas_element();
+	
 	$(document).bind('keypress', function(e) {
 		var code = e.keyCode ? e.keyCode : e.which;
 		o.trigger_data.update("keypress_"+code);
