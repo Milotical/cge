@@ -285,7 +285,8 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	o.sleep = false;
 	o.repeat = true;
 	o.special_sequences = [[],[],[],[]];
-	o.speed = 2;
+	o.speed = 5;
+	o.velocity = [0,0];
 	o.map_collision = true;
 	o.chara_collision_condition = "all";
 	o.hitbox = cge_create_rect(0,0,32,32);
@@ -300,7 +301,10 @@ function cge_create_character(sprite_data_object, image_source, width, height, r
 	o.load_sequence = function(sequence_key, faceing){
 		if(faceing == null)
 			faceing = this.faceing;
-		this.set_sequence(this.special_sequences[this.faceing][sequence_key]);
+		if(this.special_sequences[this.faceing][sequence_key] != null)
+			this.set_sequence(this.special_sequences[this.faceing][sequence_key]);
+		else
+			this.set_sequence(this.special_sequences[this.faceing]["stand"]);
 	};
 	
 	o.write_sequence = function(faceing, sequence_key, sequence){

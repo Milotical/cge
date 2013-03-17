@@ -31,15 +31,15 @@ function cge_create_scene(main_object){
 		
 		for(var i=0; i<60; i++){
 			//scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : i*10, "y" : i*10, "z" : 1, "face" : 0};
-			scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 0};
+			//scene_data["chara"][i] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 0};
 			//scene_data["chara"][i]["moves"] = [["walk",[parseInt(Math.random()*200),"random","frames"],0]];
-			scene_data["chara"][i]["moves"] = [ ["walk",[100,"towards_chara","dist",0],0]];
+			//scene_data["chara"][i]["moves"] = [ ["walk",[100,"towards_chara","dist",0],0]];
 			
-			scene_data["chara"][i]["blocking_classes"] = ["std"];
+			//scene_data["chara"][i]["blocking_classes"] = ["std"];
 		}
 		
-		/*scene_data["chara"][0] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 234, "y" : 172, "z" : 1, "face" : 2};
-		scene_data["chara"][0]["moves"] = [["wait",[100]],["walk",[32,"angle","dist_away_point",-90,[234,172,100]]],["stand"],["wait",[100]],["walk",[100,1,"frames"]],["stand"]];
+		scene_data["chara"][0] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 234, "y" : 172, "z" : 1, "face" : 2};
+		scene_data["chara"][0]["moves"] = [["wait",[30]],["jump",[100, 100, 1]],["stand"],["wait",[100]],["walk",[100,1,"frames"]],["stand"]];
 		scene_data["chara"][0]["blocking_classes"] = ["std"];
 		/*scene_data["chara"][1] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 334, "y" : 172, "z" : 1, "face" : 2};
 		scene_data["chara"][1]["moves"] = [["walk",[32,"towards_point","dist",[320,240]]],["stand"],["wait",[100]],["walk",[100,3,"frames"]],["stand"]];

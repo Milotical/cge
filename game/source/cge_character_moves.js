@@ -12,6 +12,8 @@
 	-change_speed										:	changes the move-speed of the character
 	-change_map_col									:	changes the map-col properties of the chatacter
 	-change_trough										:	changes the general collision properties
+	-teleport														:	teleports chara to new coordinates
+	-change_z													:	changes z-index of character
 	-change_var												:	changes a gam variable
 	-change_zoom										:	change zoom of the character
 	-load_sequence										:	loads a special sequence of the character
@@ -26,6 +28,7 @@ function cge_create_move_interpreter(trigger_data){
 	o.grid_walk = false;
 	o.trigger_data = trigger_data;
 	o.col_resolution = 10;
+	o.grav_const = 20;
 	
 	o.update = function(chara, move){
 		switch(move["id"]){
@@ -53,6 +56,56 @@ function cge_create_move_interpreter(trigger_data){
 				chara.faceing = this.get_faceing_from_direction(dir);;
 				chara.load_sequence("stand");
 				move.ready = true;
+				break;
+			case "jump" :
+				if(move.frame_index == 0){
+					if(move.para[2] == null)
+						 move.para[2] = this.grav_const;
+					move.special_counter = chara.trough;
+					var dx = move.para[0];
+					var dy = move.para[1];
+					var dr = Math.sqrt(dx*dx+dy*dy);
+					move.max_time = dr/chara.speed;
+					chara.velocity = [dx/dr*chara.speed, dy/dr*chara.speed, move.para[2]*parseInt(move.max_time)/2];
+					move.x0 = chara.x;
+					move.y0 = chara.y;
+					chara.trough = true;
+					chara.z += 1;
+				}
+				chara.x = move.x0 + move.frame_index*chara.velocity[0];
+				chara.y = move.y0 + move.frame_index*chara.velocity[1] - move.frame_index*chara.velocity[2]+move.para[2]*move.frame_index*move.frame_index/2;
+				if(move.frame_index >= move.max_time-1 && (!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y))){
+					chara.z -= 1;
+					move.ready = true;
+					chara.trough = move.special_counter;
+					chara.x = move.x0+move.para[0]; 
+					chara.y = move.y0+move.para[1];
+				}
+				break;
+			case "jump_to" :
+				if(move.frame_index == 0){
+					if(move.para[2] == null)
+						 move.para[2] = this.grav_const;
+					move.special_counter = chara.trough;
+					var dx = move.para[0]-chara.x;
+					var dy = move.para[1]-chara.y;
+					var dr = Math.sqrt(dx*dx+dy*dy);
+					move.max_time = dr/chara.speed;
+					chara.velocity = [dx/dr*chara.speed, dy/dr*chara.speed, move.para[2]*parseInt(move.max_time)/2];
+					move.x0 = chara.x;
+					move.y0 = chara.y;
+					chara.trough = true;
+					chara.z += 1;
+				}
+				chara.x = move.x0 + move.frame_index*chara.velocity[0];
+				chara.y = move.y0 + move.frame_index*chara.velocity[1] - move.frame_index*chara.velocity[2]+move.para[2]*move.frame_index*move.frame_index/2;
+				if(move.frame_index >= move.max_time-1 && (!this.grid_walk || this.check_grid_walk_point(chara.x, chara.y))){
+					chara.z -= 1;
+					move.ready = true;
+					chara.trough = move.special_counter;
+					chara.x = move.para[0]; 
+					chara.y = move.para[1];
+				}
 				break;
 			case "change_zoom" :
 				if(move.para[2] == null)
@@ -84,6 +137,17 @@ function cge_create_move_interpreter(trigger_data){
 				break;
 			case "change_trough" :
 				chara.trough = move.para[0];
+				move.ready = true;
+				break;
+			case "teleport" :
+				if(move.para[0] != null)
+					chara.set_x(move.para[0]); 
+				if(move.para[1] != null)
+					chara.set_y(move.para[1]);
+				move.ready = true;
+				break;
+			case "chage_z" :
+				chara.set_z(move.para[0]);
 				move.ready = true;
 				break;
 			case "change_var" :
@@ -198,56 +262,60 @@ function cge_create_move_interpreter(trigger_data){
 		return 0;
 	}
 	
+	o.refresh_velocity_attributes = function(chara, dir){
+		// Calculate velocity from speed and direction
+		if(dir == null)
+			dir = this.get_direction_from_direction_parameter(move.para[1]);
+		else	
+			dir;
+		chara.velocity = [chara.speed*dir[0], chara.speed*dir[1]];
+		// Calculate velocity-related quantities
+		chara.v_abs = [Math.abs(chara.velocity[0]), Math.abs(chara.velocity[1])];
+		if (chara.v_abs[0] > chara.v_abs[1]){
+			if(chara.v_abs[1] > 0){
+				chara.vx_vy = [chara.v_abs[0]/chara.v_abs[1], 1];
+			}else{
+				chara.vx_vy = [chara.v_abs[0], 0];
+			}
+		}else if(chara.v_abs[0] > 0){
+			chara.vx_vy = [1, chara.v_abs[1]/chara.v_abs[0]];
+		}else{  
+			chara.vx_vy = [0, chara.v_abs[1]];
+		}
+		chara.v_signs = [chara.velocity[0] > 0, chara.velocity[1] > 0];
+		chara.dr = [];
+		
+		if(chara.v_signs[0])
+			chara.dr[0] = 1;
+		else
+			chara.dr[0]  = -1;
+		
+		if(chara.v_signs[1])
+			chara.dr[1] = 1;
+		else
+			chara.dr[1]  = -1;
+		
+	};
+	
 	o.move_update = function(chara, move, dir){
 		if(move.frame_index == 0){
-			// Calculate velocity from speed and direction
-			if(dir == null)
-				move.dir = this.get_direction_from_direction_parameter(move.para[1]);
-			else	
-				move.dir = dir;
-			move.v = [chara.speed*dir[0], chara.speed*dir[1]];
-			// Calculate velocity-related quantities
-			move.v_abs = [Math.abs(move.v[0]), Math.abs(move.v[1])];
-			if (move.v_abs[0] > move.v_abs[1]){
-				if(move.v_abs[1] > 0){
-					move.vx_vy = [move.v_abs[0]/move.v_abs[1], 1];
-				}else{
-					move.vx_vy = [move.v_abs[0], 0];
-				}
-			}else if(move.v_abs[0] > 0){
-				move.vx_vy = [1, move.v_abs[1]/move.v_abs[0]];
-			}else{  
-				move.vx_vy = [0, move.v_abs[1]];
-			}
-			move.v_signs = [move.v[0] > 0, move.v[1] > 0];
-			move.dr = [];
-			
-			if(move.v_signs[0])
-				move.dr[0] = 1;
-			else
-				move.dr[0]  = -1;
-			
-			if(move.v_signs[1])
-				move.dr[1] = 1;
-			else
-				move.dr[1]  = -1;
-			
+			this.refresh_velocity_attributes(chara, dir);
 		}
 		// loop until moved full distance/frame or block
 		var blocked = false;
 		var sum_dr = [0,0];
 		var new_r = [chara.x, chara.y];
 		var col_counter = [[0],[0]]; // col-counter to prevent bad double collisions
-		while((sum_dr[0] < move.v_abs[0] || sum_dr[1] < move.v_abs[1]) && (col_counter[0][0] < 2 && col_counter[1][0] < 2) && !blocked){
+		while((sum_dr[0] < chara.v_abs[0] || sum_dr[1] < chara.v_abs[1]) && (col_counter[0][0] < 2 && col_counter[1][0] < 2) && !blocked){
 			for(var i=0; i < 2; i++){
-				if(sum_dr[i] < move.v_abs[i]){ // check if distance in specific direction was reached
-					if(sum_dr[i]+this.col_resolution < move.v_abs[i]){ // check if full pixel step possiible
-						for(var j=0; j < move.vx_vy[i] && !blocked; j++){
-							if(sum_dr[i]+this.col_resolution >= move.v_abs[i]){ // check if no more full integer steps possible
+				if(sum_dr[i] < chara.v_abs[i]){ // check if distance in specific direction was reached
+					if(sum_dr[i]+this.col_resolution < chara.v_abs[i]){ // check if full pixel step possiible
+						for(var j=0; j < chara.vx_vy[i] && !blocked; j++){
+							if(sum_dr[i]+this.col_resolution >= chara.v_abs[i]){ // check if no more full integer steps possible
 								break;
 							}else{ // perform full integer steps
-								new_r[i] += move.dr[i];
-								if(this.check_collision(new_r, chara, move.v, i)){ // passable
+								new_r[i] += chara.dr[i];
+								if(this.check_collision(new_r, chara, chara.velocity, i)){ // passable
 									if(i == 0){
 										chara.set_x(new_r[0]);
 									}else{
@@ -267,13 +335,13 @@ function cge_create_move_interpreter(trigger_data){
 						}
 					}else{
 						// perform partial integer step
-						var dn = move.v_abs[i]-sum_dr[i];
-						if(move.v_signs[i]){
+						var dn = chara.v_abs[i]-sum_dr[i];
+						if(chara.v_signs[i]){
 							new_r[i] += dn;
 						}else{
 							new_r[i] -= dn;
 						}
-						if(this.check_collision(new_r, chara, move.v, i)){ // passable
+						if(this.check_collision(new_r, chara, chara.velocity, i)){ // passable
 							if(i == 0){
 								chara.set_x(new_r[0]);
 							}else{
@@ -293,6 +361,10 @@ function cge_create_move_interpreter(trigger_data){
 				}
 			}
 		}
+		this.check_move_stop_event(move, chara);
+	};
+	
+	o.check_move_stop_event = function(move, chara){
 		switch(move.para[2]){
 			case "frames" :
 				if(move.frame_index >= move.para[0]){
