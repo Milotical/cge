@@ -1,4 +1,3 @@
-
 /*
 	List of Move-ids and their effects:
 	
@@ -19,17 +18,22 @@
 	-load_sequence										:	loads a special sequence of the character
 	-execute_function									:	executes a given javascript function
 */
-
-
-// creates the object that interprets move-commands
-function cge_create_move_interpreter(trigger_data){
+/* ======================================
+			CGE MOVE INTERPRETER
+			----------------------------------------------------------
+			interprets move commands
+====================================== */ 
+function cge_create_move_interpreter(main_object){
 	var o = new Object;
-	o.map_data = null;
-	o.grid_walk = false;
-	o.trigger_data = trigger_data;
-	o.col_resolution = 10;
-	o.grav_const = 20;
+	o.map_data = main_object.map_data;			// assiciation to the map data object 
+	o.trigger_data = main_object.trigger_data;	// assiciation to the trigger data object 
+	o.grid_walk = false;											// defines if character walks on map-grid or free	
+	o.col_resolution = 10;										// resolution of collision checking (objects smaller than this will maybe not detected)
+	o.grav_const = 20;												// gravitational constant used for some moves
 	
+	// -----------------------------------------------------------------------------------
+	// performs move command for chara (frame per frame)
+	// -----------------------------------------------------------------------------------
 	o.update = function(chara, move){
 		switch(move["id"]){
 			case "wait": // p = [#frames to wait]
@@ -172,6 +176,9 @@ function cge_create_move_interpreter(trigger_data){
 		}
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// creates direction vector
+	// -----------------------------------------------------------------------------------
 	o.get_direction_from_direction_parameter = function(dir_para, dir_para2, chara){
 		var dir = dir_para;
 		if (!(dir instanceof Array)){
@@ -248,6 +255,9 @@ function cge_create_move_interpreter(trigger_data){
 		return dir;
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// returns opposite faceing
+	// -----------------------------------------------------------------------------------
 	o.get_opposite_faceing = function(faceing){
 		switch(dir){
 			case 0 :
@@ -262,12 +272,11 @@ function cge_create_move_interpreter(trigger_data){
 		return 0;
 	}
 	
+	// -----------------------------------------------------------------------------------
+	// refress velocity vector of chara from direction and speed
+	// -----------------------------------------------------------------------------------
 	o.refresh_velocity_attributes = function(chara, dir){
-		// Calculate velocity from speed and direction
-		if(dir == null)
-			dir = this.get_direction_from_direction_parameter(move.para[1]);
-		else	
-			dir;
+		// Calculate velocity from speed
 		chara.velocity = [chara.speed*dir[0], chara.speed*dir[1]];
 		// Calculate velocity-related quantities
 		chara.v_abs = [Math.abs(chara.velocity[0]), Math.abs(chara.velocity[1])];
@@ -297,8 +306,15 @@ function cge_create_move_interpreter(trigger_data){
 		
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// frame update for move
+	// -----------------------------------------------------------------------------------
 	o.move_update = function(chara, move, dir){
 		if(move.frame_index == 0){
+			if(dir == null)
+				dir = this.get_direction_from_direction_parameter(move.para[1]);
+			else	
+				dir;
 			this.refresh_velocity_attributes(chara, dir);
 		}
 		// loop until moved full distance/frame or block
@@ -364,6 +380,9 @@ function cge_create_move_interpreter(trigger_data){
 		this.check_move_stop_event(move, chara);
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// checks move stop event and returns if fullfilled
+	// -----------------------------------------------------------------------------------
 	o.check_move_stop_event = function(move, chara){
 		switch(move.para[2]){
 			case "frames" :
@@ -379,7 +398,7 @@ function cge_create_move_interpreter(trigger_data){
 				}else if(this.grid_walk && this.check_grid_walk_point(chara.x, chara.y)){
 					move.special_counter++;
 				}
-				if(move.special_counter == move.para[0]){
+				if(move.special_counter >= move.para[0]){
 					move.ready = true;
 					move.special_counter = 0;
 				}
@@ -456,6 +475,8 @@ function cge_create_move_interpreter(trigger_data){
 					}
 				}
 				break;
+			case "inf" :
+				break;
 			default :
 				alert("Warning: Move with unknown Stop Event ID '"+move.para[2]+"' was called.");
 				move.ready = true;
@@ -463,10 +484,16 @@ function cge_create_move_interpreter(trigger_data){
 		}
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// checks if given parameters are valid map_grid points
+	// -----------------------------------------------------------------------------------
 	o.check_grid_walk_point = function(x, y){
 		return (parseInt(x)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0 && parseInt(y)%(this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor)==0);
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// checks collision
+	// -----------------------------------------------------------------------------------
 	o.check_collision = function(new_r, chara, velocity, coord_index){
 		if(chara.trough)
 			return false;
@@ -484,7 +511,7 @@ function cge_create_move_interpreter(trigger_data){
 		}
 		// Map-Collision
 		if(this.map_data.loaded && chara.map_collider){
-			if(coord_index == 0){
+			if(coord_index == 0 && dir%2 == 1){
 				var dy = (this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor);
 				x0 = new_r[0];
 				if(velocity[coord_index] > 0){
@@ -492,14 +519,19 @@ function cge_create_move_interpreter(trigger_data){
 				}
 				y0 = new_r[1];
 				yi = 0;
-				while(yi+1 < ch){
+				while(yi < ch){
 					if(!this.map_data.passable(x0, y0+yi, dir)){
 						map_collision = true;
 						return_value = false;
 					}
 					yi += dy;
 				}
-			}else{
+				//alert(x0+" "+(y0+ch));
+				if(!this.map_data.passable(x0, y0+ch, dir)){
+					map_collision = true;
+					return_value = false;
+				}
+			}else if(dir%2 == 0){
 				var dx = (this.map_data.tileset_grid_size*this.map_data.tileset_zoom_factor);
 				y0 = new_r[1];
 				if(velocity[coord_index] > 0){
@@ -507,12 +539,16 @@ function cge_create_move_interpreter(trigger_data){
 				}
 				x0 = new_r[0];
 				xi = 0;
-				while(xi+1 < cw){
+				while(xi < cw){
 					if(!this.map_data.passable(x0+xi, y0, dir)){
 						map_collision = true;
 						return_value = false;
 					}
 					xi += dx;
+				}
+				if(!this.map_data.passable(x0+cw, y0, dir)){
+					map_collision = true;
+					return_value = false;
 				}
 			}
 			if(map_collision){
@@ -521,13 +557,16 @@ function cge_create_move_interpreter(trigger_data){
 		}
 		// Character Collision
 		for(var i = 0;i < chara.col_spritesets.length; i++){
-			if(chara.col_spritesets[i].check_collision(new_r, chara, dir)){
+			if(chara.col_spritesets[i].check_collision(chara, new_r, dir)){
 				return_value = false;
 			}
 		}
 		return return_value;
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// gets faceing from any direction vector
+	// -----------------------------------------------------------------------------------
 	o.get_faceing_from_direction = function(dir){
 		if (!(dir instanceof Array)){
 			return dir;
@@ -553,7 +592,11 @@ function cge_create_move_interpreter(trigger_data){
 	return o;
 }
 
-// creates a move-command
+/* ======================================
+			CGE MOVE COMMAND
+			----------------------------------------------------------
+			move command which can be interpreted by move_interpreter
+====================================== */ 
 function cge_create_move(move_interpreter, id, chara, parameter, repeat){
 	var o = new Object;
 	o.chara = chara;

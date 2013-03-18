@@ -6,9 +6,10 @@
 		<script type="text/javascript" src="source/cge_main.js"></script>
 		<script type="text/javascript" src="source/cge_map_data.js"></script>
 		<script type="text/javascript" src="source/cge_sprite.js"></script>
-		<script type="text/javascript" src="source/cge_scene.js"></script>
+		<script type="text/javascript" src="source/cge_scene_data.js"></script>
 		<script type="text/javascript" src="source/cge_character_moves.js"></script>
 		<script type="text/javascript" src="source/cge_events.js"></script>
+		<script type="text/javascript" src="source/cge_event_interpreter.js"></script>
 		<script type="text/javascript">
 			var game;
 			var system_info;
@@ -17,9 +18,27 @@
 				system_info = [];
 				system_info["resolution"] = [640, 480];
 				system_info["fps"] = 29;
-				system_info["death_timer"] = 10000;
+				system_info["start_scene"] = "map";
+				system_info["start_map"] = 0;
 				
-				game = create_game_object("game_div",system_info);
+				/*var a = new Object;
+				a.lol = function(c, d, f){
+					alert(c+d+f);
+				};
+				a.x = 15;
+				a.o = new Object;
+				a.o.y = 17;
+				
+				var b = a.toSource();
+				alert(b);
+				
+				var c = eval("(" + b + ")");
+				
+				//c.lol(1,2,3);
+				
+				alert(c.o == a.o);
+				*/
+				game = create_game_object("game_div", system_info);
 			});
 		</script>	
 	</head>

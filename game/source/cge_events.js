@@ -1,10 +1,18 @@
-
-function cge_create_trigger_data(){
+/* ======================================
+			CGE TRIGGER DATA
+			----------------------------------------------------------
+			manages (triggers) events
+====================================== */ 
+function cge_create_trigger_data(main_object){
 	var o = new Object;
 	o.global_events = {};
 	o.map_events = {}
 	o.scene_events = {}
+	o.event_interpreter = main_object.event_interpreter;
 	
+	// -----------------------------------------------------------------------------------
+	// Add event to a specific trigger
+	// -----------------------------------------------------------------------------------
 	o.add_global_event = function(id, event){
 		if(this.global_events[id] == null)
 			this.global_events[id] = [];
@@ -21,6 +29,9 @@ function cge_create_trigger_data(){
 		this.scene_events[id].push(event);
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// Removes event from a trigger
+	// -----------------------------------------------------------------------------------
 	o.remove_global_event = function(id, event){
 		var a = this.global_events[id];
 		var index = a.indexOf(event);
@@ -37,6 +48,9 @@ function cge_create_trigger_data(){
 		this.scene_events[id].splice(index, 1);
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// removes all events from a trigger
+	// -----------------------------------------------------------------------------------
 	o.remove_all_global_events = function(id){
 		if(id == null){
 			this.global_events = [];
@@ -58,51 +72,94 @@ function cge_create_trigger_data(){
 			this.scene_events[id] = [];
 		}
 	};
-	
-	o.update = function(id, para){
-		for(i in this.global_events[id]){
-			this.global_events[id][i].update(para);
-		};
-		for(i in this.map_events[id]){
-			this.map_events[id][i].update(para);
-		};
-		for(i in this.scene_events[id]){
-			this.scene_events[id][i].update(para);
-		};
-	};
-	
-	return o;
-}
 
-function create_event(event_interpreter, effects, conditions, parallel, related_chara){
-	var o = new Object;
-	o.effects = effects;
-	o.conditions = conditions;
-	o.parallel = parallel;
-	o.effect_index = 0;
-	o.chara = related_chara;
-	o.interpreter = event_interpreter;
-	
-	o.update = function(para){
-		if(this.conditions_fullfilled){
-			if(this.parallel){
-				this.execute_effect(this.effect_index, para);
-				this.effect_index++;
-				if(this.effect_index >= effects.length)
-					this.effect_index = 0;
-			}else{
-				for(var i=0; i < effects.length; i++){
-					this.execute_effect(i, para);
+	// -----------------------------------------------------------------------------------
+	// trigger update (always called if trigger was called)
+	// -----------------------------------------------------------------------------------
+	o.update = function(id, para){
+		var e;
+		if(this.global_events[id] != null){
+			for(var i=0; i < this.global_events[id].length; i++){
+				e = this.global_events[id][i];
+				if(!e.active && e.conditions_fullfilled()){
+					if(e.parallel){
+						e.frame_index = 0;
+						e.effect_index = 0;
+						e.active = true;
+						this.event_interpreter.parallel_events.push(e);
+					}else if(this.event_interpreter.active_event == null){
+						e.frame_index = 0;
+						e.effect_index = 0;
+						e.active = true;
+						this.event_interpreter.active_event = e;
+					}
+				}
+			}
+		}
+		if(this.map_events[id] != null){
+			for(var i=0; i < this.map_events[id].length; i++){
+				e = this.map_events[id][i];
+				if(!e.active && e.conditions_fullfilled()){
+					if(e.parallel){
+						e.frame_index = 0;
+						e.effect_index = 0;
+						e.active = true;
+						this.event_interpreter.parallel_events.push(e);
+					}else if(this.event_interpreter.active_event == null){
+						e.frame_index = 0;
+						e.effect_index = 0;
+						e.active = true;
+						this.event_interpreter.active_event = e;
+					}
+				}
+			}
+		}
+		if(this.scene_events[id] != null){
+			for(var i=0; i < this.scene_events[id].length; i++){
+				e = this.scene_events[id][i];
+				if(!e.active && e.conditions_fullfilled()){
+					if(e.parallel){
+						e.frame_index = 0;
+						e.effect_index = 0;
+						e.active = true;
+						this.event_interpreter.add_prallel_event(e);
+					}else if(this.event_interpreter.active_event == null){
+						e.frame_index = 0;
+						e.effect_index = 0;
+						e.active = true;
+						this.event_interpreter.active_event = e;
+					}
 				}
 			}
 		}
 	};
 	
-	o.execute_effect = function(index, para){
-		this.interpreter.execute(this, this.effects[index], para);
-	};
+	return o;
+}
+
+/* ======================================
+			CGE EVENT
+			----------------------------------------------------------
+====================================== */ 
+function cge_create_event(id, event_interpreter, effects, conditions, parallel, related_chara){
+	var o = new Object;
+	
+	o.id = id;
+	o.effects = effects;								// List of event-effects
+	o.conditions = conditions;					// List of event conditions
+	o.parallel = parallel;							// defines if event is parallel processed
+	o.chara = related_chara;					// realted character or image
+	
+	o.effect_index = 0;								// current effect index of event
+	o.interpreter = event_interpreter;		// event interpreter object
+	o.finished = false;
+	o.active = false;
+	o.frame_index = 0;
+	o.erased = false;
 	
 	o.conditions_fullfilled = function(){
+		if(this.erased)
+			return false;
 		for(var i=0; i < this.conditions.length; i++){
 			if(!this.check_condition(this.condition[i])){
 				return false;

@@ -1,23 +1,62 @@
+/* ======================================
+			CGE SCENE DATA
+			----------------------------------------------------------
+			manages all scenes
+			a change to another scene means changeing the content of this object
+====================================== */ 
 
-
-function cge_create_scene(main_object){
+// -----------------------------------------------------------------------------------
+// creates and returns scene_data object
+// -----------------------------------------------------------------------------------
+function cge_create_scene_data(main_object){
 	var o = new Object;
-	o.alive = false;									
-	o.new_scene_id = 0;
-	o.main_object = main_object;
-	o.variables = {};
-	o.temp_variables = {};
+	o.alive = false;												// if set false the end() function will be automatically called an a new scene will be loaded (initilally false to get first scene from server)		
+	o.new_scene_id = 1;									// identifier of the new scene (is sent to the server to get scene data)
+	o.main = main_object;								// assiciation to the main object 
+	o.map_data = o.main.map_data 			// assiciation to the map data object
+	o.sprites_data = o.main.sprites_data	// assiciation to the sprites data object
 	
-	o.start = function(){ };
-	o.update = function(){ };
-	o.end = function(){ };
-	o.ctx = null;
-	o.main_object.trigger_data.remove_all_scene_events();
-	
-	// order new scene from the server
+	// template functions
+	// (set from the server if new scene is loaded)
+	o.start = function(){ };						// template start-function
+	o.update = function(){ };				// template start-function
+	o.end = function(){ };						// template start-function
+
+	// -----------------------------------------------------------------------------------
+	// called to get new scene_data from the server
+	// -----------------------------------------------------------------------------------
 	o.order_new_scene_data = function(){
+		o.main.trigger_data.remove_all_scene_events(); // remove all events related to curent scene
+		
 		// AJAX holt sich neue scene_start, scene_update und scene_end function (und gegebenenfalls verwendete Funktionen) und scene_data
-		var scene_data = [];
+		if(this.new_scene_id == "map"){
+			if(this.map_data.initialised){
+				this.map_data.reload();
+			}else{
+				this.map_data.load_new_map(this.main.start_map_id);
+			}
+			
+			this.start = function(){
+				this.main.trigger_data.update("start_scene");
+				var canv = $('#'+this.main.html_id+'_canvas');
+				this.ctx = canv[0].getContext('2d');
+			};
+		
+			this.update = function(){
+				this.sprites_data.update();
+				this.sprites_data.draw_images(this.ctx, null, -1);
+				this.map_data.draw_tiled_map(this.ctx);
+				this.sprites_data.draw_images(this.ctx, this.map_data.layers.length);
+			};
+		
+			this.end = function(){
+				this.main_object.trigger_data.update("end_scene");
+				this.map_data.unload();
+			};
+			
+		}
+		// ...................
+		/*var scene_data = [];
 		scene_data["layers"] = [];
 		scene_data["layers"][0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
 		scene_data["layers"][1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
@@ -46,67 +85,27 @@ function cge_create_scene(main_object){
 		scene_data["chara"][1]["blocking_classes"] = ["std"];
 		/*scene_data["chara"][2] = {"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 224, "y" : 100, "z" : 1, "face" : 2};
 		scene_data["chara"][2]["moves"] = [["walk",[100,2]],["stand"],["wait",[100]],["walk",[100,3]],["stand"]];
-		scene_data["chara"][2]["blocking_classes"] = ["std"];*/
+		scene_data["chara"][2]["blocking_classes"] = ["std"];
 		
 		this.sprites_data = cge_create_sprites_data(this.main_object);
 		this.main_object.trigger_data.remove_all_map_events();
 		this.map_data = cge_create_map_data_object(scene_data, this.sprites_data);
 		
 		this.ta = [];
-		
-		this.start = function(){
-			this.map_data.restore_images();
-		//	this.test_image = this.new_image("Poyo.png",100,100,1,200.1,102);
-			/*this.test_image2 = this.new_image("Poyo.png",100,100,50,250,101);
-			this.test_image3 = this.new_image("Poyo.png",100,100,100,230,-1);
-			this.test_image2.set_z(103);
-			this.test_image4 = this.new_sprite("Poyo.png", 228, 940, 10, 2, 200, 200, 101);*/
-			//this.test_image5 = this.new_anim_sprite("Poyo.png", 228, 940, 10, 2, 200, 310, 101, [[0,3],[1,3]]);
-			//this.test_image5.repeat = true;
-			this.main_object.trigger_data.update("start_scene");
-			this.main_object.trigger_data.update("start_map");
-			var canv = $('#'+this.main_object.html_id+'_canvas');
-			this.ctx = canv[0].getContext('2d');
-		};
-		this.update = function(){
-			this.sprites_data.update_images();
-			//this.sprites_data.update_images(this.ctx, null, -1);
-			//this.map_data.update(this.ctx);
-			//this.sprites_data.update_images(this.ctx, this.map_data.layers.length);
-			this.sprites_data.draw_images(this.ctx, null, -1);
-			this.map_data.draw_tiled_map(this.ctx);
-			this.sprites_data.draw_images(this.ctx, this.map_data.layers.length);
-		};
-		
-		this.end = function(){
-			this.main_object.trigger_data.update("end_map");
-			this.main_object.trigger_data.update("end_scene");
-			this.test_image.remove();
-			delete  this.test_image;
-			this.test_image2.remove();
-			delete  this.test_image2;
-			this.test_image3.remove();
-			delete  this.test_image3;
-			this.test_image4.remove();
-			delete  this.test_image4;
-			this.test_image5.remove();
-			delete  this.test_image5;
-			this.map_data.remove_images();
-		};
-		// --------------
-		
-		o.new_image = function(image_source, width, height, x, y, z){
+
+		this.new_image = function(image_source, width, height, x, y, z){
 			return cge_create_image(this.sprites_data, image_source, width, height,x,y,z);
 		};
-		o.new_sprite = function(image_source, width, height, rows, cols, x, y, z){
+		this.new_sprite = function(image_source, width, height, rows, cols, x, y, z){
 			return cge_create_sprite(this.sprites_data, image_source, width, height, rows, cols, x, y, z);
 		};
-		o.new_anim_sprite = function(image_source, width, height, rows, cols, x, y, z, frame_sequence){
+		this.new_anim_sprite = function(image_source, width, height, rows, cols, x, y, z, frame_sequence){
 			return cge_create_anim_sprite(this.sprites_data, image_source, width, height, rows, cols, x, y, z,frame_sequence);
-		};
+		};*/
+		// ...................		
 		
-		this.alive = true;
-		this.start();
+		this.alive = true; 			// set alive
+		this.start();					// starts itself
 	};
 	
 	return o;
