@@ -196,6 +196,8 @@ function cge_create_image(id, sprites_data_object, image_source, width, height, 
 		
 	var o = cge_create_rect(x,y,width,height);
 	
+	o.variables = {};
+	
 	o.id = id;
 	o.image_source = image_source;	// path of used image
 	o.z = z;													// the z-priority of the image
@@ -412,8 +414,8 @@ function cge_create_character(id, sprites_data_object, image_source, width, heig
 	o.trough = false;									// if true the object doesnt collide anymore
 	
 	// show hitbox for debugging
-	o.show_hitbox = true;
-	//o.show_hitbox = false;
+	//o.show_hitbox = true;
+	o.show_hitbox = false;
 	
 	// -----------------------------------------------------------------------------------
 	// loads a special sequence

@@ -25,6 +25,7 @@
 ====================================== */ 
 function cge_create_move_interpreter(main_object){
 	var o = new Object;
+	o.main = main_object;										// assiciation to the main object 
 	o.map_data = main_object.map_data;			// assiciation to the map data object 
 	o.trigger_data = main_object.trigger_data;	// assiciation to the trigger data object 
 	o.grid_walk = false;											// defines if character walks on map-grid or free	
@@ -35,6 +36,7 @@ function cge_create_move_interpreter(main_object){
 	// performs move command for chara (frame per frame)
 	// -----------------------------------------------------------------------------------
 	o.update = function(chara, move){
+		//this.main.debug_m(move["id"]+" "+move.para);
 		switch(move["id"]){
 			case "wait": // p = [#frames to wait]
 				if(move.frame_index >= move.para[0])
@@ -526,7 +528,6 @@ function cge_create_move_interpreter(main_object){
 					}
 					yi += dy;
 				}
-				//alert(x0+" "+(y0+ch));
 				if(!this.map_data.passable(x0, y0+ch, dir)){
 					map_collision = true;
 					return_value = false;
@@ -627,6 +628,7 @@ function cge_create_move(move_interpreter, id, chara, parameter, repeat){
 			 }else{
 				this.ready = false;
 				this.frame_index = 0;
+				this.chara.moves.shift();
 				this.chara.moves.push(this);
 			 }
 		 }

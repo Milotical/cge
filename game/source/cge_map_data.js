@@ -40,63 +40,51 @@ function cge_create_map_data(main_object){
 			charas_data[0]["moves"] = [];//[["wait",[10]],["walk",[1,1,"frames"]],["stand"]];
 			charas_data[0]["blocking_classes"] = ["std"];
 			charas_data[1] = {"id" : 1,"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 234, "y" : 330, "z" : 1, "face" : 2};
-			charas_data[1]["moves"] = [];
+			charas_data[1]["moves"] = [["walk",[5, "random", "frames"],0], ["stand",[],0], ["wait",[30],0]];
 			charas_data[1]["blocking_classes"] = ["std"];
 			
 			var events_data = [];
-			/*events_data[0] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[0]["conditions"] = [];
+			
+			events_data[0] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[0]["conditions"] = [[["faceing",-1,3,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
 			events_data[0]["triggers"] = ["keypress_37"];
-			events_data[0]["effects"] = [["move", -1, "turn", [3], 1],["move", -1, "move", [2,3,"dist"], 1],["finish"]];
-			events_data[1] = {"id" : 1, "parallel" : true, "chara" : 0};
-			events_data[1]["conditions"] = [];
-			events_data[1]["triggers"] = ["keypress_38"];
-			events_data[1]["effects"] = [["move", -1, "turn", [0], 1],["move", -1, "move", [2,0,"dist"], 1],["finish"]];
-			events_data[2] = {"id" : 2, "parallel" : true, "chara" : 0};
-			events_data[2]["conditions"] = [];
-			events_data[2]["triggers"] = ["keypress_39"];
-			events_data[2]["effects"] = [["move", -1, "turn", [1], 1],["move", -1, "move", [2,1,"dist"], 1],["finish"]];
-			events_data[3] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[3]["conditions"] = [];
-			events_data[3]["triggers"] = ["keypress_40"];
-			events_data[3]["effects"] = [["move", -1, "turn", [2], 1],["move", -1, "move", [2,2,"dist"], 1],["finish"]];*/
+			events_data[0]["effects"] = [["player_move", -1, "walk", [0,3,"inf"], 1, true]];
+			events_data[1] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[1]["conditions"] = [[["faceing",-1,3]]];
+			events_data[1]["triggers"] = ["keyrelease_37"];
+			events_data[1]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
-			events_data[0] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[0]["conditions"] = [];
-			events_data[0]["triggers"] = ["keydown_37"];
-			events_data[0]["effects"] = [["break_move",-1],["move", -1, "walk", [0,3,"inf"], 1],["finish"]];
-			events_data[1] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[1]["conditions"] = [];
-			events_data[1]["triggers"] = ["keyup_37"];
-			events_data[1]["effects"] = [["break_move",-1],["move", -1, "stand", [], 1],["finish"]];
+			events_data[2] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[2]["conditions"] = [[["faceing",-1,0,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[2]["triggers"] = ["keypress_38"];
+			events_data[2]["effects"] = [["player_move", -1, "walk", [0,0,"inf"], 1, true]];
+			events_data[3] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[3]["conditions"] = [[["faceing",-1,0]]];
+			events_data[3]["triggers"] = ["keyrelease_38"];
+			events_data[3]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
-			events_data[2] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[2]["conditions"] = [];
-			events_data[2]["triggers"] = ["keydown_38"];
-			events_data[2]["effects"] = [["break_move",-1],["move", -1, "walk", [0,0,"inf"], 1],["finish"]];
-			events_data[3] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[3]["conditions"] = [];
-			events_data[3]["triggers"] = ["keyup_38"];
-			events_data[3]["effects"] = [["break_move",-1],["move", -1, "stand", [], 1],["finish"]];
+			events_data[4] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[4]["conditions"]  = [[["faceing",-1,1,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[4]["triggers"] = ["keypress_39"];
+			events_data[4]["effects"] = [["player_move", -1, "walk", [0,1,"inf"], 1, true]];
+			events_data[5] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[5]["conditions"] = [[["faceing",-1,1]]];
+			events_data[5]["triggers"] = ["keyrelease_39"];
+			events_data[5]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
-			events_data[4] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[4]["conditions"] = [];
-			events_data[4]["triggers"] = ["keydown_39"];
-			events_data[4]["effects"] = [["break_move",-1],["move", -1, "walk", [0,1,"inf"], 1],["finish"]];
-			events_data[5] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[5]["conditions"] = [];
-			events_data[5]["triggers"] = ["keyup_39"];
-			events_data[5]["effects"] = [["break_move",-1],["move", -1, "stand", [], 1],["finish"]];
+			events_data[6] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[6]["conditions"]  = [[["faceing",-1,2,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[6]["triggers"] = ["keypress_40"];
+			events_data[6]["effects"] = [["player_move", -1, "walk", [0,2,"inf"], 1, true]];
+			events_data[7] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[7]["conditions"] = [[["faceing",-1,2]]];
+			events_data[7]["triggers"] = ["keyrelease_40"];
+			events_data[7]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
-			events_data[6] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[6]["conditions"] = [];
-			events_data[6]["triggers"] = ["keydown_40"];
-			events_data[6]["effects"] = [["break_move",-1],["move", -1, "walk", [0,2,"inf"], 1],["finish"]];
-			events_data[7] = {"id" : 0, "parallel" : true, "chara" : 0};
-			events_data[7]["conditions"] = [];
-			events_data[7]["triggers"] = ["keyup_40"];
-			events_data[7]["effects"] = [["break_move",-1],["move", -1, "stand", [], 1],["finish"]];
-			
+			this.main.input_controller.add_trigger_key(37);
+			this.main.input_controller.add_trigger_key(38);
+			this.main.input_controller.add_trigger_key(39);
+			this.main.input_controller.add_trigger_key(40);
 		}
 		for(var chara in charas_data){
 			this.add_chara(charas_data[chara]);

@@ -9,6 +9,7 @@ function cge_create_trigger_data(main_object){
 	o.map_events = {}
 	o.scene_events = {}
 	o.event_interpreter = main_object.event_interpreter;
+	o.input_controller = main_object.input_controller;
 	
 	// -----------------------------------------------------------------------------------
 	// Add event to a specific trigger
@@ -160,17 +161,24 @@ function cge_create_event(id, event_interpreter, effects, conditions, parallel, 
 	o.conditions_fullfilled = function(){
 		if(this.erased)
 			return false;
-		for(var i=0; i < this.conditions.length; i++){
-			if(!this.check_condition(this.condition[i])){
-				return false;
+		for(var j=0; j < this.conditions.length; j++){
+			var r = true;
+			for(var i=0; i < this.conditions[j].length; i++){
+				if(!this.check_condition(this.conditions[j][i])){
+					r = false;
+					break;
+				}
 			}
+			if(r == true){
+				return true;
+			}
+			r = true;
 		}
-		return true;
+		return false;
 	};
 	
 	o.check_condition = function(cond){
-		
-		return false;
+		return this.interpreter.check_condition(this, cond);
 	};
 	
 	return o;

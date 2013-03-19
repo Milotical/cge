@@ -32,11 +32,13 @@ function create_game_object(html_id, system_infos){
 	o.alive = true;																// defines if game is running (if set to false the game is terminated at the end of the frame)
 	
 	// Creating data Objects and Interpreter
+	// (order is important!)
 	o.sprites_data = cge_create_sprites_data(o);
 	o.map_data = cge_create_map_data(o);
 	o.scene_data = cge_create_scene_data(o);
 	o.event_interpreter = cge_create_event_interpreter(o);
 	o.trigger_data = cge_create_trigger_data(o);
+	o.input_controller = cge_create_input_controller(o);
 	o.move_interpreter = cge_create_move_interpreter(o);
 	
 	o.scene_data.new_scene_id = system_info["start_scene"];
@@ -63,6 +65,7 @@ function create_game_object(html_id, system_infos){
 		div.append('<canvas id="'+html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:10px;"></canvas>');
 		div.append('<canvas id="'+html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');	
 		div.append('<br /><div id="'+o.html_id+'_fps">fps: </div>');
+		div.append('<br /><div id="'+o.html_id+'_debug" style="color:red;overflow:scroll;width:800px;height:200px;"></div>');
 		// set buffer parameters
 		var canv = $('#'+this.html_id+'_canvas');
 		canv.attr("width",canvas_width+"px");
@@ -74,6 +77,11 @@ function create_game_object(html_id, system_infos){
 		canv.attr("width",canvas_width+"px");
 		canv.attr("height",canvas_height+"px");
 		this.ctx = canv[0].getContext('2d');
+	};
+	
+	o.debug_m = function(msg){
+		var div = $('#'+this.html_id+"_debug");
+		div.prepend(msg+"<br />");
 	};
 	
 	// -----------------------------------------------------------------------------------
@@ -112,6 +120,7 @@ function create_game_object(html_id, system_infos){
 		
 		// frame update of auto-event-trigger
 		this.trigger_data.update("auto");
+		this.input_controller.update();
 		this.event_interpreter.update();
 		
 		// terminate engine if not alive
@@ -125,18 +134,19 @@ function create_game_object(html_id, system_infos){
 	o.create_canvas_element();
 	
 	// create Keyboard-Trigger Event-Listener
-	$(document).bind('keypress', function(e) {
+	/*$(document).keypress( function(e) {
 		var code = e.keyCode ? e.keyCode : e.which;
 		o.trigger_data.update("keypress_"+code);
 	});
-	$(document).bind('keyup', function(e) {
+	$(document).keyup( function(e) {
 		var code = e.keyCode ? e.keyCode : e.which;
 		o.trigger_data.update("keyup_"+code);
 	});
-	$(document).bind('keydown', function(e) {
+	$(document).keydown( function(e) {
 		var code = e.keyCode ? e.keyCode : e.which;
 		o.trigger_data.update("keydown_"+code);
-	});
+		//o.debug_m("A!");
+	});*/
 	
 	o.trigger_data.update("start_game"); // call start-game-trigger
 	
