@@ -1,10 +1,38 @@
+/* LIST OF EVENT EFFECTS:
+	player_move				:	fast processing for moveing a player with key input (chara_id*, move_id, move_parameters, move_repeat)
+	scroll								:	scrolling the complete screen (function(scrollx, event){ return new_scrollx;} , function(scrolly, event){ return new_scrolly;})
+	change_map				:	changeing the map (map_id)
+	play_music					:	playing a music file (music_id, musicfile, volume, repeat)
+	stop_music					:	stop playing music (music_id)
+	move								: 	perform a move-command (chara_id*, move_id, move_parameters, move_repeat)
+	break_move					:	stops character from all moves (chara_id*)
+	character_variable 		:	changes a character-variable (chara_id*, variable_key, function(variable){ return new_value;})	
+	finish								:	finishes event-processing (-)
+	erase								:	kills event (-)
+	execute_function			:	executes specific javascript function (function(){})
+	
+	*use chara_id=-1 for the associated chara
+*/
 
+/* LIST OF EVENT CONDITIONS:
+	chara_variable			:	value of character variable (chara_id*, function(v){ return new_v;})
+	faceing						:	faceing of chara (chara_id*, faceing == function(f){ return ?;})
+*/
+
+/* ======================================
+			CGE EVENT INTERPRETER
+			----------------------------------------------------------
+			interprets event commands & conditions
+====================================== */ 
 cge_create_event_interpreter = function(main_object){
 	o = new Object;
-	o.active_event = null;
-	o.parallel_events = [];
+	o.active_event = null;		// active event
+	o.parallel_events = [];	// array of parallel processed events
 	o.main = main_object;
 	
+	// -----------------------------------------------------------------------------------
+	// frame update
+	// -----------------------------------------------------------------------------------
 	o.update = function(){
 		var clone_para_events = this.parallel_events.slice(0);
 		for(var i=0; i < clone_para_events.length; i++){
@@ -13,7 +41,8 @@ cge_create_event_interpreter = function(main_object){
 			if(clone_para_events[i].finished){
 				clone_para_events[i].active = false;
 				clone_para_events[i].finished = false;
-				this.parallel_events.splice(i, 1);
+				var ix = this.parallel_events.indexOf(clone_para_events[i]);
+				this.parallel_events.splice(ix, 1);
 			}
 		}
 		if(this.active_event != null){
@@ -27,6 +56,9 @@ cge_create_event_interpreter = function(main_object){
 		}
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// interpretation of an event
+	// -----------------------------------------------------------------------------------
 	o.interpret_event = function(event){
 		var effect_id = event.effects[event.effect_index][0];
 		var para = event.effects[event.effect_index].slice(1);
@@ -49,6 +81,26 @@ cge_create_event_interpreter = function(main_object){
 				break;
 			case "change_map" :	
 				
+				event.effect_index++;
+				break;
+			case "play_music" :
+				var div = $("#"+this.main.html_id);
+				var id = this.main.html_id+'_music_'+para[0];
+				$('#'+id).remove();
+				div.append('<audio id="'+id+'"><source src="'+para[1]+'" type="audio/wav"></audio> ');
+				if(para[2] != null)
+					$('#'+id)[0].volume = para[2];
+				else
+					$('#'+id)[0].volume = 0.5;
+				$('#'+id)[0].play();
+				if(para[3]){
+					$("#"+id)[0].addEventListener('ended', function(){ this.play(); });
+				}
+				event.effect_index++;
+				break;
+			case "stop_music" :
+				var id = this.main.html_id+'_music_'+para[0];
+				$('#'+id).remove();
 				event.effect_index++;
 				break;
 			case "move" :
@@ -87,18 +139,17 @@ cge_create_event_interpreter = function(main_object){
 				para[0]();
 				event.effect_index++;
 				break;
-			case "set_fullscreen" :
-				//alert(1);
-				this.main.canv.mozRequestFullScreen();
-				event.effect_index++;
-				break;
 			default :
 				alert("Warning: Event with unknown Effect ID '"+effect_id+"' was called.");
 		}
-		if(event.effect_index >= event.effects.length)
+		if(event.effect_index >= event.effects.length){
 			event.finished = true;
+		}
 	};
 	
+	// -----------------------------------------------------------------------------------
+	// interpretation of an condition
+	// -----------------------------------------------------------------------------------
 	o.check_condition = function(event, cond){
 		var cond_id = cond[0];
 		var para = cond.slice(1);

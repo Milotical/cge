@@ -8,8 +8,13 @@ function cge_create_trigger_data(main_object){
 	o.global_events = {};
 	o.map_events = {}
 	o.scene_events = {}
+	o.id_events = {};
 	o.event_interpreter = main_object.event_interpreter;
 	o.input_controller = main_object.input_controller;
+	
+	o.get_event_by_id = function(id){
+		return this.id_events[id];
+	};
 	
 	// -----------------------------------------------------------------------------------
 	// Add event to a specific trigger
@@ -18,32 +23,38 @@ function cge_create_trigger_data(main_object){
 		if(this.global_events[id] == null)
 			this.global_events[id] = [];
 		this.global_events[id].push(event);
+		this.id_events[event.id] = event;
 	};
 	o.add_map_event = function(id, event){
 		if(this.map_events[id] == null)
 			this.map_events[id] = [];
 		this.map_events[id].push(event);
+		this.id_events[event.id] = event;
 	};
 	o.add_scene_event = function(id, event){
 		if(this.scene_events[id] == null)
 			this.scene_events[id] = [];
 		this.scene_events[id].push(event);
+		this.id_events[event.id] = event;
 	};
 	
 	// -----------------------------------------------------------------------------------
 	// Removes event from a trigger
 	// -----------------------------------------------------------------------------------
 	o.remove_global_event = function(id, event){
+		delete this.id_events[event.id];
 		var a = this.global_events[id];
 		var index = a.indexOf(event);
 		this.global_events[id].splice(index, 1);
 	};
 	o.remove_map_event = function(id, event){
+		delete this.id_events[event.id];
 		var a = this.map_events[id];
 		var index = a.indexOf(event);
 		this.map_events[id].splice(index, 1);
 	};
 	o.remove_scene_event = function(id, event){
+		delete this.id_events[event.id];
 		var a = this.scene_events[id];
 		var index = a.indexOf(event);
 		this.scene_events[id].splice(index, 1);
@@ -153,11 +164,14 @@ function cge_create_event(id, event_interpreter, effects, conditions, parallel, 
 	
 	o.effect_index = 0;								// current effect index of event
 	o.interpreter = event_interpreter;		// event interpreter object
-	o.finished = false;
-	o.active = false;
-	o.frame_index = 0;
-	o.erased = false;
+	o.finished = false;								// defines if event-process is finished
+	o.active = false;									//  defines if event is processing
+	o.frame_index = 0;								// dummy vaiable for frame counting at event interpretation
+	o.erased = false;								  	// defines if event is erased (erased events are literally dead)
 	
+	// -----------------------------------------------------------------------------------
+	// returns if all conditions are fullfilled
+	// -----------------------------------------------------------------------------------
 	o.conditions_fullfilled = function(){
 		if(this.erased)
 			return false;
@@ -166,7 +180,7 @@ function cge_create_event(id, event_interpreter, effects, conditions, parallel, 
 		for(var j=0; j < this.conditions.length; j++){
 			var r = true;
 			for(var i=0; i < this.conditions[j].length; i++){
-				if(!this.check_condition(this.conditions[j][i])){
+				if(!this.interpreter.check_condition(this, this.conditions[j][i])){
 					r = false;
 					break;
 				}
@@ -177,10 +191,6 @@ function cge_create_event(id, event_interpreter, effects, conditions, parallel, 
 			r = true;
 		}
 		return false;
-	};
-	
-	o.check_condition = function(cond){
-		return this.interpreter.check_condition(this, cond);
 	};
 	
 	return o;

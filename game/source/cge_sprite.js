@@ -12,22 +12,18 @@ function cge_create_sprites_data(main_object){
 	o.main = main_object;		// assiciation to the main object 
 	o.images = [];						// array including all displayes sprites
 	o.spritesets = [];					// list of all spritesets
-	//o.ids = {};
+	o.id_images = {};				// list of sprites sorted my ids
 	
 	// -----------------------------------------------------------------------------------
 	// add image (automatically called when image etc. was created)
 	// -----------------------------------------------------------------------------------
 	o.add_image = function(image){
-		//this.ids[image.id] = this.images.length;
+		this.id_images[image.id] = image;
 		this.images.push(image);
 	};
 	
 	o.get_image_by_id = function(id){
-		for(var i=0; i < this.images.length; i++){
-			if(this.images[i].id == id)
-				return this.images[i];
-		}
-		return null;
+		return this.id_images[id];
 	};
 	
 	// -----------------------------------------------------------------------------------
@@ -35,6 +31,7 @@ function cge_create_sprites_data(main_object){
 	// -----------------------------------------------------------------------------------
 	o.remove_image = function(image){
 		var index = this.images.indexOf(image);
+		delete this.id_images[image.id];
 		this.images.splice(index, 1);
 	};
 	
@@ -43,6 +40,7 @@ function cge_create_sprites_data(main_object){
 	// -----------------------------------------------------------------------------------
 	o.remove_all_images = function(){
 		this.images = [];
+		this.id_images = {};
 		this.spritesets = [];
 	};
 	

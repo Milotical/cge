@@ -67,7 +67,7 @@ function create_game_object(html_id, system_infos){
 		var canvas_height = this.resolution[1];
 		// creating canvas elements (define style of canvas)
 		div.append('<canvas id="'+html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:10px;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
-		div.append('<canvas id="'+html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');	
+		div.append('<canvas id="'+html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');
 		div.append('<br /><div id="'+o.html_id+'_fps">fps: </div>');
 		div.append('<br /><div id="'+o.html_id+'_debug" style="color:red;overflow:scroll;width:800px;height:200px;"></div>');
 		// set buffer parameters
@@ -134,29 +134,13 @@ function create_game_object(html_id, system_infos){
 		this.trigger_data.update("auto");
 		this.input_controller.update();
 		this.event_interpreter.update();
-		
-		// terminate engine if not alive
-		//if(!this.alive){
-		//	clearInterval(this.interval_id);
-		//	this.trigger_data.update("end_game");
-		//}	
+
 	};
 
 	// create the canvas element
 	o.create_canvas_element();
 	
-	o.trigger_data.update("start_game"); // call start-game-trigger
-	
-	// initialise main loop
-	//o.interval_id = setInterval(function(){o.update()}, o.frame_duration);
-	
-	//$(document).keypress(function(){
-	//	o.canv.mozRequestFullScreen();
-	//});
-	var mainloop = function() {
-        o.update();
-    };
-
+	// cross browser anim-Frame function
     var animFrame = window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame    ||
@@ -164,15 +148,13 @@ function create_game_object(html_id, system_infos){
             window.msRequestAnimationFrame     ||
             null ;
 
-    var recursiveAnim = function() {
-        mainloop();
-        animFrame( recursiveAnim );
+    var recursive_update = function() {
+        o.update();
+        animFrame( recursive_update );
     };
 
     // start the mainloop
-    animFrame( recursiveAnim );
-	
-	
+    animFrame( recursive_update );
 	
 	return o;
 }
