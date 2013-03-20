@@ -161,6 +161,8 @@ function cge_create_event(id, event_interpreter, effects, conditions, parallel, 
 	o.conditions_fullfilled = function(){
 		if(this.erased)
 			return false;
+		if(this.conditions.length == 0)
+			return true;
 		for(var j=0; j < this.conditions.length; j++){
 			var r = true;
 			for(var i=0; i < this.conditions[j].length; i++){

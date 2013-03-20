@@ -76,6 +76,7 @@ function create_game_object(html_id, system_infos){
 		canv = $('#'+this.html_id+'_canvas_visible');
 		canv.attr("width",canvas_width+"px");
 		canv.attr("height",canvas_height+"px");
+		this.canv = canv[0];
 		this.ctx = canv[0].getContext('2d');
 	};
 	
@@ -152,6 +153,10 @@ function create_game_object(html_id, system_infos){
 	
 	// initialise main loop
 	o.interval_id = setInterval(function(){o.update()}, o.frame_duration);
+	
+	//$(document).keypress(function(){
+	//	o.canv.mozRequestFullScreen();
+	//});
 	
 	return o;
 }

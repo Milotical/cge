@@ -78,6 +78,11 @@ cge_create_event_interpreter = function(main_object){
 				para[0]();
 				event.effect_index++;
 				break;
+			case "set_fullscreen" :
+				//alert(1);
+				this.main.canv.mozRequestFullScreen();
+				event.effect_index++;
+				break;
 			default :
 				alert("Warning: Event with unknown Effect ID '"+effect_id+"' was called.");
 		}

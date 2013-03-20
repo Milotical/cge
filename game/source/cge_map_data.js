@@ -81,6 +81,12 @@ function cge_create_map_data(main_object){
 			events_data[7]["triggers"] = ["keyrelease_40"];
 			events_data[7]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
+			events_data[8] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[8]["conditions"] = [];
+			events_data[8]["triggers"] = ["keypress_13"];
+			events_data[8]["effects"] = [["set_fullscreen"]];
+			
+			this.main.input_controller.add_trigger_key(13);
 			this.main.input_controller.add_trigger_key(37);
 			this.main.input_controller.add_trigger_key(38);
 			this.main.input_controller.add_trigger_key(39);

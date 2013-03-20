@@ -14,6 +14,7 @@ function cge_create_input_controller(main_object){
 	
 	o.trigger_keys = [];			// keys checked for event triggering
 	
+	
 	// -----------------------------------------------------------------------------------
 	// add / removes keys for triggering
 	// -----------------------------------------------------------------------------------
