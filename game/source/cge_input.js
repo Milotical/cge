@@ -73,9 +73,15 @@ function cge_create_input_controller(main_object){
 		var key = e.keyCode ? e.keyCode : e.which;
 		o.gathered_keys[key] = true;
 	});
+	$(document).mousedown( function() {
+		o.gathered_keys["click"] = true;
+	});
 	$(document).keyup( function(e) {
 		var key = e.keyCode ? e.keyCode : e.which;
 		o.gathered_keys[key] = false;
+	});
+	$(document).mouseup( function() {
+		o.gathered_keys["click"] = false;
 	});
 	
 	return o;

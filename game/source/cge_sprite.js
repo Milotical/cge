@@ -12,12 +12,22 @@ function cge_create_sprites_data(main_object){
 	o.main = main_object;		// assiciation to the main object 
 	o.images = [];						// array including all displayes sprites
 	o.spritesets = [];					// list of all spritesets
+	//o.ids = {};
 	
 	// -----------------------------------------------------------------------------------
 	// add image (automatically called when image etc. was created)
 	// -----------------------------------------------------------------------------------
 	o.add_image = function(image){
+		//this.ids[image.id] = this.images.length;
 		this.images.push(image);
+	};
+	
+	o.get_image_by_id = function(id){
+		for(var i=0; i < this.images.length; i++){
+			if(this.images[i].id == id)
+				return this.images[i];
+		}
+		return null;
 	};
 	
 	// -----------------------------------------------------------------------------------
@@ -213,10 +223,12 @@ function cge_create_image(id, sprites_data_object, image_source, width, height, 
 	// draws image to canvas (automatically called in sprites_draw)
 	// -----------------------------------------------------------------------------------
 	o.draw = function(ctx){
-		var img = new Image();
-		img.src = this.image_source;
+		if(this.img == null){
+			this.img = new Image();
+			this.img.src = this.image_source;
+		}
 		ctx.globalAlpha = this.opacity;
-		ctx.drawImage(img, 0, 0,this.width, this.height, this.x, this.y, this.width*this.zoom_x, this.height*this.zoom_y);
+		ctx.drawImage(this.img, 0, 0,this.width, this.height, this.x, this.y, this.width*this.zoom_x, this.height*this.zoom_y);
 	};
 	
 	// -----------------------------------------------------------------------------------
@@ -270,14 +282,16 @@ function cge_create_sprite(id, sprites_data_object, image_source, width, height,
 	// draws image to canvas (automatically called in sprites_draw)
 	// -----------------------------------------------------------------------------------
 	o.draw = function(ctx){
-		var img = new Image();
-		img.src = this.image_source;
+		if(this.img == null){
+			this.img = new Image();
+			this.img.src = this.image_source;
+		}
 		var width_image = this.get_width();
 		var height_image = this.get_height();
 		var x_image = this.col_index*width_image;
 		var y_image = this.row_index*height_image;
 		ctx.globalAlpha = this.opacity;
-		ctx.drawImage(img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
 	};
 	
 	// -----------------------------------------------------------------------------------
@@ -366,14 +380,16 @@ function cge_create_anim_sprite(id, sprites_data_object, image_source, width, he
 	// draws image to canvas (automatically called in sprites_draw)
 	// -----------------------------------------------------------------------------------
 	o.draw = function(ctx){
-		var img = new Image();
-		img.src = this.image_source;
+		if(this.img == null){
+			this.img = new Image();
+			this.img.src = this.image_source;
+		}
 		var width_image = this.get_width();
 		var height_image = this.get_height();
 		var x_image = this.col_index*width_image;
 		var y_image = this.row_index*height_image;
 		ctx.globalAlpha = this.opacity;
-		ctx.drawImage(img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
 	};
 	
 	return o;
@@ -475,14 +491,16 @@ function cge_create_character(id, sprites_data_object, image_source, width, heig
 	// draws image to canvas (automatically called in sprites_draw)
 	// -----------------------------------------------------------------------------------
 	o.draw = function(ctx){
-		var img = new Image();
-		img.src = this.image_source;
+		if(this.img == null){
+			this.img = new Image();
+			this.img.src = this.image_source;
+		}
 		var width_image = this.get_width();
 		var height_image = this.get_height();
 		var x_image = this.col_index*width_image;
 		var y_image = this.row_index*height_image;
 		ctx.globalAlpha = this.opacity;
-		ctx.drawImage(img, x_image, y_image,width_image, height_image, this.x-0.5*(this.zoom_x*width_image-this.hitbox.width), this.y-this.zoom_y*height_image+this.hitbox.height, width_image*this.zoom_x, height_image*this.zoom_y);
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x-0.5*(this.zoom_x*width_image-this.hitbox.width), this.y-this.zoom_y*height_image+this.hitbox.height, width_image*this.zoom_x, height_image*this.zoom_y);
 		if(this.show_hitbox){
 			ctx.fillStyle="rgb(255,0,0)";
 			ctx.globalAlpha = 0.5;

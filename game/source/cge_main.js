@@ -31,6 +31,9 @@ function create_game_object(html_id, system_infos){
 	o.start_map_id = system_info["start_map"];		// start map id
 	o.alive = true;																// defines if game is running (if set to false the game is terminated at the end of the frame)
 	
+	o.scroll_x = 0;
+	o.scroll_y = 0;
+	
 	// Creating data Objects and Interpreter
 	// (order is important!)
 	o.sprites_data = cge_create_sprites_data(o);
@@ -52,6 +55,7 @@ function create_game_object(html_id, system_infos){
 	// Initilaising frame counter (for fps-display)
 	o.frame_counter = 0;
 	o.frame_counter_date = new Date();
+	o.min_fps = null;
 	
 	// -----------------------------------------------------------------------------------
 	// creates the canvas elements
@@ -62,7 +66,7 @@ function create_game_object(html_id, system_infos){
 		var canvas_width = this.resolution[0];
 		var canvas_height = this.resolution[1];
 		// creating canvas elements (define style of canvas)
-		div.append('<canvas id="'+html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:10px;"></canvas>');
+		div.append('<canvas id="'+html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:10px;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
 		div.append('<canvas id="'+html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');	
 		div.append('<br /><div id="'+o.html_id+'_fps">fps: </div>');
 		div.append('<br /><div id="'+o.html_id+'_debug" style="color:red;overflow:scroll;width:800px;height:200px;"></div>');
@@ -85,20 +89,27 @@ function create_game_object(html_id, system_infos){
 		div.prepend(msg+"<br />");
 	};
 	
+	o.set_buffer_size = function(w, h){
+		this.canv_buffer.width = w;
+		this.canv_buffer.height = h;
+	};
+	
 	// -----------------------------------------------------------------------------------
 	// main loop
 	// 		every loop is one frame
 	// -----------------------------------------------------------------------------------
 	o.update = function(){
 		// clear canvas elements
-		this.ctx_buffer.clearRect ( 0 , 0 , this.resolution[0] , this.resolution[1] );
+		this.ctx_buffer.clearRect ( 0 , 0 , this.canv_buffer.width , this.canv_buffer.height );
 		this.ctx.clearRect ( 0 , 0 , this.resolution[0] , this.resolution[1] );
 		this.ctx_buffer.globalAlpha = 1.0;
 		
 		// calculating and displaying fps
 		var new_date = new Date();
 		if((new_date.getTime() - this.frame_counter_date) >= 1000){
-			$("#"+this.html_id+"_fps").html('fps: '+(this.frame_counter));
+			if(this.frame_counter < this.min_fps || this.min_fps == null)
+				this.min_fps = this.frame_counter;
+			$("#"+this.html_id+"_fps").html('fps: '+(this.frame_counter)+" / min: "+this.min_fps);
 			this.frame_counter = 0;
 			this.frame_counter_date = new_date;
 		}
@@ -117,7 +128,7 @@ function create_game_object(html_id, system_infos){
 		}
 		
 		// copy content from buffer canvas to visible canvas
-		this.ctx.drawImage(this.canv_buffer, 0,0);
+		this.ctx.drawImage(this.canv_buffer, this.scroll_x, this.scroll_y);
 		
 		// frame update of auto-event-trigger
 		this.trigger_data.update("auto");
@@ -125,38 +136,43 @@ function create_game_object(html_id, system_infos){
 		this.event_interpreter.update();
 		
 		// terminate engine if not alive
-		if(!this.alive){
-			clearInterval(this.interval_id);
-			this.trigger_data.update("end_game");
-		}	
+		//if(!this.alive){
+		//	clearInterval(this.interval_id);
+		//	this.trigger_data.update("end_game");
+		//}	
 	};
 
 	// create the canvas element
 	o.create_canvas_element();
 	
-	// create Keyboard-Trigger Event-Listener
-	/*$(document).keypress( function(e) {
-		var code = e.keyCode ? e.keyCode : e.which;
-		o.trigger_data.update("keypress_"+code);
-	});
-	$(document).keyup( function(e) {
-		var code = e.keyCode ? e.keyCode : e.which;
-		o.trigger_data.update("keyup_"+code);
-	});
-	$(document).keydown( function(e) {
-		var code = e.keyCode ? e.keyCode : e.which;
-		o.trigger_data.update("keydown_"+code);
-		//o.debug_m("A!");
-	});*/
-	
 	o.trigger_data.update("start_game"); // call start-game-trigger
 	
 	// initialise main loop
-	o.interval_id = setInterval(function(){o.update()}, o.frame_duration);
+	//o.interval_id = setInterval(function(){o.update()}, o.frame_duration);
 	
 	//$(document).keypress(function(){
 	//	o.canv.mozRequestFullScreen();
 	//});
+	var mainloop = function() {
+        o.update();
+    };
+
+    var animFrame = window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame    ||
+            window.oRequestAnimationFrame      ||
+            window.msRequestAnimationFrame     ||
+            null ;
+
+    var recursiveAnim = function() {
+        mainloop();
+        animFrame( recursiveAnim );
+    };
+
+    // start the mainloop
+    animFrame( recursiveAnim );
+	
+	
 	
 	return o;
 }

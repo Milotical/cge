@@ -25,28 +25,47 @@ function cge_create_map_data(main_object){
 		
 		// AJAX call for map data
 		// ................
-		if(new_map_id == 0){
+		if(new_map_id == 1){
 			this.layers = [];
 			this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
-			this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,0]];
+			this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
 			this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
 			this.tileset_name = "Testset.png";
 			this.tileset_grid_size = 32;
 			this.tileset_zoom_factor = 1.0;
 			this.tileset_row_width = 8;
 			this.tileset_passable = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+			this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
+			this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
+		}
+		if(new_map_id == 0){
+			this.layers = [];
+			this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
+			this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
+			this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
+			this.tileset_name = "Testset.png";
+			this.tileset_grid_size = 32;
+			this.tileset_zoom_factor = 1.0;
+			this.tileset_row_width = 8;
+			this.tileset_passable = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+			this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
+			this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
+			
 			var charas_data = [];
-			charas_data[0] = {"id" : 0,"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
+			charas_data[0] = {"id" : -1,"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
 			charas_data[0]["moves"] = [];//[["wait",[10]],["walk",[1,1,"frames"]],["stand"]];
 			charas_data[0]["blocking_classes"] = ["std"];
-			charas_data[1] = {"id" : 1,"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 234, "y" : 330, "z" : 1, "face" : 2};
-			charas_data[1]["moves"] = [["walk",[5, "random", "frames"],0], ["stand",[],0], ["wait",[30],0]];
-			charas_data[1]["blocking_classes"] = ["std"];
+			
+			for(var i=1; i < 10; i++){
+				charas_data[i] = {"id" : 1,"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 2};
+				charas_data[i]["moves"] = [["walk",[5, "random", "frames"],0], ["stand",[],0], ["wait",[30],0]];
+				charas_data[i]["blocking_classes"] = ["std"];
+			}
 			
 			var events_data = [];
 			
 			events_data[0] = {"id" : 0, "parallel" : false, "chara" : 0};
-			events_data[0]["conditions"] = [[["faceing",-1,3,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[0]["conditions"]  = [[["chara_variable",-1,"walking",function(v){ return v != true; }]]];
 			events_data[0]["triggers"] = ["keypress_37"];
 			events_data[0]["effects"] = [["player_move", -1, "walk", [0,3,"inf"], 1, true]];
 			events_data[1] = {"id" : 0, "parallel" : false, "chara" : 0};
@@ -55,7 +74,7 @@ function cge_create_map_data(main_object){
 			events_data[1]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
 			events_data[2] = {"id" : 0, "parallel" : false, "chara" : 0};
-			events_data[2]["conditions"] = [[["faceing",-1,0,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[2]["conditions"]  = [[["chara_variable",-1,"walking",function(v){ return v != true; }]]];
 			events_data[2]["triggers"] = ["keypress_38"];
 			events_data[2]["effects"] = [["player_move", -1, "walk", [0,0,"inf"], 1, true]];
 			events_data[3] = {"id" : 0, "parallel" : false, "chara" : 0};
@@ -64,7 +83,7 @@ function cge_create_map_data(main_object){
 			events_data[3]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
 			events_data[4] = {"id" : 0, "parallel" : false, "chara" : 0};
-			events_data[4]["conditions"]  = [[["faceing",-1,1,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[4]["conditions"]  = [[["chara_variable",-1,"walking",function(v){ return v != true; }]]];
 			events_data[4]["triggers"] = ["keypress_39"];
 			events_data[4]["effects"] = [["player_move", -1, "walk", [0,1,"inf"], 1, true]];
 			events_data[5] = {"id" : 0, "parallel" : false, "chara" : 0};
@@ -73,7 +92,7 @@ function cge_create_map_data(main_object){
 			events_data[5]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
 			events_data[6] = {"id" : 0, "parallel" : false, "chara" : 0};
-			events_data[6]["conditions"]  = [[["faceing",-1,2,function(f, p){ return f != p; }]], [["chara_variable",-1,"walking",function(v){ return v != true; }]]];
+			events_data[6]["conditions"]  = [[["chara_variable",-1,"walking",function(v){ return v != true; }]]];
 			events_data[6]["triggers"] = ["keypress_40"];
 			events_data[6]["effects"] = [["player_move", -1, "walk", [0,2,"inf"], 1, true]];
 			events_data[7] = {"id" : 0, "parallel" : false, "chara" : 0};
@@ -81,10 +100,10 @@ function cge_create_map_data(main_object){
 			events_data[7]["triggers"] = ["keyrelease_40"];
 			events_data[7]["effects"] = [["player_move", -1, "stand", [], 1, false]];
 			
-			events_data[8] = {"id" : 0, "parallel" : false, "chara" : 0};
+			events_data[8] = {"id" : 0, "parallel" : true, "chara" : 0};
 			events_data[8]["conditions"] = [];
-			events_data[8]["triggers"] = ["keypress_13"];
-			events_data[8]["effects"] = [["set_fullscreen"]];
+			events_data[8]["triggers"] = ["auto"];
+			events_data[8]["effects"] = [["scroll", function(sx, e){ return 320-e.chara.x-e.chara.get_width()/2; }, function(sy, e){ return 240-e.chara.y-e.chara.get_height()/2; }]];
 			
 			this.main.input_controller.add_trigger_key(13);
 			this.main.input_controller.add_trigger_key(37);
@@ -99,6 +118,7 @@ function cge_create_map_data(main_object){
 			this.add_event(events_data[event]);
 		}
 		// ..................
+		this.main.set_buffer_size(this.map_width, this.map_height);
 		this.loaded = true;
 	};
 	
@@ -106,7 +126,7 @@ function cge_create_map_data(main_object){
 	// adds character to map (automatically adds to sprite data)
 	// -----------------------------------------------------------------------------------
 	o.add_chara = function(chara_data){
-		var chara_sprite = cge_create_character(this-chara_data["id"], this.sprites_data, chara_data["source"], chara_data["width"], chara_data["height"], chara_data["rows"], chara_data["cols"], chara_data["x"], chara_data["y"], chara_data["z"], chara_data["face"]);
+		var chara_sprite = cge_create_character(chara_data["id"], this.sprites_data, chara_data["source"], chara_data["width"], chara_data["height"], chara_data["rows"], chara_data["cols"], chara_data["x"], chara_data["y"], chara_data["z"], chara_data["face"]);
 		if(chara_data["moves"] != null){
 			for(var i=0; i < chara_data["moves"].length; i++){
 				var m = cge_create_move(this.main.move_interpreter , chara_data["moves"][i][0], chara_sprite, chara_data["moves"][i][1], chara_data["moves"][i][2]);
@@ -167,8 +187,10 @@ function cge_create_map_data(main_object){
 	// draws tiled map
 	// -----------------------------------------------------------------------------------
 	o.draw_tiled_map = function(ctx){
-		var img = new Image();
-		img.src = this.tileset_name;
+		if(this.img == null){
+			this.img = new Image();
+			this.img.src = this.tileset_name;
+		}
 		for(var z=0; z < this.layers.length; z++){
 			for(var y=0; y < this.layers[z].length; y++){
 				for(var x=0; x < this.layers[z][y].length; x++){
@@ -179,7 +201,7 @@ function cge_create_map_data(main_object){
 						var x_display = x*size_display;
 						var y_display = y*size_display;
 						ctx.globalAlpha = 1.0;
-						ctx.drawImage(img, x_tileset, y_tileset, this.tileset_grid_size, this.tileset_grid_size, x_display, y_display, size_display, size_display);
+						ctx.drawImage(this.img, x_tileset, y_tileset, this.tileset_grid_size, this.tileset_grid_size, x_display, y_display, size_display, size_display);
 					}
 				}
 			}
