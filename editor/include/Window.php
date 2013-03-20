@@ -8,6 +8,8 @@ class Window{
 	
 	private $mPositionAnchor = false;
 	
+	private $windowControls = "";
+	
 	private $headerColor;
 	
 	private $mBasePath;
@@ -75,6 +77,7 @@ class Window{
 		}
 		
 		$wAnchor = $this->mPositionAnchor;
+		$wControls = $this->windowControls;
 		
 		include($this->mBasePath . "template/window.php");
 	}
@@ -285,6 +288,13 @@ class Window{
 	 */
 	public function setHeaderColor($headerColor) {
 		$this->headerColor = $headerColor;
+	}
+
+	/**
+	 * @param string $newControl
+	 */
+	public function setWindowControl($pNewControl) {
+		$this->windowControls = $pNewControl;
 	}
 
 

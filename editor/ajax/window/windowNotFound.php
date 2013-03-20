@@ -2,10 +2,10 @@
 
 $content = cge_getString('WindowNotFound');
 
-$projectListWindow = new Window($_GET["w"], cge_getString('Error'), $content, $cge_editorBasePath);
-$projectListWindow->setWidth(400);
-$projectListWindow->setHeight(80);
-$projectListWindow->setHeaderColor("red");
-$projectListWindow->setPositionAnchor('center');
-$projectListWindow->printWindow();
+$tilesetWindow = new Window($_GET["w"], cge_getString('Error'), $content, $cge_editorBasePath);
+$tilesetWindow->setWidth(400);
+$tilesetWindow->setHeight(80);
+$tilesetWindow->setHeaderColor("red");
+$tilesetWindow->setPositionAnchor('center');
+$tilesetWindow->printWindow();
 ?>

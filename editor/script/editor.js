@@ -1,11 +1,22 @@
 var cge_loading = 0;
 
-$(window).load(function(){
+$(document).ready(function(){
 	cge_enableWindowFunctions();
 	cge_resizeWindowWrapper();
 	
 	//cge_setLoading(true);
+	
+
 });
+
+function cge_toggleFullscreen(){
+	if(!document.mozFullScreen){
+		var e = document.getElementById("editorBody");
+		e.mozRequestFullScreen();
+	}else{
+		document.mozCancelFullScreen();
+	}
+}
 
 $(window).resize(function(){
 	cge_resizeWindowWrapper();

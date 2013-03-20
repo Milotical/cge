@@ -9,10 +9,10 @@ if(!isset($_SESSION["cge_loadedProject"])){
 	$cge_startScript .= 'cge_loadWinodw(\'cge_ProjectListWindow\');
 ';
 }else{
-	$cge_startScript .= 'cge_loadWinodw(\'cge_ProjectTileset\')
-	';
-	$cge_startScript .= 'cge_loadWinodw(\'cge_ProjectMapList\')
-	';
+	$cge_startScript .= '
+			cge_loadWinodw(\'cge_ProjectTileset\');';
+	$cge_startScript .= '
+			cge_loadWinodw(\'cge_ProjectMapList\');';
 }
 
 include("template/pageHeading.php");

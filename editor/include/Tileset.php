@@ -1,7 +1,11 @@
 <?php
-
 class Tileset{
 	private $mFilepath;
+	private $mFilename;
+	private $mId;
+
+	private $mName;
+	
 	private $mWidth;
 	private $mHeight;
 	
@@ -10,15 +14,19 @@ class Tileset{
 	
 	private $mTile;
 	
-	function __construct($pFilepath, $pTileSizeX = null, $pTileSizeY = null, $pWidth = null, $pHeight = null){
+	function __construct($pFilepath, $pFilename, $pName, $pTileSizeX = null, $pTileSizeY = null, $pWidth = null, $pHeight = null){
 		if(file_exists($pFilepath)){
-			$this->mFilepath = $pFilepath;
+			$this->mFilepath = $pFilepath . $pFilename;
+			$this->mFilename = $pFilename;
+			$this->mName = $pName;
 			
 			$this->mTileSizeX = $pTileSizeX;
 			$this->mTileSizeY = $pTileSizeY;
 			
 			$this->mWidth = $pWidth;
 			$this->mHeight = $pHeight;
+			
+			$this->mId = cge_String::toId($this->mName);
 			
 			if($pWidth && $pHeight){
 				$this->generatePathing();
@@ -77,90 +85,155 @@ class Tileset{
 		}
 	}
 	
+	public function getCeiledWidth(){
+		return $this->getColumns() * $this->mTileSizeY;
+	}
+
+	public function getCeiledHeight(){
+		return $this->getRows() * $this->mTileSizeX;
+	}
+	
+	
+	public function getTileCount(){
+		return $this->getRows() * $this->getColumns();
+	}
+	
+	public function getRows() {
+		return ceil($this->mHeight / $this->mTileSizeY);
+	}
+	
+	public function getColumns() {
+		return ceil($this->mWidth / $this->mTileSizeX);
+	}
+	
+	
+	public function getName(){
+		return $this->mName;
+	}
+	
 	/**
 	 * @return the $mFilepath
 	 */
-	public function getMFilepath() {
+	public function getFilepath() {
 		return $this->mFilepath;
 	}
 
 	/**
 	 * @return the $mWidth
 	 */
-	public function getMWidth() {
+	public function getWidth() {
 		return $this->mWidth;
 	}
 
 	/**
 	 * @return the $mHeight
 	 */
-	public function getMHeight() {
+	public function getHeight() {
 		return $this->mHeight;
 	}
 
 	/**
 	 * @return the $mTileSizeX
 	 */
-	public function getMTileSizeX() {
+	public function getTileSizeX() {
 		return $this->mTileSizeX;
 	}
 
 	/**
 	 * @return the $mTileSizeY
 	 */
-	public function getMTileSizeY() {
+	public function getTileSizeY() {
 		return $this->mTileSizeY;
 	}
 
 	/**
 	 * @return the $mTile
 	 */
-	public function getMTile() {
+	public function getTile() {
 		return $this->mTile;
 	}
 
 	/**
 	 * @param string $mFilepath
 	 */
-	public function setMFilepath($mFilepath) {
+	public function setFilepath($mFilepath) {
 		$this->mFilepath = $mFilepath;
 	}
 
 	/**
 	 * @param int $mWidth
 	 */
-	public function setMWidth($mWidth) {
+	public function setWidth($mWidth) {
 		$this->mWidth = $mWidth;
 	}
 
 	/**
 	 * @param int $mHeight
 	 */
-	public function setMHeight($mHeight) {
+	public function setHeight($mHeight) {
 		$this->mHeight = $mHeight;
 	}
 
 	/**
 	 * @param int $mTileSizeX
 	 */
-	public function setMTileSizeX($mTileSizeX) {
+	public function setTileSizeX($mTileSizeX) {
 		$this->mTileSizeX = $mTileSizeX;
 	}
 
 	/**
 	 * @param int $mTileSizeY
 	 */
-	public function setMTileSizeY($mTileSizeY) {
+	public function setTileSizeY($mTileSizeY) {
 		$this->mTileSizeY = $mTileSizeY;
 	}
 
 	/**
 	 * @param array $mTile
 	 */
-	public function setMTile($mTile) {
+	public function setTile($mTile) {
 		$this->mTile = $mTile;
 	}
+	
+	/**
+	 * @return the $mFilename
+	 */
+	public function getFilename() {
+		return $this->mFilename;
+	}
 
+	/**
+	 * @param String $mFilename
+	 */
+	public function setFilename($mFilename) {
+		$this->mFilename = $mFilename;
+	}
+
+	/**
+	 * @return the Id
+	 */
+	public function getId() {
+		return $this->mId;
+	}
+	
+	
+	
+	
+	public static function getTilesetById($pTilesetList, $pTilesetId){
+		if(is_array($pTilesetList) && !empty($pTilesetList)){
+			foreach($pTilesetList as $tileset){
+				if(is_a($tileset, "Tileset")){
+					if($tileset->getId() == $pTilesetId){
+						return $tileset;
+					}else{
+						//TODO: Throw warning because list contains none-tilesets
+					}
+				}
+			}
+		}else{
+			//TODO: Throw warning
+		}
+	}
 }
 
 ?>

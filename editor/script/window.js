@@ -1,3 +1,6 @@
+var cge_focusedWindowId = "";
+var cge_focusedWindowZ = 5;
+
 /**
  * Functions for windows used in the cge_Editor
  */
@@ -8,6 +11,7 @@ function cge_loadWinodw(pWindowName){
 			cge_setLoading(false);
 			$("#cge_editorWindowWrapper").append(data);
 			cge_enableWindowFunctions();
+			cge_windowPushStack($("#" + pWindowName));
 		});
 	}else{
 		cge_openWindow(pWindowName);
@@ -18,11 +22,29 @@ function cge_enableWindowFunctions(){
 	$("div.cge_EditorWindow").draggable({
 		handle: "header",
 		cancel: "div.cge_EditorWindowControlPane, div.cge_WindowMaximized header",
-		stack: "div.cge_EditorWindow",
+		start: function(e, u ){
+			cge_windowPushStack($(e.target));
+		},
 		containment: $("#cge_editorWindowWrapper"),
 		snap: true,
 		snapMode: "outer"
 	});
+	
+	$("div.cge_EditorWindow").bind("click", function(e){
+		cge_windowPushStack($(e.target).parents("div.cge_EditorWindow"));
+	});
+}
+
+function cge_windowPushStack(pWindowObj){
+	if(pWindowObj.attr("id") != cge_focusedWindowId){
+		cge_focusedWindowId = pWindowObj.attr("id");
+		cge_focusedWindowZ++;
+		pWindowObj.css("z-index", cge_focusedWindowZ);
+		
+		$(".cge_alwaysOnTop").each(function(){
+			$(this).css("z-index", parseInt($(this).css("z-index"))+1);
+		});
+	}
 }
 
 function cge_maximizeWindow(pWindowId){
@@ -63,6 +85,7 @@ function cge_openWindow(pWindowId){
 	if(currentWindow.css("display") == "none"){
 		currentWindow.show();
 		cge_setWindowHandlerState(pWindowId, true);
+		cge_windowPushStack($("#" + pWindowId));
 	}else{
 		cge_closeWindow(pWindowId);
 	}

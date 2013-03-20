@@ -42,7 +42,7 @@ class NavigationTop{
 			echo '<a href="#" onclick="' . $item["event"] . '; return false;" id="' . $id . '" class="' . $item["class"] . '">' . $item["name"] . '</a>';
 			
 			if(!empty($item["sub"]) && is_array($item["sub"])){
-				echo '<ul class="topBarSubNavigation">';
+				echo '<ul class="topBarSubNavigation cge_alwaysOnTop">';
 				foreach($item["sub"] as $sub){
 					echo '<li>';
 					echo '<a id="' . $sub["id"] . '" href="#" onclick="' . $sub["event"] . '; return false;" class="' . $sub["class"] . '">' . $sub["name"] . '</a>';

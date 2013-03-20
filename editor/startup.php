@@ -6,6 +6,9 @@ if(!isset($cge_editorBasePath)){
 	$cge_editorBasePath = "";
 }
 
+#Load string module
+require_once($cge_editorBasePath . "include/String.php");
+
 #Load project module
 require_once($cge_editorBasePath . "include/Project.php");
 

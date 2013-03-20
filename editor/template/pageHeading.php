@@ -13,24 +13,29 @@
 	<script src="script/jquery-ui-1.9.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/editor.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/window.js" type="text/javascript" charset="utf-8"></script>
+	<script src="script/tileset.js" type="text/javascript" charset="utf-8"></script>
 	
 	<script type="text/javascript">
 		$(window).load(function(){
 			<?php echo $cge_startScript; ?>
+
+
 		});
 	</script>
 	
 	<title><?php cge_print("title"); ?></title>
 </head>
 
-<body>
+<body id="editorBody">
 
 <div id="topBarWrapper">
 	<div id="topBarContent">
 		<nav id="topBarNavigation">
 			<?php 
 			$nav->printList();?>
-			
+			<div id="topBarNavigationEssentials">
+				<a href="#" onclick="cge_toggleFullscreen(); return false;" class="cge_essential_btn cge_maximize"></a>
+			</div>
 		</nav>
 	</div>
 </div>

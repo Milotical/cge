@@ -19,12 +19,12 @@ $content = '
 ';
 
 
-$projectListWindow = new Window("cge_NewProjectWindow", cge_getString('New Project'), $content, $cge_editorBasePath);
-$projectListWindow->setTop(24);
-$projectListWindow->setLeft(24);
-$projectListWindow->setWidth(500);
-$projectListWindow->setHeight(270);
-$projectListWindow->setHeaderColor("blue");
-$projectListWindow->setPositionAnchor('center');
-$projectListWindow->printWindow();
+$tilesetWindow = new Window("cge_NewProjectWindow", cge_getString('New Project'), $content, $cge_editorBasePath);
+$tilesetWindow->setTop(24);
+$tilesetWindow->setLeft(24);
+$tilesetWindow->setWidth(500);
+$tilesetWindow->setHeight(275);
+$tilesetWindow->setHeaderColor("blue");
+$tilesetWindow->setPositionAnchor('center');
+$tilesetWindow->printWindow();
 ?>

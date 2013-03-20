@@ -1,7 +1,19 @@
+@font-face
+{
+font-family: akashi;
+src: url('akashi.ttf');
+}
+
+@font-face
+{
+font-family: nevis;
+src: url('nevis.ttf');
+}
+
 body{
 	background: #EEEEEE;
 	color: #000000;
-	font: 12px/16px 'Helvetica', Arial, sans-seif;
+	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	margin: 0;
 }
 
@@ -36,6 +48,61 @@ a.cge_projectListItem{
 
 a.cge_projectListItem:hover{
 	background-color: #a8dff4;
+}
+
+div.cge_tilesetContainerWrapper{
+	border: 1px solid #CCCCCC;
+	margin-top: 15px;
+	background: url('transparentBackground.png') repeat;
+	display: none;
+}
+
+div.cge_tilesetActive{
+	display: block;
+}
+
+div.cge_tilesetContainer{
+	position: relative;
+}
+
+div.cge_tilesetContainer div.cge_tilesetSelectionIndicator{
+	position: absolute;
+	left: 0;
+	top: 0;
+	box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+	border: 2px solid #FFFFFF;
+
+	z-index: 500;
+}
+
+span.cge_tilesetTile{
+	display: block;
+	float: left;
+	border: 1px solid rgba(34, 34, 34, 0.0);
+}
+
+span.cge_tilesetSelectTile{
+	display: block;
+	float: left;
+}
+
+span.cge_tilesetTile:hover{
+	background: rgba(51, 181, 229, 0.5);
+}
+
+div.cge_tilesetWithGrid span.cge_tilesetTile{
+	border: 1px solid rgba(34, 34, 34, 0.4)  !important;
+}
+
+div.cge_tilesetSelectionHelper{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 900;
+}
+
+span.cge_tilesetSelectTile span.cge_tilesetTileInfo{
+	display: none;
 }
 
 span.cge_Log{
@@ -114,6 +181,38 @@ span.cge_LogError{
 	margin: 0;
 }
 
+#topBarWrapper nav{
+	position: relative;
+}
+
+#topBarNavigationEssentials{
+	position: absolute;
+	display: inline;
+	right: 0;
+	top: 0;
+}
+
+a.cge_essential_btn{
+	display: inline-block;
+	background-color: #FFFFFF;
+	background-position: 0 4px !important;
+	cursor: default;
+	width: 32px;
+	height: 40px;
+	
+	border-left: 1px solid #CCCCCC;
+	
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
+}
+
+a.cge_essential_btn:hover, a.cge_essential_btn:active{
+	background-color: #a8dff4;
+	cursor: default;
+}
+
 #topBarWrapper nav ul{
 	list-style: none outside none;
 	padding: 0;
@@ -131,9 +230,8 @@ span.cge_LogError{
 	background-color: #FFFFFF;
 	padding: 12px 15px;
 	color: #000000;
-	font-weight: bold;
 	font-size: 14px;
-	line-height: 40px;
+	line-height: 39px;
 	text-decoration: none;
 	border-right: 1px solid #CCCCCC;
 
@@ -141,10 +239,13 @@ span.cge_LogError{
 	-moz-transition: background-color 0.5s;
 	-webkit-transition: background-color 0.5s;
 	-o-transition: background-color 0.5s;
+
+	cursor: default;
 }
 
 #topBarWrapper nav ul li a:hover, #topBarWrapper nav ul li a:active{
 	background-color: #a8dff4;
+	cursor: default;
 }
 
 ul.topBarSubNavigation{
@@ -178,6 +279,7 @@ ul.topBarSubNavigation li a{
 	min-width: 150px;	
 	padding: 0px 35px !important;
 	background-position: 0 3px;
+	cursor: default;
 }
 
 ul.topBarSubNavigation li a.checked{
@@ -256,6 +358,9 @@ div.cge_EditorWindow header.cge_EditorWindowHeader_yellow{
 div.cge_EditorWindow header h2{
 	margin: 0;
 	font-size: 18px;
+	font-family: akashi !important;
+	font-weight: normal;
+	text-shadow: 1px 1px 0 #FFFFFF;
 	line-height: 18px;
 }
 
@@ -293,6 +398,7 @@ div.cge_windowSettings{
  * Input related
  */
 textarea, input{
+	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	background: #FFFFFF;
 	border: 1px solid #CCCCCC;
 	margin-bottom: 5px;
@@ -303,15 +409,13 @@ textarea{
 }
 
 label.cge_editorLabel{
-	font-weight: bold;
 	font-size: 14px;
 }
 
 input.cge_btn{
 	background-color: #DFDFDF;
 	border: 0;
-	font-size: 14px;
-	font-weight: bold;
+	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 15px 30px;
 	cursor: default;
 	
@@ -330,13 +434,24 @@ div.cge_inputTextWrapper{
 }
 
 input.cge_text{
-	font-size: 14px;
+	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	width: 95%;
 
 	padding: 12px 10px;
 	border: 1px solid #CFCFCF;
 	cursor: text;
 	display: block;
+}
+
+select.cge_select{
+	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	width: 100%;
+	padding: 5px;
+	border: 1px solid #CFCFCF;
+}
+
+select.cge_select option{
+	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
 
 input.cge_btn:hover{
@@ -416,4 +531,18 @@ a.cge_search{
 a.cge_error{
 	background-image: url('icon/error.png');
 	background-repeat: no-repeat;
+}
+
+a.cge_grid{
+	background-image: url('icon/grid.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_edit{
+	background-image: url('icon/edit.png');
+	background-repeat: no-repeat;
+}
+
+span.cge_EditorData{
+	display: none;
 }
