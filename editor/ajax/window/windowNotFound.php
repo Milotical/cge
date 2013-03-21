@@ -7,6 +7,11 @@ $tName = "Error details";
 $tContent = 'Window id: "' . $_GET["w"] . '"<br />
 Caused by: "editor/ajax/getWindow.php"<br />
 Time: ' . date("d.m.Y") . ' at ' . date("H:i:s");
+
+if(isset($_GET["o"])){
+	$tContent .= '<br />
+Options: ' . implode(", ", $_GET["o"]);
+}
 eval('$content .= \'' . file_get_contents($cge_editorBasePath . "template/toggle.php") . '\';');
 
 $tilesetWindow = new Window($_GET["w"], cge_getString('Error'), $content, $cge_editorBasePath);

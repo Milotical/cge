@@ -4,10 +4,14 @@ var cge_focusedWindowZ = 5;
 /**
  * Functions for windows used in the cge_Editor
  */
-function cge_loadWinodw(pWindowName){
+function cge_loadWinodw(pWindowName, opts){
+	if(opts == undefined){
+		opts = new Array();
+	}
+	
 	if($("#" + pWindowName).length <= 0){
 		cge_setLoading(true);
-		$.get("ajax/getWindow.php", {w: pWindowName}, function(data){
+		$.get("ajax/getWindow.php", {w: pWindowName, 'o[]': opts}, function(data){
 			cge_setLoading(false);
 			$("#cge_editorWindowWrapper").append(data);
 			cge_enableWindowFunctions();

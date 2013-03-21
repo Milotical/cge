@@ -133,3 +133,9 @@ function cge_changeSelectedTileset(pNewTileset){
 		});
 	}
 }
+
+function cge_editActiveTileset(){
+	var tilesetName = $("div.cge_tilesetActive").children(".cge_tilesetFile").text();
+	
+	cge_loadWinodw("cge_editTileset", [tilesetName, "blah"]);
+}

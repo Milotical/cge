@@ -30,6 +30,7 @@ $cge_loadedTilesetOutput .= '
 	
 	<span class="cge_EditorData cge_tilesizeX">' . $loadedTileset->getTileSizeX() . '</span>
 	<span class="cge_EditorData cge_tilesizeY">' . $loadedTileset->getTileSizeY() . '</span>
+	<span class="cge_EditorData cge_tilesetFile">' . $loadedTileset->getFilename() . '</span>
 </div>
 ';
 ?>

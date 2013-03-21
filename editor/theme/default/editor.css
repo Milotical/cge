@@ -148,17 +148,19 @@ span.cge_LogError{
 a.cge_ToggleButton{
 	display: block !important;
 	width: auto;
-	border: 1px solid #CCCCCC;
 	margin-top: 15px;
 }
 
 div.cge_ToggleContent{
-	background: #EEEEEE;
 	display: none;
 	margin: 0 0 5px 0;
 	border-top-width: 0;
 	padding: 5px;
-	border: 1px solid #CCCCCC;
+	border: 3px solid #C6C6C6;
+}
+
+a.cge_ToggleButtonActive{
+	background-color: #C6C6C6 !important;
 }
 
 /*
@@ -289,7 +291,7 @@ ul.topBarSubNavigation{
 	z-index: 100;
 	position: absolute !important;
 	top: 40px;
-	left: 0;
+	left: -1px;
 	
 	z-index: 215;
 }

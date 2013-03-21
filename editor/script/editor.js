@@ -72,13 +72,15 @@ function cge_isLoading(){
 function cge_toggleContent(pContentId){
 	if($("#cge_toggleContent_" + pContentId).css("display") == 'none'){
 		$("#cge_toggleContent_" + pContentId).stop(true, true);
-		$("#cge_toggleContent_" + pContentId).show('blind', 500);
+		$("#cge_toggleContent_" + pContentId).slideDown(500);
 		$("#cge_toggleButton_" + pContentId).addClass("cge_arrowUp");
+		$("#cge_toggleButton_" + pContentId).addClass("cge_ToggleButtonActive");
 		$("#cge_toggleButton_" + pContentId).removeClass("cge_arrowDown");
 	}else{
 		$("#cge_toggleContent_" + pContentId).stop(true, true);
-		$("#cge_toggleContent_" + pContentId).hide('blind', 500);
+		$("#cge_toggleContent_" + pContentId).slideUp(500);
 		$("#cge_toggleButton_" + pContentId).addClass("cge_arrowDown");
+		$("#cge_toggleButton_" + pContentId).removeClass("cge_ToggleButtonActive");
 		$("#cge_toggleButton_" + pContentId).removeClass("cge_arrowUp");
 	}
 	
