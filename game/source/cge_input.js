@@ -16,6 +16,9 @@ function CGE_Input_Controller(main_object){
 	// -----------------------------------------------------------------------------------
 	// adding action listeners
 	// -----------------------------------------------------------------------------------
+	$(document).unbind("keydown");
+	$(document).unbind("keyup");
+	
 	$(document).keydown( function(e) {
 		var key = e.keyCode ? e.keyCode : e.which;
 		o.gathered_keys[key] = true;

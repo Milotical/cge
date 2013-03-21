@@ -49,7 +49,7 @@ function cge_load_game(str){
 	game.scene_data.order_new_scene_data(save_data.scene_data.scene_id);
 	game.map_data.load_new_map(save_data.map_data.map_id);
 	game.map_data.images = [];
-	game.map_data.events = [];
+	game.map_data.events = {};
 	game.sprites_data.images = [];
 	game.sprites_data.id_images = {};
 	game.sprites_data.spritesets = [];
@@ -75,8 +75,8 @@ function cge_load_game(str){
 			}
 		}
 		game.map_data.images.push(chara);
-		game.map_data.main.sprites_data.add_image(chara);
 	}
+	
 	for(var i in save_data.sprites_data.spritesets){
 		game.sprites_data.spritesets[i] = new CGE_Spriteset();
 		var spriteset = save_data.sprites_data.spritesets[i];
@@ -100,8 +100,8 @@ function cge_load_game(str){
 		game.input_controller[c] = save_data.input_controller[c];
 	}
 	game.input_controller.gathered_keys = [];
-	
 	game.reload_save();
+	
 	delete save_data;
 	
 	// cross browser anim-Frame function

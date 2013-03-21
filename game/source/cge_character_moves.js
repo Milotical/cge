@@ -5,7 +5,7 @@
 	-move														:	moves character in a specific direction (without any change in its animation)
 	-walk															:	character walks in a specific direction (without any change in its animation)
 	-stand														: 	character shows stand-anim (e.g. stops walk anim)
-	-turn															:	changes the faceing direction of character
+	-turn															:	changes the facing direction of character
 	-change_sequence 								:	changes the animation sequence of the character
 	-change_image										:	changes the image file of the character
 	-change_speed										:	changes the move-speed of the character
@@ -47,7 +47,7 @@ CGE_Move_Interpreter.prototype.update = function(chara, move){
 		case "walk" : // p = [stop_parameter, direction, stop_event, (direction_parameter, stop_event_parameter)]
 			if(move.frame_index == 0){
 				move.special_attr = this.get_direction_from_direction_parameter(move.para[1],move.para[3], chara);
-				chara.faceing = this.get_faceing_from_direction(move.special_attr);
+				chara.facing = this.get_facing_from_direction(move.special_attr);
 				chara.load_sequence("walk");
 			}
 			this.move_update(chara, move, move.special_attr);
@@ -57,7 +57,7 @@ CGE_Move_Interpreter.prototype.update = function(chara, move){
 			break;
 		case "turn": // p = [direction, (direction_parameter)]
 			var dir = this.get_direction_from_direction_parameter(move.para[0], move.para[1], move);
-			chara.faceing = this.get_faceing_from_direction(dir);;
+			chara.facing = this.get_facing_from_direction(dir);;
 			chara.load_sequence("stand");
 			move.ready = true;
 			break;
@@ -158,7 +158,7 @@ CGE_Move_Interpreter.prototype.update = function(chara, move){
 			// ...
 			move.ready = true;
 			break;
-		case "load_sequence": // p = [sequence key, (faceing)]
+		case "load_sequence": // p = [sequence key, (facing)]
 			chara.load_sequence(move.para[0], move.para[1]);
 			move.ready = true;
 			break;
@@ -234,16 +234,16 @@ CGE_Move_Interpreter.prototype.get_direction_from_direction_parameter = function
 				dir = [(dx)/r, (dy)/r];
 				break;
 			case "angle" :
-				dir = this.get_direction_from_direction_parameter(chara.faceing, dir_para2, chara);
+				dir = this.get_direction_from_direction_parameter(chara.facing, dir_para2, chara);
 				var sin = Math.sin(dir_para2*Math.PI/180);
 				var cos = Math.cos(dir_para2*Math.PI/180);
 				dir = [dir[0]*cos-dir[1]*sin, dir[0]*sin+dir[1]*cos];
 				break;
 			case "forward" :
-				dir = this.get_direction_from_direction_parameter(chara.faceing, chara, move);
+				dir = this.get_direction_from_direction_parameter(chara.facing, chara, move);
 				break;
 			case "backward" :
-				dir = this.get_direction_from_direction_parameter(this.get_opposite_faceing(chara.faceing), chara, move);
+				dir = this.get_direction_from_direction_parameter(this.get_opposite_facing(chara.facing), chara, move);
 				break;
 			default :
 				alert("Warning: Move with unknown Direction ID '"+dir+"' was called.");
@@ -256,9 +256,9 @@ CGE_Move_Interpreter.prototype.get_direction_from_direction_parameter = function
 }
 
 // -----------------------------------------------------------------------------------
-// returns opposite faceing
+// returns opposite facing
 // -----------------------------------------------------------------------------------
-CGE_Move_Interpreter.prototype.get_opposite_faceing = function(faceing){
+CGE_Move_Interpreter.prototype.get_opposite_facing = function(facing){
 	switch(dir){
 		case 0 :
 			return 3;
@@ -564,9 +564,9 @@ CGE_Move_Interpreter.prototype.check_collision = function(new_r, chara, velocity
 }
 
 // -----------------------------------------------------------------------------------
-// gets faceing from any direction vector
+// gets facing from any direction vector
 // -----------------------------------------------------------------------------------
-CGE_Move_Interpreter.prototype.get_faceing_from_direction = function(dir){
+CGE_Move_Interpreter.prototype.get_facing_from_direction = function(dir){
 	if (!(dir instanceof Array)){
 		return dir;
 	}

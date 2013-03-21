@@ -456,16 +456,16 @@ CGE_Anim_Sprite.prototype.draw = function(ctx){
 CGE_Character.prototype = new CGE_Anim_Sprite();
 CGE_Character.prototype.constructor = CGE_Character;
 
-function CGE_Character(id, sprites_data_object, image_source, width, height, rows, cols, x, y, z, faceing){
+function CGE_Character(id, sprites_data_object, image_source, width, height, rows, cols, x, y, z, facing){
 	if(rows == null)
 		rows = 4;
 	if(cols == null)
 		cols = 4;
-	if(faceing == null)
-		faceing = 2;
+	if(facing == null)
+		facing = 2;
 	CGE_Anim_Sprite.call(this, id, sprites_data_object, image_source, width, height, rows, cols, x, y, z, [[0,0]]);
 	
-	this.faceing = faceing;						// faceing of character (direction the character is looking at)
+	this.facing = facing;						// facing of character (direction the character is looking at)
 	this.moves = [];									// array with move commands
 	
 	// setting anim parameters
@@ -504,20 +504,20 @@ function CGE_Character(id, sprites_data_object, image_source, width, height, row
 // -----------------------------------------------------------------------------------
 // loads a special sequence
 // -----------------------------------------------------------------------------------
-CGE_Character.prototype.load_sequence = function(sequence_key, faceing){
-	if(faceing == null)
-		faceing = this.faceing;
-	if(this.special_sequences[this.faceing][sequence_key] != null)
-		this.set_sequence(this.special_sequences[this.faceing][sequence_key]);
+CGE_Character.prototype.load_sequence = function(sequence_key, facing){
+	if(facing == null)
+		facing = this.facing;
+	if(this.special_sequences[this.facing][sequence_key] != null)
+		this.set_sequence(this.special_sequences[this.facing][sequence_key]);
 	else
-		this.set_sequence(this.special_sequences[this.faceing]["stand"]);
+		this.set_sequence(this.special_sequences[this.facing]["stand"]);
 }
 
 // -----------------------------------------------------------------------------------
 // creates a new special sequence
 // -----------------------------------------------------------------------------------
-CGE_Character.prototype.write_sequence = function(faceing, sequence_key, sequence){
-	this.special_sequences[faceing][sequence_key] = sequence;
+CGE_Character.prototype.write_sequence = function(facing, sequence_key, sequence){
+	this.special_sequences[facing][sequence_key] = sequence;
 }
 
 // -----------------------------------------------------------------------------------

@@ -16,7 +16,7 @@
 
 /* LIST OF EVENT CONDITIONS:
 	chara_variable			:	value of character variable (chara_id*, function(v){ return new_v;})
-	faceing						:	faceing of chara (chara_id*, faceing == function(f){ return ?;})
+	facing						:	facing of chara (chara_id*, facing == function(f){ return ?;})
 */
 
 /* ======================================
@@ -37,23 +37,35 @@ CGE_Event_Interpreter.prototype.update = function(){
 	var clone_para_events = this.parallel_events.slice(0);
 	for(var i=0; i < clone_para_events.length; i++){
 		var e = this.main.trigger_data.get_event_by_id(clone_para_events[i]);
-		this.interpret_event(e);
-		e.frame_index++;
-		if(e.finished){
-			e.active = false;
-			e.finished = false;
+		if(e != null){
+			this.interpret_event(e);
+			e.frame_index++;
+			if(e.finished){
+				e.active = false;
+				e.finished = false;
+				var ix = this.parallel_events.indexOf(clone_para_events[i]);
+				this.parallel_events.splice(ix, 1);
+			}
+		}else{
+			alert("Warning: Invalid Event ID '"+clone_para_events[i]+"' was called.");
 			var ix = this.parallel_events.indexOf(clone_para_events[i]);
 			this.parallel_events.splice(ix, 1);
 		}
 	}
 	if(this.active_event != null){
 		var e = this.main.trigger_data.get_event_by_id(this.active_event);
-		this.interpret_event(e);
-		e.frame_index++;
-		if(e.finished){
-			e.finished = false;
-			e.active = false;
-			this.active_event = null;
+		if(e != null){
+			this.interpret_event(e);
+			e.frame_index++;
+			if(e.finished){
+				e.finished = false;
+				e.active = false;
+				this.active_event = null;
+			}
+		}else{
+			alert("Warning: Invalid Event ID '"+clone_para_events[i]+"' was called.");
+			var ix = this.parallel_events.indexOf(clone_para_events[i]);
+			this.parallel_events.splice(ix, 1);
 		}
 	}
 }
@@ -66,6 +78,7 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 	var para = event.effects[event.effect_index].slice(1);
 	switch(effect_id){
 		case "player_move" :
+			//this.main.debug_m(effect_id+" "+para);
 			if(para[0] == -1)
 				var chara = this.main.sprites_data.get_image_by_id(event.chara);
 			else	
@@ -81,8 +94,19 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 			this.main.scroll_y = para[1](this.main.scroll_y, event);
 			event.effect_index++;
 			break;
-		case "change_map" :	
-			
+		case "change_map" :
+			this.main.map_data.load_new_map(para[0]);
+			if(para[1] == null || para[1] == true)
+				event.finished = true;
+			event.effect_index++;
+			break;
+		case "teleport" :
+			if(para[0] == -1)
+				var chara = this.main.sprites_data.get_image_by_id(event.chara);
+			else	
+				var chara = this.main.sprites_data.get_image_by_id(para[0]);
+			chara.x = para[1](chara.x);
+			chara.y = para[2](chara.y);
 			event.effect_index++;
 			break;
 		case "play_music" :
@@ -175,14 +199,14 @@ CGE_Event_Interpreter.prototype.check_condition = function(event, cond){
 			else	
 				var chara = this.main.sprites_data.get_image_by_id(para[0]);
 			return para[2](chara.variables[para[1]]);
-		case "faceing" :
+		case "facing" :
 			if(para[0] == -1)
 				var chara = this.main.sprites_data.get_image_by_id(event.chara);
 			else	
 				var chara = this.main.sprites_data.get_image_by_id(para[0]);
 			if(para[2] == null)
-				return (chara.faceing == para[1]);
-			return para[2](chara.faceing, para[1]);
+				return (chara.facing == para[1]);
+			return para[2](chara.facing, para[1]);
 		default :
 			alert("Warning: Condition with unknown ID '"+cond_id+"' was called.");
 	}
