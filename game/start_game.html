@@ -12,23 +12,27 @@
 		<script type="text/javascript" src="source/cge_event_interpreter.js"></script>
 		<script type="text/javascript" src="source/cge_input.js"></script>
 		<script type="text/javascript">
-			var game;
-			var system_info;
 			
 			$(document).ready(function(){
-				system_info = [];
+				var system_info = [];
 				system_info["resolution"] = [640, 480];
-				system_info["fps"] = 29;
 				system_info["start_scene"] = "map";
 				system_info["start_map"] = 0;
 				
-				game = create_game_object("game_div", system_info);
-				//$("#m")[0].play();
+				cge_start_game(system_info);
+				
+				$("#load_button").click(function(){
+					cge_load_game($("#load_text").val());
+				});
 			});
-		</script>	
+			
+			
+		</script>
+	
 	</head>
 	<body>
 		<div id="game_div"></div>
-		
+		<textarea id="load_text" style="width:800px;height:200px;"></textarea><br />
+		<button id="load_button">load</button>
 	</body>
 </html>
