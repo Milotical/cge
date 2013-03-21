@@ -1,19 +1,19 @@
 @font-face
 {
-font-family: akashi;
-src: url('akashi.ttf');
+	font-family: akashi;
+	src: url('akashi.ttf');
 }
 
 @font-face
 {
-font-family: nevis;
-src: url('nevis.ttf');
+	font-family: nevis;
+	src: url('nevis.ttf');
 }
 
 body{
 	background: #EEEEEE;
 	color: #000000;
-	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	margin: 0;
 }
 
@@ -75,10 +75,24 @@ div.cge_tilesetContainer div.cge_tilesetSelectionIndicator{
 	z-index: 500;
 }
 
-span.cge_tilesetTile{
+div.cge_tilesetGrid{
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+div.cge_tilesetTile{
 	display: block;
 	float: left;
 	border: 1px solid rgba(34, 34, 34, 0.0);
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-ie-box-sizing: border-box;
+}
+
+div.cge_tilesetWithGrid div.cge_tilesetTile{
+	border: 1px solid rgba(34, 34, 34, 0.4)  !important;
 }
 
 span.cge_tilesetSelectTile{
@@ -90,16 +104,13 @@ span.cge_tilesetTile:hover{
 	background: rgba(51, 181, 229, 0.5);
 }
 
-div.cge_tilesetWithGrid span.cge_tilesetTile{
-	border: 1px solid rgba(34, 34, 34, 0.4)  !important;
-}
-
 div.cge_tilesetSelectionHelper{
 	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 900;
 }
+
 
 span.cge_tilesetSelectTile span.cge_tilesetTileInfo{
 	display: none;
@@ -134,6 +145,22 @@ span.cge_LogError{
 	color: #FF4444;
 }
 
+a.cge_ToggleButton{
+	display: block !important;
+	width: auto;
+	border: 1px solid #CCCCCC;
+	margin-top: 15px;
+}
+
+div.cge_ToggleContent{
+	background: #EEEEEE;
+	display: none;
+	margin: 0 0 5px 0;
+	border-top-width: 0;
+	padding: 5px;
+	border: 1px solid #CCCCCC;
+}
+
 /*
  * Navigation
  */
@@ -155,13 +182,15 @@ span.cge_LogError{
 
 #cge_editorLoadingInidicatorWrapper div{
 	background-color: #33B5E5;
-	width: 5px; 
-	height: 5px;
+	width: 10px; 
+	height: 10px;
 
 	position: absolute;
 
 	left: 0;
 	top: 0;
+
+	z-index: 1000;
 }
 
 #topBarWrapper{
@@ -316,7 +345,7 @@ div.cge_EditorWindow{
 	border: 1px solid #CCCCCC;
 	position: absolute;
 	border-radius: 3px;
-	
+
 	box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.2);
 	
 	z-index: 5;
@@ -395,10 +424,21 @@ div.cge_windowSettings{
 }
 
 /*
+ * Tooltip related
+ */
+.cge_Tooltip{
+	background: #FFFFFF !important;
+	color: #000000 !important;
+	border: 2px solid #CCCCCC !important;
+
+	font: 16px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif !important;
+}
+
+/*
  * Input related
  */
 textarea, input{
-	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	background: #FFFFFF;
 	border: 1px solid #CCCCCC;
 	margin-bottom: 5px;
@@ -415,7 +455,7 @@ label.cge_editorLabel{
 input.cge_btn{
 	background-color: #DFDFDF;
 	border: 0;
-	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	padding: 15px 30px;
 	cursor: default;
 	
@@ -434,7 +474,7 @@ div.cge_inputTextWrapper{
 }
 
 input.cge_text{
-	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	width: 95%;
 
 	padding: 12px 10px;
@@ -444,14 +484,14 @@ input.cge_text{
 }
 
 select.cge_select{
-	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	width: 100%;
 	padding: 5px;
 	border: 1px solid #CFCFCF;
 }
 
 select.cge_select option{
-	font: 14px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
 
 input.cge_btn:hover{
@@ -476,6 +516,16 @@ a.cge_btn:hover{
 a.cge_btn_icon{
 	width: 32px;
 	height: 32px;
+}
+
+a.cge_btn_icon_text{
+	background-position: 0 5px;
+	height: 32px;
+	padding: 5px 15px 5px 37px;
+	line-height: 35px;
+	font-size: 16px;
+	background-color: #DFDFDF;
+	color: #000000;
 }
 
 a.cge_new{
@@ -540,6 +590,16 @@ a.cge_grid{
 
 a.cge_edit{
 	background-image: url('icon/edit.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_arrowUp{
+	background-image: url('icon/arrowUp.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_arrowDown{
+	background-image: url('icon/arrowDown.png');
 	background-repeat: no-repeat;
 }
 

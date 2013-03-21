@@ -10,7 +10,7 @@
 	<link rel="stylesheet" href="theme/<?php echo $cge_Theme; ?>/dark-hive/jquery-ui-1.9.2.custom.min.css" type="text/css" />
 
 	<script src="script/jquery-1.7.2.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="script/jquery-ui-1.9.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="script/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/editor.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/window.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/tileset.js" type="text/javascript" charset="utf-8"></script>
@@ -34,13 +34,13 @@
 			<?php 
 			$nav->printList();?>
 			<div id="topBarNavigationEssentials">
-				<a href="#" onclick="cge_toggleFullscreen(); return false;" class="cge_essential_btn cge_maximize"></a>
+				<a href="#" title="<?php cge_print("Toggle Fullscreen"); ?>" onclick="cge_toggleFullscreen(); return false;" class="cge_essential_btn cge_maximize"></a>
 			</div>
 		</nav>
 	</div>
 </div>
 
-<div id="cge_editorLoadingInidicatorWrapper">
+<div id="cge_editorLoadingInidicatorWrapper" class="cge_alwaysOnTop">
 
 </div>
 

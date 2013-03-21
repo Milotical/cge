@@ -32,6 +32,6 @@ $tilesetWindow->setLeft(24);
 $tilesetWindow->setMinWidth(250);
 $tilesetWindow->setHeaderColor("green");
 $tilesetWindow->setWindowControl($tilesetWindowControl);
-//$projectListWindow->setPositionAnchor('center');
+$tilesetWindow->setPositionAnchor('right');
 $tilesetWindow->printWindow();
 ?>

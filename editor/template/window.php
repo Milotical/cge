@@ -1,4 +1,14 @@
-<div id="<?php echo $wId; ?>" class="cge_EditorWindow"<?php echo $wStyles; ?>>
+<?php 
+$additionalClass = "";
+
+if($wAutoSizeWidth){
+	$additionalClass .= " cge_WindowAutoSizeWidth";
+}
+
+if($wAutoSizeHeight){
+	$additionalClass .= " cge_WindowAutoSizeHeight";
+}
+?><div id="<?php echo $wId; ?>" class="cge_EditorWindow<?php echo $additionalClass; ?>"<?php echo $wStyles; ?>>
 	<header class="cge_EditorWindowHeader<?php echo $wHeaderColorClass; ?>">
 		<h2 class="cge_EditorWindowHeaderTitle"><?php echo $wTitle; ?></h2>
 		<div class="cge_EditorWindowControlPane">
@@ -6,7 +16,7 @@
 		</div>
 	</header>
 	
-	<div class="cge_EditorWindowContentWrapper" style="height: <?php echo $wContentWrapperHeight; ?>px;">
+	<div class="cge_EditorWindowContentWrapper" style="height: <?php echo $wContentWrapperHeight; ?>;">
 		<div class="cge_EditorWindowContent">
 			<?php echo $wContent; ?>
 		</div>
@@ -21,7 +31,7 @@
 <?php
 	if($wAnchor):
 	?>
-	cge_positionWindow('<?php echo $wId; ?>','<?php echo $wAnchor; ?>', 26);<?php 
+	cge_positionWindow('<?php echo $wId; ?>','<?php echo $wAnchor; ?>', 40);<?php 
 	endif;
 	?>
 	cge_setWindowHandlerState('<?php echo $wId; ?>', true);

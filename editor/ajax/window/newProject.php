@@ -23,7 +23,6 @@ $tilesetWindow = new Window("cge_NewProjectWindow", cge_getString('New Project')
 $tilesetWindow->setTop(24);
 $tilesetWindow->setLeft(24);
 $tilesetWindow->setWidth(500);
-$tilesetWindow->setHeight(275);
 $tilesetWindow->setHeaderColor("blue");
 $tilesetWindow->setPositionAnchor('center');
 $tilesetWindow->printWindow();

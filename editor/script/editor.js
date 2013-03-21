@@ -5,8 +5,15 @@ $(document).ready(function(){
 	cge_resizeWindowWrapper();
 	
 	//cge_setLoading(true);
-	
-
+		
+	//	$(document).tooltip({
+	//		position: {
+	//			my: "center bottom",
+	//			at: "right top-5"
+	//		},
+	//		tooltipClass: "cge_Tooltip cge_alwaysOnTop",
+	//		show: {delay: 1000}
+	//	});
 });
 
 function cge_toggleFullscreen(){
@@ -48,7 +55,7 @@ function cge_setLoading(pBool){
 	
 	if(cge_isLoading()){
 		loadingWrapper.show();
-		loadingWrapper.animate({height: 5});
+		loadingWrapper.animate({height: 10});
 		cge_startLoadingAnimation();
 	}else{
 		loadingWrapper.animate({height: 0}, function(){
@@ -60,6 +67,22 @@ function cge_setLoading(pBool){
 
 function cge_isLoading(){
 	return (cge_loading > 0);
+}
+
+function cge_toggleContent(pContentId){
+	if($("#cge_toggleContent_" + pContentId).css("display") == 'none'){
+		$("#cge_toggleContent_" + pContentId).stop(true, true);
+		$("#cge_toggleContent_" + pContentId).show('blind', 500);
+		$("#cge_toggleButton_" + pContentId).addClass("cge_arrowUp");
+		$("#cge_toggleButton_" + pContentId).removeClass("cge_arrowDown");
+	}else{
+		$("#cge_toggleContent_" + pContentId).stop(true, true);
+		$("#cge_toggleContent_" + pContentId).hide('blind', 500);
+		$("#cge_toggleButton_" + pContentId).addClass("cge_arrowDown");
+		$("#cge_toggleButton_" + pContentId).removeClass("cge_arrowUp");
+	}
+	
+	$("#cge_toggleButton_" + pContentId).blur();
 }
 
 function cge_startLoadingAnimation(){

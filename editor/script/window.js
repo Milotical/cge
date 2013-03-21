@@ -22,7 +22,7 @@ function cge_enableWindowFunctions(){
 	$("div.cge_EditorWindow").draggable({
 		handle: "header",
 		cancel: "div.cge_EditorWindowControlPane, div.cge_WindowMaximized header",
-		start: function(e, u ){
+		start: function(e, u){
 			cge_windowPushStack($(e.target));
 		},
 		containment: $("#cge_editorWindowWrapper"),
@@ -67,10 +67,23 @@ function cge_maximizeWindow(pWindowId){
 		//Restore style settings
 		currentWindow.css("top", currentWindow.children("div.cge_windowSettings").css("top"));
 		currentWindow.css("left", currentWindow.children("div.cge_windowSettings").css("left"));
-		currentWindow.width(currentWindow.children("div.cge_windowSettings").css("width"));
-		currentWindow.height(currentWindow.children("div.cge_windowSettings").css("height"));
-
+		
+		if(!currentWindow.hasClass("cge_WindowAutoSizeWidth")){
+			currentWindow.width(currentWindow.children("div.cge_windowSettings").css("width"));
+			
+		}else{
+			currentWindow.css("width", "auto");
+		}
+		
+		if(!currentWindow.hasClass("cge_WindowAutoSizeHeight")){
+			currentWindow.width(currentWindow.children("div.cge_windowSettings").css("height"));
+			
+		}else{
+			currentWindow.css("height", "auto");
+		}
+		
 		currentWindow.removeClass("cge_WindowMaximized");
+		cge_checkWindowOverlap(pWindowId);
 	}
 }
 
@@ -97,7 +110,7 @@ function cge_positionWindow(pWindowId, pAnchor, pMargin){
 	}
 	
 	if(pAnchor == 'right'){
-		currentWindow.css("left", $("#cge_editorWindowWrapper").width() - currentWindow.width() - pMargin + "px");
+		$("#" + pWindowId).css("left", $("#cge_editorWindowWrapper").width() - $("#" + pWindowId).outerWidth(true) - pMargin + "px");
 	}
 }
 
@@ -118,6 +131,17 @@ function cge_setWindowHandlerState(pWindowId, pState){
 	}
 }
 
+function cge_checkWindowOverlap(pWindowId){
+	var currentWindow = $("#" + pWindowId);
+	
+	if(parseInt(currentWindow.outerWidth(true)) + parseInt(currentWindow.css("left")) > parseInt($(window).width())){
+		cge_positionWindow(pWindowId, 'right', 5);
+	}
+	
+	if(parseInt(currentWindow.outerHeight(true)) + parseInt(currentWindow.css("top")) +  parseInt($("#topBarWrapper").outerHeight(true)) > parseInt($(window).height())){
+		currentWindow.css("top", parseInt($(window).height()) - parseInt(currentWindow.outerHeight(true)) - parseInt($("#topBarWrapper").outerHeight(true) + 5) + "px");
+	}
+}
 
 function cge_resizeWindowWrapper(){
 	$("#cge_editorWindowWrapper").width($(window).width() + "px");
@@ -125,4 +149,8 @@ function cge_resizeWindowWrapper(){
 	
 	$("div.cge_WindowMaximized").width(($(window).width() - 2) + "px");
 	$("div.cge_WindowMaximized").height(($("#cge_editorWindowWrapper").height() - 2) + "px");
+	
+	$("div.cge_EditorWindow").each(function(){
+		cge_checkWindowOverlap($(this).attr("id"));
+	});
 }

@@ -92,8 +92,8 @@ function cge_tileSelectionRedraw(){
 	var width = Math.max(cge_tileSelectioStartX, cge_tileSelectioEndX) - Math.min(cge_tileSelectioStartX, cge_tileSelectioEndX);
 	var height = Math.max(cge_tileSelectioStartY, cge_tileSelectioEndY) - Math.min(cge_tileSelectioStartY, cge_tileSelectioEndY);
 	
-	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").css("left", (left*cge_tilesetTileWidth - 2) + "px");
-	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").css("top", (top*cge_tilesetTileHeight - 2) + "px");
+	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").css("left", (left*cge_tilesetTileWidth) + "px");
+	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").css("top", (top*cge_tilesetTileHeight) + "px");
 	
 	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").width((width*cge_tilesetTileWidth + cge_tilesetTileWidth - 2) + "px");
 	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").height((height*cge_tilesetTileHeight + cge_tilesetTileHeight - 2) + "px");
@@ -118,6 +118,7 @@ function cge_changeSelectedTileset(pNewTileset){
 		cge_unbindTilesetEvents();
 		$("div.cge_tilesetActive").removeClass("cge_tilesetActive");
 		$("#cge_tilesetContainer_" + pNewTileset).addClass("cge_tilesetActive");
+		cge_checkWindowOverlap('cge_ProjectTileset');
 		cge_bindTilesetEvents();
 	}else{
 		cge_setLoading(true);
@@ -127,6 +128,7 @@ function cge_changeSelectedTileset(pNewTileset){
 			cge_unbindTilesetEvents();
 			$("div.cge_tilesetActive").removeClass("cge_tilesetActive");
 			$("#cge_ProjectTileset div.cge_EditorWindowContent").append(data);
+			cge_checkWindowOverlap('cge_ProjectTileset');
 			cge_bindTilesetEvents();
 		});
 	}

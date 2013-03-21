@@ -12,6 +12,8 @@ class Window{
 	
 	private $headerColor;
 	
+	private $autoSize = false;
+	
 	private $mBasePath;
 	
 	function __construct($pId, $pTtitle, $pContent, $pBasePath = ""){
@@ -69,7 +71,26 @@ class Window{
 			$style .= 'min-height: ' . $this->minHeight . 'px;';
 		}
 		
+			if(!$this->width){
+			$wAutoSizeWidth = true;
+		}else{
+			$wAutoSizeWidth = false;
+		}
+		
+		if(!$this->height){
+			$wAutoSizeHeight = true;
+		}else{
+			$wAutoSizeHeight = false;
+		}
+		
 		$wContentWrapperHeight = $this->height - 38;
+
+		if($wContentWrapperHeight <= 0){
+			$wContentWrapperHeight = "auto";
+		}else{
+			$wContentWrapperHeight .= "px";
+		}
+		
 		$wStyles = ' style="' . $style . '"';
 		$wHeaderColorClass = "";
 		if(isset($this->headerColor)){
