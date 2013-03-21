@@ -4,16 +4,16 @@ $(document).ready(function(){
 	cge_enableWindowFunctions();
 	cge_resizeWindowWrapper();
 	
-	//cge_setLoading(true);
+//	cge_setLoading(true);
 		
-	//	$(document).tooltip({
-	//		position: {
-	//			my: "center bottom",
-	//			at: "right top-5"
-	//		},
-	//		tooltipClass: "cge_Tooltip cge_alwaysOnTop",
-	//		show: {delay: 1000}
-	//	});
+//	$("body").children().tooltip({
+//		position: {
+//			my: "center bottom",
+//			at: "right top-5"
+//		},
+//		tooltipClass: "cge_Tooltip cge_alwaysOnTop",
+//		show: {delay: 1000}
+//	});
 });
 
 function cge_toggleFullscreen(){
