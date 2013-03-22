@@ -231,7 +231,7 @@ CGE_Rect.prototype.update = function(ctx){ }
 ====================================== */ 
 CGE_Image.prototype = new CGE_Rect();
 CGE_Image.prototype.constructor = CGE_Image;
-function CGE_Image(id, sprites_data_object, image_source, width, height, x, y, z){
+function CGE_Image(id, sprites_data, image_source, width, height, x, y, z){
 	if(x == null)
 		x = 0;
 	if(y == null)
@@ -248,7 +248,7 @@ function CGE_Image(id, sprites_data_object, image_source, width, height, x, y, z
 	this.z = z;													// the z-priority of the image
 	this.zoom_x = 1.0;									// zoom factors
 	this.zoom_y = 1.0;
-	this.sprites_data_object = sprites_data_object; // association to data objects (to add and remove itself)
+	this.sprites_data = sprites_data; // association to data objects (to add and remove itself)
 	
 	this.visible = true;									// visibility of image
 	this.opacity = 1.0;										// opacity of image
@@ -271,9 +271,9 @@ CGE_Image.prototype.draw = function(ctx){
 // deletes image (at next frame)
 // -----------------------------------------------------------------------------------
 CGE_Image.prototype.remove = function(){
-	this.sprites_data_object.remove_image(this);
+	this.sprites_data.remove_image(this);
 	for(var i=0; i < this.spritesets.length; i++){
-		this.sprites_data_object.spritesets[this.spritesets[i]].remove_sprite(this);
+		this.sprites_data.spritesets[this.spritesets[i]].remove_sprite(this);
 	}
 }
 
@@ -306,8 +306,8 @@ CGE_Image.prototype.reload_save = function(main){
 CGE_Sprite.prototype = new CGE_Image();
 CGE_Sprite.prototype.constructor = CGE_Sprite;
 
-function CGE_Sprite(id, sprites_data_object, image_source, width, height, rows, cols, x, y, z){
-	CGE_Image.call(this, id, sprites_data_object, image_source, width, height, x, y, z);
+function CGE_Sprite(id, sprites_data, image_source, width, height, rows, cols, x, y, z){
+	CGE_Image.call(this, id, sprites_data, image_source, width, height, x, y, z);
 	if(rows == null)
 		rows = 4;
 	if(cols == null)
@@ -362,8 +362,8 @@ CGE_Sprite.prototype.get_height = function(){
 CGE_Anim_Sprite.prototype = new CGE_Sprite();
 CGE_Anim_Sprite.prototype.constructor = CGE_Anim_Sprite;
 
-function CGE_Anim_Sprite(id, sprites_data_object, image_source, width, height, rows, cols, x, y, z, frame_sequence){
-	CGE_Sprite.call(this, id, sprites_data_object, image_source, width, height, rows, cols, x, y, z);
+function CGE_Anim_Sprite(id, sprites_data, image_source, width, height, rows, cols, x, y, z, frame_sequence){
+	CGE_Sprite.call(this, id, sprites_data, image_source, width, height, rows, cols, x, y, z);
 	if(frame_sequence == null)
 		frame_sequence = [[0,0]];
 	this.frame_sequence = frame_sequence;	// current frame sequence e.g. [  [0,0]  ,  [0,1,15]  , ...] (each sub-array has structure [col_index, row_index, frames]) 
@@ -456,14 +456,14 @@ CGE_Anim_Sprite.prototype.draw = function(ctx){
 CGE_Character.prototype = new CGE_Anim_Sprite();
 CGE_Character.prototype.constructor = CGE_Character;
 
-function CGE_Character(id, sprites_data_object, image_source, width, height, rows, cols, x, y, z, facing){
+function CGE_Character(id, sprites_data, image_source, width, height, rows, cols, x, y, z, facing){
 	if(rows == null)
 		rows = 4;
 	if(cols == null)
 		cols = 4;
 	if(facing == null)
 		facing = 2;
-	CGE_Anim_Sprite.call(this, id, sprites_data_object, image_source, width, height, rows, cols, x, y, z, [[0,0]]);
+	CGE_Anim_Sprite.call(this, id, sprites_data, image_source, width, height, rows, cols, x, y, z, [[0,0]]);
 	
 	this.facing = facing;						// facing of character (direction the character is looking at)
 	this.moves = [];									// array with move commands
@@ -579,19 +579,19 @@ CGE_Character.prototype.add_move = function(move){
 // -----------------------------------------------------------------------------------
 CGE_Character.prototype.add_col_spriteset = function(set_id){
 	this.col_spritesets.push(set_id);
-	this.sprites_data_object.spritesets[set_id].add_sprite(this);
+	this.sprites_data.spritesets[set_id].add_sprite(this);
 }
 
 // -----------------------------------------------------------------------------------
 // deletes image (at next frame)
 // -----------------------------------------------------------------------------------
 CGE_Character.prototype.remove = function(){
-	this.sprites_data_object.remove_image(this);
+	this.sprites_data.remove_image(this);
 	for(var i=0; i < this.spritesets.length; i++){
-		this.sprites_data_object.spritesets[this.spritesets[i]].remove_sprite(this);
+		this.sprites_data.spritesets[this.spritesets[i]].remove_sprite(this);
 	}
 	for(var i=0; i < this.col_spritesets.length; i++){
-		this.sprites_data_object.spritesets[this.col_spritesets[i]].remove_sprite(this);
+		this.sprites_data.spritesets[this.col_spritesets[i]].remove_sprite(this);
 	}
 }
 

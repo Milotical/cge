@@ -66,12 +66,12 @@ CGE_Trigger_Data.prototype.remove_all_global_events = function(id){
 	if(id == null){
 		for(var i in this.global_events){
 			for(var j in this.global_events[i]){
-				this.remove_global_event(this.global_events[i], this.global_events[i][j]);
+				this.remove_global_event(i, this.global_events[i][j]);
 			}
 		}
 	}else{
 		for(var j in this.global_events[id]){
-			this.remove_global_event(this.global_events[i], this.global_events[id][j]);
+			this.remove_global_event(id, this.global_events[id][j]);
 		}
 	}
 }
@@ -92,12 +92,12 @@ CGE_Trigger_Data.prototype.remove_all_scene_events = function(id){
 	if(id == null){
 		for(var i in this.scene_events){
 			for(var j in this.scene_events[i]){
-				this.remove_scene_event(this.scene_events[i], this.scene_events[i][j]);
+				this.remove_scene_event(i, this.scene_events[i][j]);
 			}
 		}
 	}else{
 		for(var j in this.scene_events[id]){
-			this.remove_scene_event(this.scene_events[i], this.scene_events[id][j]);
+			this.remove_scene_event(id, this.scene_events[id][j]);
 		}
 	}
 }
@@ -115,11 +115,13 @@ CGE_Trigger_Data.prototype.update = function(id, para){
 					e.frame_index = 0;
 					e.effect_index = 0;
 					e.active = true;
+					e.finished = false;
 					this.main.event_interpreter.parallel_events.push(e.id);
 				}else if(this.main.event_interpreter.active_event == null){
 					e.frame_index = 0;
 					e.effect_index = 0;
 					e.active = true;
+					e.finished = false;
 					this.main.event_interpreter.active_event = e.id;
 				}
 			}
@@ -133,11 +135,13 @@ CGE_Trigger_Data.prototype.update = function(id, para){
 					e.frame_index = 0;
 					e.effect_index = 0;
 					e.active = true;
+					e.finished = false;
 					this.main.event_interpreter.parallel_events.push(e.id);
 				}else if(this.main.event_interpreter.active_event == null){
 					e.frame_index = 0;
 					e.effect_index = 0;
 					e.active = true;
+					e.finished = false;
 					this.main.event_interpreter.active_event = e.id;
 				}
 			}
@@ -151,11 +155,13 @@ CGE_Trigger_Data.prototype.update = function(id, para){
 					e.frame_index = 0;
 					e.effect_index = 0;
 					e.active = true;
-					this.main.event_interpreter.add_prallel_event(e.id);
+					e.finished = false;
+					this.main.event_interpreter.parallel_events.push(e.id);
 				}else if(this.main.event_interpreter.active_event == null){
 					e.frame_index = 0;
 					e.effect_index = 0;
 					e.active = true;
+					e.finished = false;
 					this.main.event_interpreter.active_event = e.id;
 				}
 			}

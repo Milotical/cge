@@ -42,7 +42,7 @@ CGE_Event_Interpreter.prototype.update = function(){
 			e.frame_index++;
 			if(e.finished){
 				e.active = false;
-				e.finished = false;
+				//e.finished = false;
 				var ix = this.parallel_events.indexOf(clone_para_events[i]);
 				this.parallel_events.splice(ix, 1);
 			}
@@ -58,7 +58,7 @@ CGE_Event_Interpreter.prototype.update = function(){
 			this.interpret_event(e);
 			e.frame_index++;
 			if(e.finished){
-				e.finished = false;
+				//e.finished = false;
 				e.active = false;
 				this.active_event = null;
 			}
@@ -92,6 +92,13 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 		case "scroll" :
 			this.main.scroll_x = para[0](this.main.scroll_x, event);
 			this.main.scroll_y = para[1](this.main.scroll_y, event);
+			event.effect_index++;
+			break;
+		case "change_scene" :
+			this.main.scene_data.new_scene_id = para[0];
+			this.main.scene_data.alive = false;
+			if(para[1] == null || para[1] == true)
+				event.finished = true;
 			event.effect_index++;
 			break;
 		case "change_map" :
@@ -162,13 +169,15 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 			event.erased = true;
 			break;
 		case "save_game" :
-			this.main.save_to_string();
+			var save_data = this.main.save_to_string();
+			// ...send to server ...
 			event.effect_index++;
 			break;
 		case "load_game" :	
-			var t = this.main.save_to_string();
-			this.main.load_from_string(t);
-			event.effect_index++;
+			var save_data = "";
+			// ...get save from server...
+			cge_load_game(save_data);
+			this.main.alive = false;
 			break;
 		case "execute_function" :
 			para[0]();
@@ -176,13 +185,13 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 			break;
 		case "kill_game" :
 			this.main.alive = false;
-			event.effect_index++;
 			break;
 		default :
 			alert("Warning: Event with unknown Effect ID '"+effect_id+"' was called.");
 	}
 	if(event.effect_index >= event.effects.length){
 		event.finished = true;
+		event.effect_index = 0;
 	}
 }
 

@@ -36,6 +36,11 @@ function CGE_Input_Controller(main_object){
 	
 }
 
+CGE_Input_Controller.prototype.refresh = function(){
+	this.old_keys = [];				
+	this.pressed_keys = [];		
+	this.gathered_keys = [];	
+}
 
 // -----------------------------------------------------------------------------------
 // add / removes keys for triggering
