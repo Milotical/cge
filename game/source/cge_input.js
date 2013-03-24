@@ -11,6 +11,8 @@ function CGE_Input_Controller(main_object){
 	this.gathered_keys = [];		// keys pressed (assynchronous)
 	
 	this.trigger_keys = [];			// keys checked for event triggering
+	this.mouse_x = 0;
+	this.mouse_y = 0;
 	
 	var o = this;
 	// -----------------------------------------------------------------------------------
@@ -22,6 +24,8 @@ function CGE_Input_Controller(main_object){
 	$(document).keydown( function(e) {
 		var key = e.keyCode ? e.keyCode : e.which;
 		o.gathered_keys[key] = true;
+		if(key == 122)
+			$("#"+o.main.html_id)[0].mozRequestFullScreen();
 	});
 	$(document).mousedown( function() {
 		o.gathered_keys["click"] = true;
@@ -32,6 +36,12 @@ function CGE_Input_Controller(main_object){
 	});
 	$(document).mouseup( function() {
 		o.gathered_keys["click"] = false;
+	});
+	$(document).mousemove( function(e){
+		var canv = $("#"+o.main.html_id+"_canvas_visible");
+		var offset = $("#"+o.main.html_id+"_canvas_visible").offset();
+		o.mouse_x = (e.pageX-offset.left)/canv.width()*o.main.resolution[0];
+		o.mouse_y = (e.pageY-offset.top)/canv.height()*o.main.resolution[1];
 	});
 	
 }

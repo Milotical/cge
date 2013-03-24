@@ -7,7 +7,7 @@
 
 function CGE_Map_Data(main_object){
 	this.main = main_object;									// assiciation to the main object 
-	
+	this.initialised = false;
 	this.images = [];													// array of corresponding images
 	this.events ={};													// array of corresponding events
 	this.loaded = true;												// defines if map is displayed
@@ -24,6 +24,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 	this.images = [];
 	this.events = {};
 	this.map_id = new_map_id;
+	this.initialised = true;
 	
 	var charas_data = [];
 	var events_data = [];

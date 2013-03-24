@@ -41,18 +41,36 @@ CGE_Trigger_Data.prototype.add_scene_event = function(id, event){
 // Removes event from a trigger
 // -----------------------------------------------------------------------------------
 CGE_Trigger_Data.prototype.remove_global_event = function(id, event){
+	if(this.main.event_interpreter.active_event == event)
+		this.main.event_interpreter.active_event = null;
+	for(var i = 0; i < this.main.event_interpreter.parallel_events.length; i++){
+		if(this.main.event_interpreter.parallel_events[i] == event)
+			this.main.event_interpreter.parallel_events.splice(i, 1);
+	}
 	delete this.id_events[event.id];
 	var a = this.global_events[id];
 	var index = a.indexOf(event);
 	this.global_events[id].splice(index, 1);
 }
 CGE_Trigger_Data.prototype.remove_map_event = function(id, event){
+	if(this.main.event_interpreter.active_event == event)
+		this.main.event_interpreter.active_event = null;
+	for(var i = 0; i < this.main.event_interpreter.parallel_events.length; i++){
+		if(this.main.event_interpreter.parallel_events[i] == event)
+			this.main.event_interpreter.parallel_events.splice(i, 1);
+	}
 	delete this.id_events[event.id];
 	var a = this.map_events[id];
 	var index = a.indexOf(event);
 	this.map_events[id].splice(index, 1);
 }
 CGE_Trigger_Data.prototype.remove_scene_event = function(id, event){
+	if(this.main.event_interpreter.active_event == event)
+		this.main.event_interpreter.active_event = null;
+	for(var i = 0; i < this.main.event_interpreter.parallel_events.length; i++){
+		if(this.main.event_interpreter.parallel_events[i] == event)
+			this.main.event_interpreter.parallel_events.splice(i, 1);
+	}
 	delete this.id_events[event.id];
 	var a = this.scene_events[id];
 	var index = a.indexOf(event);
@@ -65,39 +83,45 @@ CGE_Trigger_Data.prototype.remove_scene_event = function(id, event){
 CGE_Trigger_Data.prototype.remove_all_global_events = function(id){
 	if(id == null){
 		for(var i in this.global_events){
-			for(var j in this.global_events[i]){
-				this.remove_global_event(i, this.global_events[i][j]);
+			var clone_events = this.global_events[i].slice(0);
+			for(var j in clone_events){
+				this.remove_global_event(i, clone_events[j]);
 			}
 		}
 	}else{
-		for(var j in this.global_events[id]){
-			this.remove_global_event(id, this.global_events[id][j]);
+		var clone_events = this.global_events[id].slice(0);
+		for(var j in clone_events){
+			this.remove_global_event(id, clone_events[j]);
 		}
 	}
 }
 CGE_Trigger_Data.prototype.remove_all_map_events = function(id){
 	if(id == null){
 		for(var i in this.map_events){
-			for(var j in this.map_events[i]){
-				this.remove_map_event(i, this.map_events[i][j]);
+			var clone_events = this.map_events[i].slice(0);
+			for(var j in clone_events){
+				this.remove_map_event(i, clone_events[j]);
 			}
 		}
 	}else{
-		for(var j in this.map_events[id]){
-			this.remove_map_event(i, this.map_events[id][j]);
+		var clone_events = this.map_events[id].slice(0);
+		for(var j in clone_events){
+			this.remove_map_event(i, clone_events[j]);
 		}
 	}
 }
 CGE_Trigger_Data.prototype.remove_all_scene_events = function(id){
 	if(id == null){
 		for(var i in this.scene_events){
-			for(var j in this.scene_events[i]){
-				this.remove_scene_event(i, this.scene_events[i][j]);
+			var clone_events = this.scene_events[i].slice(0);
+			for(var j in clone_events){
+				this.remove_scene_event(i, clone_events[j]);
 			}
 		}
 	}else{
-		for(var j in this.scene_events[id]){
-			this.remove_scene_event(id, this.scene_events[id][j]);
+		var clone_events = this.scene_events[id].slice(0);
+		for(var j in clone_events){
+			this.remove_scene_event(id, clone_events[j]);
 		}
 	}
 }
@@ -176,11 +200,6 @@ CGE_Trigger_Data.prototype.prepare_save = function(){
 			this.global_events[i][j].prepare_save();
 		}
 	}
-	/*for(var i in this.map_events){
-		for(var j in this.map_events[i]){
-			this.map_events[i][j].prepare_save();
-		}
-	}*/
 	for(var i in this.scene_events){
 		for(var j in this.scene_events[i]){
 			this.scene_events[i][j].prepare_save();
@@ -197,12 +216,6 @@ CGE_Trigger_Data.prototype.reload_save = function(main){
 			this.id_events[this.global_events[i][j].id] = this.global_events[i][j];
 		}
 	}
-	/*for(var i in this.map_events){
-		for(var j in this.map_events[i]){
-			this.map_events[i][j].reload_save(main);
-			this.id_events[this.map_events[i][j].id] = this.map_events[i][j];
-		}
-	}*/
 	for(var i in this.scene_events){
 		for(var j in this.scene_events[i]){
 			this.scene_events[i][j].reload_save(main);

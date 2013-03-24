@@ -189,12 +189,12 @@ CGE_Spriteset.prototype.check_collision = function(chara, new_r, dir){
 // =================================================================================================
 
 /* ======================================
-			CGE RECT
+			CGE AREA
 			----------------------------------------------------------
 			Object representing a rect with position x,y and width,height
 ====================================== */ 
 // basic object for an area
-function CGE_Rect(x,y,w,h){
+function CGE_Area(x,y,w,h){
 	// position
 	this.x = x;
 	this.y = y;
@@ -202,34 +202,36 @@ function CGE_Rect(x,y,w,h){
 	// size
 	this.width = w;
 	this.height = h;
+	
+	this.type = "CGE_Area";
 }
 	
-CGE_Rect.prototype.set_x = function(new_x){
+CGE_Area.prototype.set_x = function(new_x){
 	this.x = new_x;
 }
-CGE_Rect.prototype.set_y = function(new_y){
+CGE_Area.prototype.set_y = function(new_y){
 	this.y = new_y;
 }
-CGE_Rect.prototype.set_z = function(new_z){
+CGE_Area.prototype.set_z = function(new_z){
 	this.z = new_z;
 }
-CGE_Rect.prototype.get_hitbox = function(){
+CGE_Area.prototype.get_hitbox = function(){
 	return this;
 }
 
 // -----------------------------------------------------------------------------------
 // frame update template
 // -----------------------------------------------------------------------------------
-CGE_Rect.prototype.update = function(ctx){ }
+CGE_Area.prototype.update = function(ctx){ }
 	
 // =================================================================================================
 
 /* ======================================
-			CGE IMAGE <- RECT
+			CGE IMAGE <- AREA
 			----------------------------------------------------------
 			Object representing a trivial image
 ====================================== */ 
-CGE_Image.prototype = new CGE_Rect();
+CGE_Image.prototype = new CGE_Area();
 CGE_Image.prototype.constructor = CGE_Image;
 function CGE_Image(id, sprites_data, image_source, width, height, x, y, z){
 	if(x == null)
@@ -239,7 +241,7 @@ function CGE_Image(id, sprites_data, image_source, width, height, x, y, z){
 	if(z == null)
 		z = 100;
 		
-	CGE_Rect.call(this,x,y,width,height);
+	CGE_Area.call(this,x,y,width,height);
 	
 	this.variables = {};
 	
@@ -253,6 +255,8 @@ function CGE_Image(id, sprites_data, image_source, width, height, x, y, z){
 	this.visible = true;									// visibility of image
 	this.opacity = 1.0;										// opacity of image
 	this.spritesets = [];									// list of own spriteset-ids
+	
+	this.type = "CGE_Image";
 }
 	
 // -----------------------------------------------------------------------------------
@@ -280,10 +284,10 @@ CGE_Image.prototype.remove = function(){
 // -----------------------------------------------------------------------------------
 // returns display size
 // -----------------------------------------------------------------------------------
-CGE_Image.prototype.get_width = function(){
+CGE_Area.prototype.get_width = function(){
 	return this.width;
 }
-CGE_Image.prototype.get_height = function(){
+CGE_Area.prototype.get_height = function(){
 	return this.height;
 }
 
@@ -316,6 +320,8 @@ function CGE_Sprite(id, sprites_data, image_source, width, height, rows, cols, x
 	this.n_cols = cols;			// number of columns
 	this.row_index = 0;			// current row
 	this.col_index = 0;			// current collumn
+	
+	this.type = "CGE_Sprite";
 }	
 	
 // -----------------------------------------------------------------------------------
@@ -378,6 +384,7 @@ function CGE_Anim_Sprite(id, sprites_data, image_source, width, height, rows, co
 	this.col_index = this.frame_sequence[0][0];
 	this.row_index = this.frame_sequence[0][1];
 	
+	this.type = "CGE_Anim_Sprite";
 }
 	
 // -----------------------------------------------------------------------------------
@@ -477,7 +484,7 @@ function CGE_Character(id, sprites_data, image_source, width, height, rows, cols
 	this.special_sequences = [{},{},{},{}];  // array of special sequences that can be loaded
 	this.speed = 5;										   // speed of movement
  	this.velocity = [0,0];									// current velocity
-	this.hitbox = new CGE_Rect(0,0,32,32);	// created hitbox which differs from own size
+	this.hitbox = new CGE_Area(0,0,32,32);	// created hitbox which differs from own size
 	
 	this.col_spritesets = [];							// spritesets which character collides with
 	this.map_collider = true;						// defines if character collides with map
@@ -486,6 +493,8 @@ function CGE_Character(id, sprites_data, image_source, width, height, rows, cols
 	// show hitbox for debugging
 	//this.show_hitbox = true;
 	this.show_hitbox = false;
+	
+	this.type = "CGE_Character";
 	
 	// define some basic sequences for movement
 	this.write_sequence(2, "stand",[[0,0]]);
@@ -607,4 +616,247 @@ CGE_Character.prototype.reload_save = function(main){
 	for(var m=0; m < this.moves.length; m++){
 		this.moves[m].move_interpreter = main.move_interpreter;
 	}
+}
+
+/* ======================================
+			CGE TEXTAREA <- AREA
+			----------------------------------------------------------
+			Object representing a formatted text
+====================================== */ 
+CGE_Text.prototype = new CGE_Area();
+CGE_Text.prototype.constructor = CGE_Text;
+function CGE_Text(id, text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height){
+	if(x == null)
+		x = 0;
+	if(y == null)
+		y = 0;
+	if(z == null)
+		z = 100;
+	if(text == null)
+		text = "";
+	CGE_Area.call(this,x,y,width,height);
+	this.z  = z;
+	this.id = id;										
+	this.zoom_x = 1.0;									
+	this.zoom_y = 1.0;
+	this.sprites_data = sprites_data;
+	this.visible = true;								
+	this.opacity = 1.0;
+	this.text = text;
+	this.autobreak = true;
+	this.line_spacing = 5;
+	this.size = 24;
+	this.bold = false;
+	this.italic = false;
+	this.font = "Arial";
+	this.i_source = i_source;
+	this.i_cols = i_cols;
+	this.i_rows = i_rows;
+	this.i_width = i_width;
+	this.i_height = i_height;
+	this.color = "rgb(0,0,0)";
+	this.type = "CGE_Text";
+	this.refresh();
+}
+
+CGE_Text.prototype.set_text = function(new_text){
+	this.text = new_text;
+	this.refresh();
+}
+
+CGE_Text.prototype.refresh = function(){
+	// split text in words
+	this.words = [];
+	var all_letters = this.text.split("");
+	var temp_words = this.text.split(" ");
+	// format commands filter
+	for(var w=0; w < temp_words.length; w++){
+		var temp_word = temp_words[w];
+		var letters = temp_word.split("");
+		var words_in_letters = [""];
+		var i = 0;
+		var k = 0;
+		while(i < letters.length){
+			// linebreaks
+			if(letters[i] == "/" && letters[i+1] == "n"){
+				if(words_in_letters[k] != "") 
+					k++;
+				words_in_letters[k] = "/n";
+				k++;
+				i += 2;
+				if(letters[i] != null)
+					words_in_letters[k] = "";
+			}
+			if(letters[i] == "[" && i != 0){
+				k++;
+				words_in_letters[k] = "";
+			}
+			if(letters[i] == "]"){
+				words_in_letters[k] += letters[i];
+				k++;
+				i++;
+				if(letters[i] != null)
+					words_in_letters[k] = "";
+			}
+			if(letters[i] != null)
+				words_in_letters[k] += letters[i];
+			i++;
+		}
+		this.words = this.words.concat(words_in_letters);
+	}
+	this.height_image = this.i_height/this.i_rows;
+	this.width_image = this.i_width/this.i_cols;
+}
+
+CGE_Text.prototype.draw = function(ctx){
+	var up = 0;
+	var down = 0;
+	var mem_color = this.color;
+	var mem_size = this.size;
+	var mem_font = this.font;
+	// show text
+	var y = this.size;
+	var x = 0;
+	for(var j=0; j < this.words.length; j++){
+		var invisible_word = false;
+		var word = this.words[j];
+		// x out of range
+		if(word != "/n" && !this.is_format_command(word) && (x+ctx.measureText(word).width) > this.width){
+			// auto linebreak
+			if(this.autobreak){
+				y += (this.size+this.line_spacing);
+			}else{
+				break;
+			}
+			x = 0;
+		}
+		// forced linebreak
+		if(word == "/n"){
+			y += (this.size+this.line_spacing);
+			x = 0;
+		}
+		if(this.is_format_command(word)){
+			var format_word = true;
+			var spl = word.split("=");
+			if(spl[0] == "[c"){ // color
+				mem_color = this.color;
+				var rgb = word.split("=")[1].split("]")[0];
+				this.color = "rgb("+rgb+")";
+				invisible_word = true;
+			}else if(word == "[/c]"){
+				this.color = mem_color;
+				invisible_word = true;
+			}else if(spl[0] == "[p"){ // picture/icon
+				var n = word.split("=")[1].split("]")[0];
+				if(this.img == null){
+					this.img = new Image();
+					this.img.src = this.i_source;
+				}
+				var display_height = this.size;
+				var display_width = this.width_image*display_height/this.height_image;
+				var x_image = (n%this.i_cols)*this.width_image;
+				var y_image = parseInt(n/this.i_cols)*this.height_image;
+				if(x + display_width > this.width){
+					if(this.autobreak){
+						y += (this.size+this.line_spacing);
+					}else{
+						break;
+					}
+					x = 0;
+				}
+				ctx.globalAlpha = this.opacity;
+				ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
+				x += this.width_image;
+				x += ctx.measureText(" ").width;
+			}else if(word == "[b]"){
+				this.bold = true;
+				invisible_word = true;
+			}else if(word == "[/b]"){
+				this.bold = false;
+				invisible_word = true;
+			}else if(word == "[i]"){
+				this.italic = true;
+				invisible_word = true;
+			}else if(word == "[/i]"){
+				this.intalic = false;
+				invisible_word = true;
+			}else if(spl[0] == "[s"){ 
+				mem_size = this.size;
+				this.size = parseInt(word.split("=")[1].split("]")[0]);
+				invisible_word = true;
+			}else if(word == "[/s]"){ 
+				this.size = mem_size;
+				invisible_word = true;
+			}else if(spl[0] == "[f"){ 
+				mem_font = this.font;
+				this.font = word.split("=")[1].split("]")[0];
+				invisible_word = true;
+			}else if(word == "[/f]"){ 
+				this.font = mem_font;
+				invisible_word = true;
+			}else if(spl[0] == "[u"){
+				up = parseInt(word.split("=")[1].split("]")[0]);
+				invisible_word = true;
+			}else if(word == "[/u]"){ 
+				up = 0;
+				invisible_word = true;
+			}else if(spl[0] == "[d"){
+				down = parseInt(word.split("=")[1].split("]")[0]);
+				invisible_word = true;
+			}else if(word == "[/d]"){ 
+				down = 0;
+				invisible_word = true;
+			}
+		}
+		// y out of range
+		if(this.height != null && y > this.height){
+			break;
+		}
+		if(word != null && word != "/n" && !this.is_format_command(word)){
+			this.set_font_parameter(ctx);
+			ctx.fillStyle = this.color;
+			ctx.fillText(word, this.x+x, this.y+y-up+down);
+			x += ctx.measureText(word).width
+			if(!invisible_word){
+				x += ctx.measureText(" ").width;
+			}
+		}
+	}
+	this.color = mem_color;
+	this.size = mem_size;
+	this.font = mem_font;
+	this.bold = false;
+	this.italic = false;
+}
+
+CGE_Text.prototype.set_font_parameter = function(ctx){
+	var f = "";
+	if(this.italic)
+		f = "italic ";
+	if(this.bold)
+		f += "bold ";
+	f += this.size+"pt ";
+	ctx.font = f+this.font;
+}
+
+CGE_Text.prototype.update = function(){ }
+
+CGE_Text.prototype.is_format_command = function(word){
+	return (word.split("")[0] == "[");
+}
+
+CGE_Text.prototype.remove = function(){
+	this.sprites_data.remove_image(this);
+	for(var i=0; i < this.spritesets.length; i++){
+		this.sprites_data.spritesets[this.spritesets[i]].remove_sprite(this);
+	}
+}
+
+CGE_Text.prototype.prepare_save = function(){
+	this.sprites_data = null;
+	this.img = null;
+}
+
+CGE_Text.prototype.reload_save = function(main){
+	this.sprites_data = main.sprites_data;
 }

@@ -42,7 +42,6 @@ CGE_Event_Interpreter.prototype.update = function(){
 			e.frame_index++;
 			if(e.finished){
 				e.active = false;
-				//e.finished = false;
 				var ix = this.parallel_events.indexOf(clone_para_events[i]);
 				this.parallel_events.splice(ix, 1);
 			}
@@ -58,7 +57,6 @@ CGE_Event_Interpreter.prototype.update = function(){
 			this.interpret_event(e);
 			e.frame_index++;
 			if(e.finished){
-				//e.finished = false;
 				e.active = false;
 				this.active_event = null;
 			}
@@ -74,11 +72,15 @@ CGE_Event_Interpreter.prototype.update = function(){
 // interpretation of an event
 // -----------------------------------------------------------------------------------
 CGE_Event_Interpreter.prototype.interpret_event = function(event){
+	if(event.effects.length == 0){
+		event.finished = true;
+		event.effect_index = 0;
+		return;
+	}
 	var effect_id = event.effects[event.effect_index][0];
 	var para = event.effects[event.effect_index].slice(1);
 	switch(effect_id){
 		case "player_move" :
-			//this.main.debug_m(effect_id+" "+para);
 			if(para[0] == -1)
 				var chara = this.main.sprites_data.get_image_by_id(event.chara);
 			else	
@@ -112,8 +114,8 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 				var chara = this.main.sprites_data.get_image_by_id(event.chara);
 			else	
 				var chara = this.main.sprites_data.get_image_by_id(para[0]);
-			chara.x = para[1](chara.x);
-			chara.y = para[2](chara.y);
+			chara.x = para[1](this.main, chara.x);
+			chara.y = para[2](this.main, chara.y);
 			event.effect_index++;
 			break;
 		case "play_music" :
@@ -178,6 +180,13 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 			// ...get save from server...
 			cge_load_game(save_data);
 			this.main.alive = false;
+			break;
+		case "set_mouse_display" :
+			if(para[0] == false)
+				this.main.canv.style.cursor = "none";
+			else	
+				this.main.canv.style.cursor = "default";
+			event.effect_index++;
 			break;
 		case "execute_function" :
 			para[0]();

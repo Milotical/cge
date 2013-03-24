@@ -67,26 +67,30 @@ function cge_load_game(str){
 		game.trigger_data.id_events = {};
 		game.event_interpreter.active_event = null;
 		game.event_interpreter.parallel_events = [];
+		game.scene_data.ctx = game.ctx_buffer;
 		
 		for(var i=0; i < save_data.map_data.images.length; i++){
 			var save_chara = save_data.map_data.images[i];
-			var chara = new CGE_Character();
+			var chara = eval("new "+save_chara.type+"()");
 			for(var c in save_chara){
 				chara[c] = save_chara[c];
 			}
-			chara.moves = [];
-			for(var m in save_chara.moves){
-				chara.moves[m] = new CGE_Move();
-				var move = save_chara.moves[m];
-				for(var c in move){
-					chara.moves[m][c] = move[c];
+			if(chara.type == "CGE_Character"){
+				chara.moves = [];
+				for(var m in save_chara.moves){
+					chara.moves[m] = new CGE_Move();
+					var move = save_chara.moves[m];
+					for(var c in move){
+						chara.moves[m][c] = move[c];
+					}
 				}
 			}
 			game.map_data.images.push(chara);
 		}
 		for(var i=0; i < save_data.sprites_data.images.length; i++){
 			var save_image = save_data.sprites_data.images[i];
-			var img = new CGE_Image();
+			var img = eval("new "+save_image.type+"()");
+			//var img = new CGE_Image();
 			for(var c in save_image){
 				img[c] = save_image[c];
 			}
@@ -131,16 +135,18 @@ function cge_load_game(str){
 		for(var c in save_data.input_controller){
 			game.input_controller[c] = save_data.input_controller[c];
 		}
+		game.global_variables = save_data.global_variables;
+		game.data_objects = save_data.data_objects;
 		game.input_controller.gathered_keys = [];
 		game.input_controller.trigger_keys = save_data.input_controller.trigger_keys; 
 		game.map_data.layers = save_data.map_data.layers;
 		game.map_data.tileset_name = save_data.map_data.tileset_name
 		game.map_data.tileset_grid_size = save_data.map_data.tileset_grid_size
 		game.map_data.tileset_zoom_factor = save_data.map_data.tileset_zoom_factor;
-		game.map_data.tileset_row_width = save_data.map_data.tileset_row_width
-		game.map_data.tileset_passable = save_data.map_data.tileset_passable
-		game.map_data.map_width = save_data.map_data.map_width
-		game.map_data.map_height = save_data.map_data.map_height
+		game.map_data.tileset_row_width = save_data.map_data.tileset_row_width;
+		game.map_data.tileset_passable = save_data.map_data.tileset_passable;
+		game.map_data.map_width = save_data.map_data.map_width;
+		game.map_data.map_height = save_data.map_data.map_height;
 		game.scene_data.images = save_data.scene_data.images;
 	
 		game.reload_save();
@@ -191,6 +197,8 @@ function CGE_Game(html_id, system_info){
 	this.resolution = system_info["resolution"]; 				// array defining the resolution (e.g. [640, 480])
 	this.start_map_id = system_info["start_map"];		// start map id
 	this.alive = true;																// defines if game is running (if set to false the game is terminated at the end of the frame)
+	this.data_objects = {};
+	this.global_variables = {};
 	
 	this.scroll_x = 0;
 	this.scroll_y = 0;
@@ -229,7 +237,7 @@ CGE_Game.prototype.create_canvas_element = function(){
 	var canvas_height = this.resolution[1];
 	div.html("");
 	// creating canvas elements (define style of canvas)
-	div.append('<canvas id="'+this.html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:10px;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
+	div.append('<canvas id="'+this.html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:1px;width:100%;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
 	div.append('<canvas id="'+this.html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');
 	div.append('<br /><div id="'+this.html_id+'_fps">fps: </div>');
 	div.append('<br /><div id="'+this.html_id+'_debug" style="color:red;overflow:scroll;width:800px;height:100px;"></div>');
@@ -280,12 +288,15 @@ CGE_Game.prototype.update = function(){
 	
 	// checking if scene is alive
 	if(this.scene_data.alive){
+		// frame update of auto-event-trigger
+		this.trigger_data.update("auto");
 		this.scene_data.update(); // frame update for scene
 	}else{
-		if(this.scene_data.new_scene_id != 0)
+		if(this.scene_data.new_scene_id != 0){
 			this.scene_data.end(); // end scene
-		else	
+		}else{	
 			this.alive = false;
+		}
 		// get new scene data from the server	
 		this.scene_data.order_new_scene_data(this.new_scene_id);
 	}
@@ -293,8 +304,6 @@ CGE_Game.prototype.update = function(){
 	// copy content from buffer canvas to visible canvas
 	this.ctx.drawImage(this.canv_buffer, this.scroll_x, this.scroll_y);
 	
-	// frame update of auto-event-trigger
-	this.trigger_data.update("auto");
 	this.input_controller.update();
 	this.event_interpreter.update();
 
