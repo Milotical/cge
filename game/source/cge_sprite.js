@@ -625,7 +625,7 @@ CGE_Character.prototype.reload_save = function(main){
 ====================================== */ 
 CGE_Text.prototype = new CGE_Area();
 CGE_Text.prototype.constructor = CGE_Text;
-function CGE_Text(id, text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height){
+function CGE_Text(id, text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height){
 	if(x == null)
 		x = 0;
 	if(y == null)
@@ -656,6 +656,11 @@ function CGE_Text(id, text, sprites_data, width, height, x, y, z,i_source, i_col
 	this.i_height = i_height;
 	this.color = "rgb(0,0,0)";
 	this.type = "CGE_Text";
+	this.f_source = f_source;
+	this.f_cols = f_cols;
+	this.f_rows = f_rows;
+	this.f_width = f_width;
+	this.f_height = f_height;
 	this.refresh();
 }
 
@@ -664,11 +669,10 @@ CGE_Text.prototype.set_text = function(new_text){
 	this.refresh();
 }
 
-CGE_Text.prototype.refresh = function(){
-	// split text in words
-	this.words = [];
-	var all_letters = this.text.split("");
-	var temp_words = this.text.split(" ");
+CGE_Text.prototype.create_real_words = function(text){
+	var words = [];
+	var all_letters = text.split("");
+	var temp_words = text.split(" ");
 	// format commands filter
 	for(var w=0; w < temp_words.length; w++){
 		var temp_word = temp_words[w];
@@ -702,10 +706,20 @@ CGE_Text.prototype.refresh = function(){
 				words_in_letters[k] += letters[i];
 			i++;
 		}
-		this.words = this.words.concat(words_in_letters);
+		words = words.concat(words_in_letters);
 	}
+	return words;
+}
+
+CGE_Text.prototype.refresh = function(){
+	// split text in words
+	this.words = this.create_real_words(this.text);
 	this.height_image = this.i_height/this.i_rows;
 	this.width_image = this.i_width/this.i_cols;
+	if(this.f_source != null){
+		this.height_font_image = this.f_height/this.f_rows;
+		this.width_font_image = this.f_width/this.f_cols;
+	}
 }
 
 CGE_Text.prototype.draw = function(ctx){
@@ -720,16 +734,6 @@ CGE_Text.prototype.draw = function(ctx){
 	for(var j=0; j < this.words.length; j++){
 		var invisible_word = false;
 		var word = this.words[j];
-		// x out of range
-		if(word != "/n" && !this.is_format_command(word) && (x+ctx.measureText(word).width) > this.width){
-			// auto linebreak
-			if(this.autobreak){
-				y += (this.size+this.line_spacing);
-			}else{
-				break;
-			}
-			x = 0;
-		}
 		// forced linebreak
 		if(word == "/n"){
 			y += (this.size+this.line_spacing);
@@ -739,35 +743,42 @@ CGE_Text.prototype.draw = function(ctx){
 			var format_word = true;
 			var spl = word.split("=");
 			if(spl[0] == "[c"){ // color
-				mem_color = this.color;
-				var rgb = word.split("=")[1].split("]")[0];
-				this.color = "rgb("+rgb+")";
+				if(spl[1] != null){
+					mem_color = this.color;
+					var rgb = spl[1].split("]")[0];
+					if(rgb != null)
+						this.color = "rgb("+rgb+")";
+				}
 				invisible_word = true;
 			}else if(word == "[/c]"){
 				this.color = mem_color;
 				invisible_word = true;
 			}else if(spl[0] == "[p"){ // picture/icon
-				var n = word.split("=")[1].split("]")[0];
-				if(this.img == null){
-					this.img = new Image();
-					this.img.src = this.i_source;
-				}
-				var display_height = this.size;
-				var display_width = this.width_image*display_height/this.height_image;
-				var x_image = (n%this.i_cols)*this.width_image;
-				var y_image = parseInt(n/this.i_cols)*this.height_image;
-				if(x + display_width > this.width){
-					if(this.autobreak){
-						y += (this.size+this.line_spacing);
-					}else{
-						break;
+				if(spl[1] != null){
+					var n = spl[1].split("]")[0];
+					if(n != null){
+						if(this.img == null){
+							this.img = new Image();
+							this.img.src = this.i_source;
+						}
+						var display_height = this.size;
+						var display_width = this.width_image*display_height/this.height_image;
+						var x_image = (n%this.i_cols)*this.width_image;
+						var y_image = parseInt(n/this.i_cols)*this.height_image;
+						if(x + display_width > this.width){
+							if(this.autobreak){
+								y += (this.size+this.line_spacing);
+							}else{
+								break;
+							}
+							x = 0;
+						}
+						ctx.globalAlpha = this.opacity;
+						ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
+						x += this.width_image;
+						x += ctx.measureText(" ").width;
 					}
-					x = 0;
 				}
-				ctx.globalAlpha = this.opacity;
-				ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
-				x += this.width_image;
-				x += ctx.measureText(" ").width;
 			}else if(word == "[b]"){
 				this.bold = true;
 				invisible_word = true;
@@ -778,30 +789,40 @@ CGE_Text.prototype.draw = function(ctx){
 				this.italic = true;
 				invisible_word = true;
 			}else if(word == "[/i]"){
-				this.intalic = false;
+				this.italic = false;
 				invisible_word = true;
-			}else if(spl[0] == "[s"){ 
-				mem_size = this.size;
-				this.size = parseInt(word.split("=")[1].split("]")[0]);
+			}else if(spl[0] == "[s"){
+				if(spl[1] != null){
+					var s = spl[1].split("]")[0];
+					if(s != null){
+						mem_size = this.size;
+						this.size = parseInt(s);
+					}
+				}
 				invisible_word = true;
 			}else if(word == "[/s]"){ 
 				this.size = mem_size;
 				invisible_word = true;
 			}else if(spl[0] == "[f"){ 
-				mem_font = this.font;
-				this.font = word.split("=")[1].split("]")[0];
+				var fo = word.split("=")[1].split("]")[0];
+				if(fo != null){
+					mem_font = this.font;
+					this.font = fo;
+				}
 				invisible_word = true;
 			}else if(word == "[/f]"){ 
 				this.font = mem_font;
 				invisible_word = true;
 			}else if(spl[0] == "[u"){
-				up = parseInt(word.split("=")[1].split("]")[0]);
+				if(spl[1] != null)
+					up = parseInt(spl[1].split("]")[0]);
 				invisible_word = true;
 			}else if(word == "[/u]"){ 
 				up = 0;
 				invisible_word = true;
 			}else if(spl[0] == "[d"){
-				down = parseInt(word.split("=")[1].split("]")[0]);
+				if(spl[1] != null)
+					down = parseInt(spl[1].split("]")[0]);
 				invisible_word = true;
 			}else if(word == "[/d]"){ 
 				down = 0;
@@ -813,12 +834,43 @@ CGE_Text.prototype.draw = function(ctx){
 			break;
 		}
 		if(word != null && word != "/n" && !this.is_format_command(word)){
+			// x out of range
+			if(this.check_autp_linebreak(ctx, x, word, j)){
+				// auto linebreak
+				if(this.autobreak){
+					y += (this.size+this.line_spacing);
+				}else{
+					break;
+				}
+				x = 0;
+			}
 			this.set_font_parameter(ctx);
-			ctx.fillStyle = this.color;
-			ctx.fillText(word, this.x+x, this.y+y-up+down);
-			x += ctx.measureText(word).width
+			if(this.f_source == null){
+				ctx.fillStyle = this.color;
+				ctx.fillText(word, this.x+x, this.y+y-up+down);
+				x += ctx.measureText(word).width
+			}else{
+				if(this.font_img == null){
+					this.font_img = new Image();
+					this.font_img.src = this.f_source;
+				}
+				for(var l=0; l < word.length; l++){
+					var n = (word.charCodeAt(l)-33);
+					var display_height = this.size;
+					var display_width = this.width_font_image*display_height/this.height_font_image;
+					var x_image = (n%this.f_cols)*this.width_font_image;
+					var y_image = parseInt(n/this.f_cols)*this.height_font_image;
+					ctx.globalAlpha = this.opacity;
+					ctx.drawImage(this.font_img, x_image, y_image,this.width_font_image, this.height_font_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
+					x += this.width_font_image;
+				}
+			}
 			if(!invisible_word){
-				x += ctx.measureText(" ").width;
+				if(this.f_source == null){
+					x += ctx.measureText(" ").width;
+				}else{
+					x += this.width_font_image;
+				}
 			}
 		}
 	}
@@ -827,6 +879,10 @@ CGE_Text.prototype.draw = function(ctx){
 	this.font = mem_font;
 	this.bold = false;
 	this.italic = false;
+}
+
+CGE_Text.prototype.check_autp_linebreak = function(ctx, x, word){
+	return (this.f_source == null && x+ctx.measureText(word).width > this.width)  || 	(this.f_source != null && x+word.length*this.width_font_image > this.width);
 }
 
 CGE_Text.prototype.set_font_parameter = function(ctx){
@@ -855,8 +911,74 @@ CGE_Text.prototype.remove = function(){
 CGE_Text.prototype.prepare_save = function(){
 	this.sprites_data = null;
 	this.img = null;
+	this.font_image = null;
 }
 
 CGE_Text.prototype.reload_save = function(main){
 	this.sprites_data = main.sprites_data;
+}
+
+/* ======================================
+			CGE FLOAT_TEXT <- TEXT
+			----------------------------------------------------------
+			Object representing a formatted text
+====================================== */ 
+CGE_Float_Text.prototype = new CGE_Text();
+CGE_Float_Text.prototype.constructor = CGE_Float_Text;
+function CGE_Float_Text(id, text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height, letter_duration){
+	this.full_text = text;
+	this.text = "";
+	CGE_Text.call(this,id, this.text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height);
+	this.frame_index = 0;
+	if(letter_duration == null)
+		letter_duration = 6;
+	this.letter_duration = letter_duration;
+	this.type = "CGE_Float_Text";
+	this.skip_frames = 0;
+}
+
+CGE_Float_Text.prototype.show_complete_text = function(){
+	this.frame_index = this.full_text.length*this.letter_duration;
+}
+
+CGE_Float_Text.prototype.completed = function(){
+	return this.frame_index >= this.full_text.length*this.letter_duration;
+}
+
+CGE_Float_Text.prototype.update = function(){
+	if(!this.completed()){
+		if(this.skip_frames == 0){
+			var letter_index = parseInt(this.frame_index/this.letter_duration);
+			if(this.full_text[letter_index-1] == "/" && this.full_text[letter_index] == "n"){
+				letter_index += 2;
+				this.frame_index += 2*this.letter_duration;
+			}
+			if(this.full_text[letter_index-1] == "["){
+				if(this.full_text[letter_index] == "p")
+					this.skip_frames = this.letter_duration*2;
+				letter_index += 2;
+				this.frame_index += 2*(this.letter_duration);
+				while((this.full_text[letter_index-2] != "]" && !this.completed())){
+					letter_index++;
+					this.frame_index += (this.letter_duration);
+				}
+			}
+			this.frame_index = parseInt(this.frame_index);
+			this.text = this.full_text.slice(0, letter_index);
+			this.refresh();
+			this.frame_index++;
+		}else{
+			this.skip_frames--;
+		}
+	}
+}
+
+CGE_Float_Text.prototype.refresh = function(){
+	CGE_Text.prototype.refresh.call(this);
+	this.full_words = this.create_real_words(this.full_text);
+}
+
+CGE_Float_Text.prototype.check_autp_linebreak = function(ctx, x, word, word_index){
+	var word=this.full_words[word_index];
+	return (this.f_source == null && x+ctx.measureText(word).width > this.width) || (this.f_source != null && x+word.length*this.width_font_image > this.width);
 }

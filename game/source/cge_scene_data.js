@@ -106,9 +106,20 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 			/*var img = new CGE_Text("t", "Das ist ein Test", this.main.sprites_data, 100, 100, 50, 50, 20,"icons.png", 4, 3, 88, 66);
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);*/
-			var img = new CGE_Text("t2", "aaa/nbbb", this.main.sprites_data, 100, 100, 50, 50, 20,"icons.png", 4, 3, 88, 66);
+			var img = new CGE_Text("t2", "Ein [i]Testtext [s=30]zum[/s] [b]ausprobieren[/i] [c=0,0,255]der verschiedenen[/b] Formartierungsmöglichkeiten[/c] und [u=5]Zeilenumbrüchen.[/u] Auch Icons funktionieren hoffentlich noch: [s=15][p=1][p=2][p=0][/s]", this.main.sprites_data, 200, null, 10, 50, 20,"icons.png", 4, 3, 88, 66);
 			img.size = 12;
 			img.color = "red";
+			this.main.sprites_data.add_image(img);
+			this.images.push(img.id);
+			
+			var img = new CGE_Float_Text("t4", "[s=15][p=1][p=2][p=0][/s]Ein [i]Testtext [s=30]zum[/s] [b]ausprobieren[/i] [c=0,0,255]der verschiedenen[/b] Formartierungsmöglichkeiten[/c] und [u=5]Zeilenumbrüchen.[/u] Auch Icons funktionieren hoffentlich noch: [s=15][p=1][p=2][p=0][/s]", this.main.sprites_data, 200, null, 10, 200, 20,"icons.png", 4, 3, 88, 66);
+			img.size = 12;
+			img.color = "blue";
+			this.main.sprites_data.add_image(img);
+			this.images.push(img.id);
+			
+			var img = new CGE_Text("t3", "Ein kleiner Testtext in eigenem Font, /n 13 + 17 = 30 oder?/n Wie siehts mit Umlauten aus: Ä Ö Ü ä ö ü ß", this.main.sprites_data, 300, null, 200, 50, 20,"icons.png", 4, 3, 88, 66,"testfont.png",16,16, 352, 352);
+			img.size = 22;
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			
