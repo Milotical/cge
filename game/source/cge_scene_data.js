@@ -112,7 +112,7 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			
-			var img = new CGE_Float_Text("t4", "[s=15][p=1][p=2][p=0][/s]Ein [i]Testtext [s=30]zum[/s] [b]ausprobieren[/i] [c=0,0,255]der verschiedenen[/b] Formartierungsmöglichkeiten[/c] und [u=5]Zeilenumbrüchen.[/u] Auch Icons funktionieren hoffentlich noch: [s=15][p=1][p=2][p=0][/s]", this.main.sprites_data, 200, null, 10, 200, 20,"icons.png", 4, 3, 88, 66);
+			var img = new CGE_Speech_Bubble("t4", "Hallo, /n Ich bin ein dicker Drache mit großem Hunger!", this.main.sprites_data, 200, 100, 200, 550, 70,100, 300, 20,"icons.png", 4, 3, 88, 66);
 			img.size = 12;
 			img.color = "blue";
 			this.main.sprites_data.add_image(img);
@@ -123,6 +123,10 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			
+			/*/var img = new CGE_Window("w", this.main.sprites_data, 220, 400, 0, 10, 10, "Testskin.png", 96, 96);
+			//this.main.sprites_data.add_image(img);
+			//this.images.push(img.id);
+			*/
 			this.main.trigger_data.update("start_scene");
 		};
 		

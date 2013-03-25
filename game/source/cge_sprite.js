@@ -194,7 +194,7 @@ CGE_Spriteset.prototype.check_collision = function(chara, new_r, dir){
 			Object representing a rect with position x,y and width,height
 ====================================== */ 
 // basic object for an area
-function CGE_Area(x,y,w,h){
+function CGE_Area(x,y,w,h,sprites_data){
 	// position
 	this.x = x;
 	this.y = y;
@@ -202,8 +202,10 @@ function CGE_Area(x,y,w,h){
 	// size
 	this.width = w;
 	this.height = h;
-	
+	this.sprites_data = sprites_data;
+	this.spritesets = [];
 	this.type = "CGE_Area";
+	this.variables = {};
 }
 	
 CGE_Area.prototype.set_x = function(new_x){
@@ -218,11 +220,39 @@ CGE_Area.prototype.set_z = function(new_z){
 CGE_Area.prototype.get_hitbox = function(){
 	return this;
 }
+// -----------------------------------------------------------------------------------
+// returns display size
+// -----------------------------------------------------------------------------------
+CGE_Area.prototype.get_width = function(){
+	return this.width;
+}
+CGE_Area.prototype.get_height = function(){
+	return this.height;
+}
+
+// -----------------------------------------------------------------------------------
+// deletes image (at next frame)
+// -----------------------------------------------------------------------------------
+CGE_Area.prototype.remove = function(){
+	this.sprites_data.remove_image(this);
+	for(var i=0; i < this.spritesets.length; i++){
+		this.sprites_data.spritesets[this.spritesets[i]].remove_sprite(this);
+	}
+}
+
+CGE_Area.prototype.prepare_save = function(){
+	this.sprites_data = null;
+}
+
+CGE_Area.prototype.reload_save = function(main){
+	this.sprites_data = main.sprites_data;
+}
 
 // -----------------------------------------------------------------------------------
 // frame update template
 // -----------------------------------------------------------------------------------
-CGE_Area.prototype.update = function(ctx){ }
+CGE_Area.prototype.update = function(){ }
+CGE_Area.prototype.draw = function(ctx){ }
 	
 // =================================================================================================
 
@@ -241,16 +271,13 @@ function CGE_Image(id, sprites_data, image_source, width, height, x, y, z){
 	if(z == null)
 		z = 100;
 		
-	CGE_Area.call(this,x,y,width,height);
-	
-	this.variables = {};
+	CGE_Area.call(this,x,y,width,height,sprites_data);
 	
 	this.id = id;
 	this.image_source = image_source;	// path of used image
 	this.z = z;													// the z-priority of the image
 	this.zoom_x = 1.0;									// zoom factors
 	this.zoom_y = 1.0;
-	this.sprites_data = sprites_data; // association to data objects (to add and remove itself)
 	
 	this.visible = true;									// visibility of image
 	this.opacity = 1.0;										// opacity of image
@@ -258,7 +285,7 @@ function CGE_Image(id, sprites_data, image_source, width, height, x, y, z){
 	
 	this.type = "CGE_Image";
 }
-	
+
 // -----------------------------------------------------------------------------------
 // draws image to canvas (automatically called in sprites_draw)
 // -----------------------------------------------------------------------------------
@@ -269,26 +296,6 @@ CGE_Image.prototype.draw = function(ctx){
 	}
 	ctx.globalAlpha = this.opacity;
 	ctx.drawImage(this.img, 0, 0,this.width, this.height, this.x, this.y, this.width*this.zoom_x, this.height*this.zoom_y);
-}
-
-// -----------------------------------------------------------------------------------
-// deletes image (at next frame)
-// -----------------------------------------------------------------------------------
-CGE_Image.prototype.remove = function(){
-	this.sprites_data.remove_image(this);
-	for(var i=0; i < this.spritesets.length; i++){
-		this.sprites_data.spritesets[this.spritesets[i]].remove_sprite(this);
-	}
-}
-
-// -----------------------------------------------------------------------------------
-// returns display size
-// -----------------------------------------------------------------------------------
-CGE_Area.prototype.get_width = function(){
-	return this.width;
-}
-CGE_Area.prototype.get_height = function(){
-	return this.height;
 }
 
 CGE_Image.prototype.prepare_save = function(){
@@ -728,6 +735,7 @@ CGE_Text.prototype.draw = function(ctx){
 	var mem_color = this.color;
 	var mem_size = this.size;
 	var mem_font = this.font;
+	ctx.fillStyle = this.color;
 	// show text
 	var y = this.size;
 	var x = 0;
@@ -755,28 +763,35 @@ CGE_Text.prototype.draw = function(ctx){
 				invisible_word = true;
 			}else if(spl[0] == "[p"){ // picture/icon
 				if(spl[1] != null){
-					var n = spl[1].split("]")[0];
-					if(n != null){
-						if(this.img == null){
-							this.img = new Image();
-							this.img.src = this.i_source;
-						}
-						var display_height = this.size;
-						var display_width = this.width_image*display_height/this.height_image;
-						var x_image = (n%this.i_cols)*this.width_image;
-						var y_image = parseInt(n/this.i_cols)*this.height_image;
-						if(x + display_width > this.width){
-							if(this.autobreak){
-								y += (this.size+this.line_spacing);
-							}else{
-								break;
+					var spl2 = spl[1].slice(0, spl[1].length-1).split(",");
+					for(var i=0; i < spl2.length; i++){
+						var n = spl2[i];
+						if(n != null){
+							if(this.img == null){
+								this.img = new Image();
+								this.img.src = this.i_source;
 							}
-							x = 0;
+							var display_height = this.size;
+							var display_width = this.width_image*display_height/this.height_image;
+							var x_image = (n%this.i_cols)*this.width_image;
+							var y_image = parseInt(n/this.i_cols)*this.height_image;
+							if(x + display_width > this.width){
+								if(this.autobreak){
+									y += (this.size+this.line_spacing);
+								}else{
+									break;
+								}
+								x = 0;
+							}
+							ctx.globalAlpha = this.opacity;
+							ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
+							x += this.width_image;
 						}
-						ctx.globalAlpha = this.opacity;
-						ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
-						x += this.width_image;
+					}
+					if(this.f_source == null){
 						x += ctx.measureText(" ").width;
+					}else{
+						x += this.width_font_image;
 					}
 				}
 			}else if(word == "[b]"){
@@ -824,13 +839,19 @@ CGE_Text.prototype.draw = function(ctx){
 				if(spl[1] != null)
 					down = parseInt(spl[1].split("]")[0]);
 				invisible_word = true;
-			}else if(word == "[/d]"){ 
+			}else if(word == "[/d]"){
 				down = 0;
 				invisible_word = true;
+			}else if(word == "[w]"){
+				if(this.f_source == null){
+					x += ctx.measureText(" ").width;
+				}else{
+					x += this.width_font_image;
+				}
 			}
 		}
 		// y out of range
-		if(this.height != null && y > this.height){
+		if(this.height != null && y+this.size > this.height){
 			break;
 		}
 		if(word != null && word != "/n" && !this.is_format_command(word)){
@@ -861,16 +882,15 @@ CGE_Text.prototype.draw = function(ctx){
 					var x_image = (n%this.f_cols)*this.width_font_image;
 					var y_image = parseInt(n/this.f_cols)*this.height_font_image;
 					ctx.globalAlpha = this.opacity;
+					
 					ctx.drawImage(this.font_img, x_image, y_image,this.width_font_image, this.height_font_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
 					x += this.width_font_image;
 				}
 			}
-			if(!invisible_word){
-				if(this.f_source == null){
-					x += ctx.measureText(" ").width;
-				}else{
-					x += this.width_font_image;
-				}
+			if(this.f_source == null){
+				x += ctx.measureText(" ").width;
+			}else{
+				x += this.width_font_image;
 			}
 		}
 	}
@@ -911,7 +931,7 @@ CGE_Text.prototype.remove = function(){
 CGE_Text.prototype.prepare_save = function(){
 	this.sprites_data = null;
 	this.img = null;
-	this.font_image = null;
+	this.font_img = null;
 }
 
 CGE_Text.prototype.reload_save = function(main){
@@ -926,6 +946,8 @@ CGE_Text.prototype.reload_save = function(main){
 CGE_Float_Text.prototype = new CGE_Text();
 CGE_Float_Text.prototype.constructor = CGE_Float_Text;
 function CGE_Float_Text(id, text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height, letter_duration){
+	if(text == null)
+		text = "";
 	this.full_text = text;
 	this.text = "";
 	CGE_Text.call(this,id, this.text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height);
@@ -942,7 +964,7 @@ CGE_Float_Text.prototype.show_complete_text = function(){
 }
 
 CGE_Float_Text.prototype.completed = function(){
-	return this.frame_index >= this.full_text.length*this.letter_duration;
+	return this.frame_index > this.full_text.length*this.letter_duration;
 }
 
 CGE_Float_Text.prototype.update = function(){
@@ -981,4 +1003,193 @@ CGE_Float_Text.prototype.refresh = function(){
 CGE_Float_Text.prototype.check_autp_linebreak = function(ctx, x, word, word_index){
 	var word=this.full_words[word_index];
 	return (this.f_source == null && x+ctx.measureText(word).width > this.width) || (this.f_source != null && x+word.length*this.width_font_image > this.width);
+}
+
+/* ======================================
+			CGE SPEECH BUBBLE <- FLOAT TEXT
+			----------------------------------------------------------
+			Object representing a speech bubble
+====================================== */ 
+CGE_Speech_Bubble.prototype = new CGE_Float_Text();
+CGE_Speech_Bubble.prototype.constructor = CGE_Speech_Bubble;
+function CGE_Speech_Bubble(id, text, sprites_data, width, height, r, x0, y0, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height, letter_duration){
+	CGE_Float_Text.call(this,id, text, sprites_data, width, height, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height, letter_duration);
+	this.style = "black";
+	this.line_width = 1;
+	var w = parseInt(this.width);
+	var h = parseInt(this.height);
+	if(r > w/2)
+		r = w/2;
+	if(r > h/2)
+		r = h/2;
+	this.r = r;
+	this.bg_color = "white";
+	this.bg_opacity = 0.5;
+	this.x0 = x0;
+	this.y0 = y0;
+	this.tail_base_length = 40;
+	this.tail_offset = 0;
+	this.tail_dir = 2;
+	this.tail_style = "auto"; // autoX, autoY, fix
+	this.type = "CGE_Speech_Bubble";
+}
+
+CGE_Speech_Bubble.prototype.refresh_tail = function(){
+	var x_center = this.x+this.width/2;
+	var y_center = this.y+this.height/2;
+	var dx = this.x0-x_center;
+	var dy = this.y0-y_center;
+	switch(this.tail_style){
+		case "auto" :
+			if(Math.abs(dx) > Math.abs(dy)){
+				if(dx > 0){	
+					this.tail_dir = 1;
+				}else{
+					this.tail_dir = 3;
+				}
+			}else{
+				if(dy > 0){	
+					this.tail_dir = 2;
+				}else{
+					this.tail_dir = 0;
+				}
+			}
+			break;
+		case "autoX" :
+			if(dx > 0){	
+				this.tail_dir = 1;
+			}else{
+				this.tail_dir = 3;
+			}
+			break;
+		case "autoY" :	
+			if(dy > 0){
+				this.tail_dir = 2;
+			}else{
+				this.tail_dir = 0;
+			}
+			break;
+	}
+}
+
+CGE_Speech_Bubble.prototype.draw = function(ctx){
+	this.refresh_tail();
+	ctx.globalAlpha = this.bg_opacity;
+	ctx.beginPath();
+	ctx.strokeStyle = this.style;
+	ctx.lineWidth = this.line_width;
+	var x = parseInt(this.x - 0.29*this.r);
+	var y = parseInt(this.y - 0.29*this.r);
+	var w = parseInt(this.width+0.58*this.r);
+	var h = parseInt(this.height+0.58*this.r);
+	ctx.moveTo(x, y+this.r);
+	// darw bubble:
+	ctx.quadraticCurveTo(x,y,x+this.r,y);
+	// top
+	if(this.tail_dir == 0){
+		ctx.lineTo(x+this.r+this.tail_offset, y);
+		ctx.lineTo(this.x0, this.y0);
+		ctx.lineTo(x+this.r+this.tail_offset+this.tail_base_length, y);
+	}
+	ctx.lineTo(x+w-this.r, y);
+	ctx.quadraticCurveTo(x+w,y,x+w,y+this.r);
+	// right
+	if(this.tail_dir == 1){
+		ctx.lineTo(x+w, y+this.r+this.tail_offset);
+		ctx.lineTo(this.x0, this.y0);
+		ctx.lineTo(x+w, y+this.r+this.tail_offset+this.tail_base_length);
+	}
+	ctx.lineTo(x+w, y+h-this.r);
+	ctx.quadraticCurveTo(x+w,y+h,x+w-this.r,y+h);
+	// down
+	if(this.tail_dir == 2){
+		ctx.lineTo(x+w-this.r-this.tail_offset, y+h);
+		ctx.lineTo(this.x0, this.y0);
+		ctx.lineTo(x+w-this.r-this.tail_offset-this.tail_base_length, y+h);
+	}
+	ctx.lineTo(x+this.r, y+h);
+	ctx.quadraticCurveTo(x,y+h,x,y+h-this.r);
+	// left
+	if(this.tail_dir == 3){
+		ctx.lineTo(x, y+h-this.r-this.tail_offset);
+		ctx.lineTo(this.x0, this.y0);
+		ctx.lineTo(x, y+h-this.r-this.tail_offset-this.tail_base_length);
+	}
+	ctx.lineTo(x, y+this.r);
+	
+	ctx.fillStyle = this.bg_color;
+	ctx.fill();
+	ctx.stroke();
+	ctx.globalAlpha = this.opacity;
+	CGE_Float_Text.prototype.draw.call(this, ctx);
+}
+
+/* ======================================
+			WINDOW <- AREA
+			----------------------------------------------------------
+			Object representing a window with border
+====================================== */ 
+CGE_Window.prototype = new CGE_Area();
+CGE_Window.prototype.constructor = CGE_Window;
+function CGE_Window(id, sprites_data, width, height, x, y, z, windowskin, width_image, height_image){
+	if(width < width_image)
+		width = width_image;
+	if(height < height_image)
+		height = height_image;
+	CGE_Area.call(this,x,y,width,height);
+	this.z = z;
+	this.windowskin = windowskin;
+	this.width_image = width_image;
+	this.height_image = height_image;
+	this.opacity = 1.0;
+	this.type = "CGE_Window";
+}
+
+CGE_Window.prototype.draw = function(ctx){
+	if(this.img == null){
+		this.img = new Image();
+		this.img.src = this.windowskin;
+	}
+	var width_image = this.width_image/3;
+	var height_image = this.height_image/3;
+	ctx.globalAlpha = this.opacity;
+	// Draw Background
+	var x_image = width_image;
+	var y_image = height_image;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y+height_image, this.width-2*width_image, this.height-2*height_image);
+	// Darw Border
+	// top
+	var x_image = width_image;
+	var y_image = 0;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y, this.width-2*width_image, height_image);
+	// bottom
+	var x_image = width_image;
+	var y_image = 2*height_image;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y+this.height-height_image, this.width-2*width_image, height_image);
+	// left
+	var x_image = 0;
+	var y_image = height_image;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y+height_image, width_image, this.height-2*height_image);
+	// right
+	var x_image = 2*width_image;
+	var y_image = height_image;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y+height_image, width_image, this.height-2*height_image);
+	// Draw corners
+	var x_image = 0;
+	var y_image = 0;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image, height_image);
+	var x_image = 2*width_image;
+	var y_image = 0;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y, width_image, height_image);
+	var x_image = 0;
+	var y_image = 2*height_image;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y+this.height-height_image, width_image, height_image);
+	var x_image = 2*width_image;
+	var y_image = 2*height_image;
+	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y+this.height-height_image, width_image, height_image);
+}
+
+CGE_Window.prototype.prepare_save = function(){
+	this.sprites_data = null;
+	this.img = null;
 }
