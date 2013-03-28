@@ -24,8 +24,14 @@ function CGE_Input_Controller(main_object){
 	$(document).keydown( function(e) {
 		var key = e.keyCode ? e.keyCode : e.which;
 		o.gathered_keys[key] = true;
-		if(key == 122)
-			$("#"+o.main.html_id)[0].mozRequestFullScreen();
+		if(key == 122){
+			if($("#"+o.main.html_id)[0].requestFullScreen != null)
+				$("#"+o.main.html_id)[0].requestFullScreen();
+			else if($("#"+o.main.html_id)[0].mozRequestFullScreen != null)
+				$("#"+o.main.html_id)[0].mozRequestFullScreen();
+			else if($("#"+o.main.html_id)[0].webkitRequestFullScreen != null)
+				$("#"+o.main.html_id)[0].webkitRequestFullScreen();
+		}
 	});
 	$(document).mousedown( function() {
 		o.gathered_keys["click"] = true;

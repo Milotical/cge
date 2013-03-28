@@ -294,8 +294,10 @@ CGE_Image.prototype.draw = function(ctx){
 		this.img = new Image();
 		this.img.src = this.image_source;
 	}
-	ctx.globalAlpha = this.opacity;
-	ctx.drawImage(this.img, 0, 0,this.width, this.height, this.x, this.y, this.width*this.zoom_x, this.height*this.zoom_y);
+	if(this.visible){
+		ctx.globalAlpha = this.opacity;
+		ctx.drawImage(this.img, 0, 0,this.width, this.height, this.x, this.y, this.width*this.zoom_x, this.height*this.zoom_y);
+	}
 }
 
 CGE_Image.prototype.prepare_save = function(){
@@ -347,12 +349,14 @@ CGE_Sprite.prototype.draw = function(ctx){
 		this.img = new Image();
 		this.img.src = this.image_source;
 	}
-	var width_image = this.get_width();
-	var height_image = this.get_height();
-	var x_image = this.col_index*width_image;
-	var y_image = this.row_index*height_image;
-	ctx.globalAlpha = this.opacity;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+	if(this.visible){
+		var width_image = this.get_width();
+		var height_image = this.get_height();
+		var x_image = this.col_index*width_image;
+		var y_image = this.row_index*height_image;
+		ctx.globalAlpha = this.opacity;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+	}
 }
 
 // -----------------------------------------------------------------------------------
@@ -450,12 +454,14 @@ CGE_Anim_Sprite.prototype.draw = function(ctx){
 		this.img = new Image();
 		this.img.src = this.image_source;
 	}
-	var width_image = this.get_width();
-	var height_image = this.get_height();
-	var x_image = this.col_index*width_image;
-	var y_image = this.row_index*height_image;
-	ctx.globalAlpha = this.opacity;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+	if(this.visible){
+		var width_image = this.get_width();
+		var height_image = this.get_height();
+		var x_image = this.col_index*width_image;
+		var y_image = this.row_index*height_image;
+		ctx.globalAlpha = this.opacity;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image*this.zoom_x, height_image*this.zoom_y);
+	}
 }
 
 // =================================================================================================
@@ -569,17 +575,19 @@ CGE_Character.prototype.draw = function(ctx){
 		this.img = new Image();
 		this.img.src = this.image_source;
 	}
-	var width_image = this.get_width();
-	var height_image = this.get_height();
-	var x_image = this.col_index*width_image;
-	var y_image = this.row_index*height_image;
-	ctx.globalAlpha = this.opacity;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x-0.5*(this.zoom_x*width_image-this.hitbox.width), this.y-this.zoom_y*height_image+this.hitbox.height, width_image*this.zoom_x, height_image*this.zoom_y);
-	if(this.show_hitbox){
-		ctx.fillStyle="rgb(255,0,0)";
-		ctx.globalAlpha = 0.5;
-		ctx.fillRect(this.x,this.y,this.hitbox.width,this.hitbox.height); 
-		ctx.globalAlpha = 1;
+	if(this.visible){
+		var width_image = this.get_width();
+		var height_image = this.get_height();
+		var x_image = this.col_index*width_image;
+		var y_image = this.row_index*height_image;
+		ctx.globalAlpha = this.opacity;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x-0.5*(this.zoom_x*width_image-this.hitbox.width), this.y-this.zoom_y*height_image+this.hitbox.height, width_image*this.zoom_x, height_image*this.zoom_y);
+		if(this.show_hitbox){
+			ctx.fillStyle="rgb(255,0,0)";
+			ctx.globalAlpha = 0.5;
+			ctx.fillRect(this.x,this.y,this.hitbox.width,this.hitbox.height); 
+			ctx.globalAlpha = 1;
+		}
 	}
 }
 
@@ -730,119 +738,164 @@ CGE_Text.prototype.refresh = function(){
 }
 
 CGE_Text.prototype.draw = function(ctx){
-	var up = 0;
-	var down = 0;
-	var mem_color = this.color;
-	var mem_size = this.size;
-	var mem_font = this.font;
-	ctx.fillStyle = this.color;
-	// show text
-	var y = this.size;
-	var x = 0;
-	for(var j=0; j < this.words.length; j++){
-		var invisible_word = false;
-		var word = this.words[j];
-		// forced linebreak
-		if(word == "/n"){
-			y += (this.size+this.line_spacing);
-			x = 0;
-		}
-		if(this.is_format_command(word)){
-			var format_word = true;
-			var spl = word.split("=");
-			if(spl[0] == "[c"){ // color
-				if(spl[1] != null){
-					mem_color = this.color;
-					var rgb = spl[1].split("]")[0];
-					if(rgb != null)
-						this.color = "rgb("+rgb+")";
-				}
-				invisible_word = true;
-			}else if(word == "[/c]"){
-				this.color = mem_color;
-				invisible_word = true;
-			}else if(spl[0] == "[p"){ // picture/icon
-				if(spl[1] != null){
-					var spl2 = spl[1].slice(0, spl[1].length-1).split(",");
-					for(var i=0; i < spl2.length; i++){
-						var n = spl2[i];
-						if(n != null){
-							if(this.img == null){
-								this.img = new Image();
-								this.img.src = this.i_source;
-							}
-							var display_height = this.size;
-							var display_width = this.width_image*display_height/this.height_image;
-							var x_image = (n%this.i_cols)*this.width_image;
-							var y_image = parseInt(n/this.i_cols)*this.height_image;
-							if(x + display_width > this.width){
-								if(this.autobreak){
-									y += (this.size+this.line_spacing);
-								}else{
-									break;
+	if(this.visible){
+		var up = 0;
+		var down = 0;
+		var mem_color = this.color;
+		var mem_size = this.size;
+		var mem_font = this.font;
+		ctx.fillStyle = this.color;
+		// show text
+		var y = this.size;
+		var x = 0;
+		for(var j=0; j < this.words.length; j++){
+			var invisible_word = false;
+			var word = this.words[j];
+			// forced linebreak
+			if(word == "/n"){
+				y += (this.size+this.line_spacing);
+				x = 0;
+			}
+			if(this.is_format_command(word)){
+				var format_word = true;
+				var spl = word.split("=");
+				if(spl[0] == "[c"){ // color
+					if(spl[1] != null){
+						mem_color = this.color;
+						var rgb = spl[1].split("]")[0];
+						if(rgb != null)
+							this.color = "rgb("+rgb+")";
+					}
+					invisible_word = true;
+				}else if(word == "[/c]"){
+					this.color = mem_color;
+					invisible_word = true;
+				}else if(spl[0] == "[p"){ // picture/icon
+					if(spl[1] != null){
+						var spl2 = spl[1].slice(0, spl[1].length-1).split(",");
+						for(var i=0; i < spl2.length; i++){
+							var n = spl2[i];
+							if(n != null){
+								if(this.img == null){
+									this.img = new Image();
+									this.img.src = this.i_source;
 								}
-								x = 0;
+								var display_height = this.size;
+								var display_width = this.width_image*display_height/this.height_image;
+								var x_image = (n%this.i_cols)*this.width_image;
+								var y_image = parseInt(n/this.i_cols)*this.height_image;
+								if(this.width != null && x + display_width > this.width){
+									if(this.autobreak){
+										y += (this.size+this.line_spacing);
+									}else{
+										break;
+									}
+									x = 0;
+								}
+								ctx.globalAlpha = this.opacity;
+								ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
+								x += this.width_image;
 							}
-							ctx.globalAlpha = this.opacity;
-							ctx.drawImage(this.img, x_image, y_image,this.width_image, this.height_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
-							x += this.width_image;
+						}
+						if(this.f_source == null){
+							x += ctx.measureText(" ").width;
+						}else{
+							x += this.width_font_image;
 						}
 					}
+				}else if(word == "[b]"){
+					this.bold = true;
+					invisible_word = true;
+				}else if(word == "[/b]"){
+					this.bold = false;
+					invisible_word = true;
+				}else if(word == "[i]"){
+					this.italic = true;
+					invisible_word = true;
+				}else if(word == "[/i]"){
+					this.italic = false;
+					invisible_word = true;
+				}else if(spl[0] == "[s"){
+					if(spl[1] != null){
+						var s = spl[1].split("]")[0];
+						if(s != null){
+							mem_size = this.size;
+							this.size = parseInt(s);
+						}
+					}
+					invisible_word = true;
+				}else if(word == "[/s]"){ 
+					this.size = mem_size;
+					invisible_word = true;
+				}else if(spl[0] == "[f"){ 
+					var fo = word.split("=")[1].split("]")[0];
+					if(fo != null){
+						mem_font = this.font;
+						this.font = fo;
+					}
+					invisible_word = true;
+				}else if(word == "[/f]"){ 
+					this.font = mem_font;
+					invisible_word = true;
+				}else if(spl[0] == "[u"){
+					if(spl[1] != null)
+						up = parseInt(spl[1].split("]")[0]);
+					invisible_word = true;
+				}else if(word == "[/u]"){ 
+					up = 0;
+					invisible_word = true;
+				}else if(spl[0] == "[d"){
+					if(spl[1] != null)
+						down = parseInt(spl[1].split("]")[0]);
+					invisible_word = true;
+				}else if(word == "[/d]"){
+					down = 0;
+					invisible_word = true;
+				}else if(word == "[w]"){
 					if(this.f_source == null){
 						x += ctx.measureText(" ").width;
 					}else{
 						x += this.width_font_image;
 					}
 				}
-			}else if(word == "[b]"){
-				this.bold = true;
-				invisible_word = true;
-			}else if(word == "[/b]"){
-				this.bold = false;
-				invisible_word = true;
-			}else if(word == "[i]"){
-				this.italic = true;
-				invisible_word = true;
-			}else if(word == "[/i]"){
-				this.italic = false;
-				invisible_word = true;
-			}else if(spl[0] == "[s"){
-				if(spl[1] != null){
-					var s = spl[1].split("]")[0];
-					if(s != null){
-						mem_size = this.size;
-						this.size = parseInt(s);
+			}
+			// y out of range
+			if(this.height != null && y+this.size > this.height){
+				break;
+			}
+			if(word != null && word != "/n" && !this.is_format_command(word)){
+				// x out of range
+				if(this.check_autp_linebreak(ctx, x, word, j)){
+					// auto linebreak
+					if(this.autobreak){
+						y += (this.size+this.line_spacing);
+					}else{
+						break;
+					}
+					x = 0;
+				}
+				this.set_font_parameter(ctx);
+				if(this.f_source == null){
+					ctx.fillStyle = this.color;
+					ctx.fillText(word, this.x+x, this.y+y-up+down);
+					x += ctx.measureText(word).width
+				}else{
+					if(this.font_img == null){
+						this.font_img = new Image();
+						this.font_img.src = this.f_source;
+					}
+					for(var l=0; l < word.length; l++){
+						var n = (word.charCodeAt(l)-33);
+						var display_height = this.size;
+						var display_width = this.width_font_image*display_height/this.height_font_image;
+						var x_image = (n%this.f_cols)*this.width_font_image;
+						var y_image = parseInt(n/this.f_cols)*this.height_font_image;
+						ctx.globalAlpha = this.opacity;
+						
+						ctx.drawImage(this.font_img, x_image, y_image,this.width_font_image, this.height_font_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
+						x += this.width_font_image;
 					}
 				}
-				invisible_word = true;
-			}else if(word == "[/s]"){ 
-				this.size = mem_size;
-				invisible_word = true;
-			}else if(spl[0] == "[f"){ 
-				var fo = word.split("=")[1].split("]")[0];
-				if(fo != null){
-					mem_font = this.font;
-					this.font = fo;
-				}
-				invisible_word = true;
-			}else if(word == "[/f]"){ 
-				this.font = mem_font;
-				invisible_word = true;
-			}else if(spl[0] == "[u"){
-				if(spl[1] != null)
-					up = parseInt(spl[1].split("]")[0]);
-				invisible_word = true;
-			}else if(word == "[/u]"){ 
-				up = 0;
-				invisible_word = true;
-			}else if(spl[0] == "[d"){
-				if(spl[1] != null)
-					down = parseInt(spl[1].split("]")[0]);
-				invisible_word = true;
-			}else if(word == "[/d]"){
-				down = 0;
-				invisible_word = true;
-			}else if(word == "[w]"){
 				if(this.f_source == null){
 					x += ctx.measureText(" ").width;
 				}else{
@@ -850,59 +903,16 @@ CGE_Text.prototype.draw = function(ctx){
 				}
 			}
 		}
-		// y out of range
-		if(this.height != null && y+this.size > this.height){
-			break;
-		}
-		if(word != null && word != "/n" && !this.is_format_command(word)){
-			// x out of range
-			if(this.check_autp_linebreak(ctx, x, word, j)){
-				// auto linebreak
-				if(this.autobreak){
-					y += (this.size+this.line_spacing);
-				}else{
-					break;
-				}
-				x = 0;
-			}
-			this.set_font_parameter(ctx);
-			if(this.f_source == null){
-				ctx.fillStyle = this.color;
-				ctx.fillText(word, this.x+x, this.y+y-up+down);
-				x += ctx.measureText(word).width
-			}else{
-				if(this.font_img == null){
-					this.font_img = new Image();
-					this.font_img.src = this.f_source;
-				}
-				for(var l=0; l < word.length; l++){
-					var n = (word.charCodeAt(l)-33);
-					var display_height = this.size;
-					var display_width = this.width_font_image*display_height/this.height_font_image;
-					var x_image = (n%this.f_cols)*this.width_font_image;
-					var y_image = parseInt(n/this.f_cols)*this.height_font_image;
-					ctx.globalAlpha = this.opacity;
-					
-					ctx.drawImage(this.font_img, x_image, y_image,this.width_font_image, this.height_font_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
-					x += this.width_font_image;
-				}
-			}
-			if(this.f_source == null){
-				x += ctx.measureText(" ").width;
-			}else{
-				x += this.width_font_image;
-			}
-		}
+		this.color = mem_color;
+		this.size = mem_size;
+		this.font = mem_font;
+		this.bold = false;
+		this.italic = false;
 	}
-	this.color = mem_color;
-	this.size = mem_size;
-	this.font = mem_font;
-	this.bold = false;
-	this.italic = false;
 }
 
 CGE_Text.prototype.check_autp_linebreak = function(ctx, x, word){
-	return (this.f_source == null && x+ctx.measureText(word).width > this.width)  || 	(this.f_source != null && x+word.length*this.width_font_image > this.width);
+	return this.width != null &&  ((this.f_source == null && x+ctx.measureText(word).width > this.width)  || 	(this.f_source != null && x+word.length*this.width_font_image > this.width));
 }
 
 CGE_Text.prototype.set_font_parameter = function(ctx){
@@ -1032,6 +1042,8 @@ function CGE_Speech_Bubble(id, text, sprites_data, width, height, r, x0, y0, x, 
 	this.tail_dir = 2;
 	this.tail_style = "auto"; // autoX, autoY, fix
 	this.type = "CGE_Speech_Bubble";
+	this.status_img_id = null;
+	this.visible = true;
 }
 
 CGE_Speech_Bubble.prototype.refresh_tail = function(){
@@ -1073,55 +1085,79 @@ CGE_Speech_Bubble.prototype.refresh_tail = function(){
 }
 
 CGE_Speech_Bubble.prototype.draw = function(ctx){
-	this.refresh_tail();
-	ctx.globalAlpha = this.bg_opacity;
-	ctx.beginPath();
-	ctx.strokeStyle = this.style;
-	ctx.lineWidth = this.line_width;
-	var x = parseInt(this.x - 0.29*this.r);
-	var y = parseInt(this.y - 0.29*this.r);
-	var w = parseInt(this.width+0.58*this.r);
-	var h = parseInt(this.height+0.58*this.r);
-	ctx.moveTo(x, y+this.r);
-	// darw bubble:
-	ctx.quadraticCurveTo(x,y,x+this.r,y);
-	// top
-	if(this.tail_dir == 0){
-		ctx.lineTo(x+this.r+this.tail_offset, y);
-		ctx.lineTo(this.x0, this.y0);
-		ctx.lineTo(x+this.r+this.tail_offset+this.tail_base_length, y);
+	if(this.visible){
+		this.refresh_tail();
+		ctx.globalAlpha = this.bg_opacity;
+		ctx.beginPath();
+		ctx.strokeStyle = this.style;
+		ctx.lineWidth = this.line_width;
+		var x = parseInt(this.x - 0.29*this.r);
+		var y = parseInt(this.y - 0.29*this.r);
+		var w = parseInt(this.width+0.58*this.r);
+		var h = parseInt(this.height+0.58*this.r);
+		ctx.moveTo(x, y+this.r);
+		// darw bubble:
+		ctx.quadraticCurveTo(x,y,x+this.r,y);
+		// top
+		if(this.tail_dir == 0){
+			ctx.lineTo(x+this.r+this.tail_offset, y);
+			ctx.lineTo(this.x0, this.y0);
+			ctx.lineTo(x+this.r+this.tail_offset+this.tail_base_length, y);
+		}
+		ctx.lineTo(x+w-this.r, y);
+		ctx.quadraticCurveTo(x+w,y,x+w,y+this.r);
+		// right
+		if(this.tail_dir == 1){
+			ctx.lineTo(x+w, y+this.r+this.tail_offset);
+			ctx.lineTo(this.x0, this.y0);
+			ctx.lineTo(x+w, y+this.r+this.tail_offset+this.tail_base_length);
+		}
+		ctx.lineTo(x+w, y+h-this.r);
+		ctx.quadraticCurveTo(x+w,y+h,x+w-this.r,y+h);
+		// down
+		if(this.tail_dir == 2){
+			ctx.lineTo(x+w-this.r-this.tail_offset, y+h);
+			ctx.lineTo(this.x0, this.y0);
+			ctx.lineTo(x+w-this.r-this.tail_offset-this.tail_base_length, y+h);
+		}
+		ctx.lineTo(x+this.r, y+h);
+		ctx.quadraticCurveTo(x,y+h,x,y+h-this.r);
+		// left
+		if(this.tail_dir == 3){
+			ctx.lineTo(x, y+h-this.r-this.tail_offset);
+			ctx.lineTo(this.x0, this.y0);
+			ctx.lineTo(x, y+h-this.r-this.tail_offset-this.tail_base_length);
+		}
+		ctx.lineTo(x, y+this.r);
+		
+		ctx.fillStyle = this.bg_color;
+		ctx.fill();
+		ctx.stroke();
+		ctx.globalAlpha = this.opacity;
+		CGE_Float_Text.prototype.draw.call(this, ctx);
 	}
-	ctx.lineTo(x+w-this.r, y);
-	ctx.quadraticCurveTo(x+w,y,x+w,y+this.r);
-	// right
-	if(this.tail_dir == 1){
-		ctx.lineTo(x+w, y+this.r+this.tail_offset);
-		ctx.lineTo(this.x0, this.y0);
-		ctx.lineTo(x+w, y+this.r+this.tail_offset+this.tail_base_length);
+}
+
+CGE_Speech_Bubble.prototype.update = function(){
+	if(this.status_img_id != null){
+		var i = this.sprites_data.get_image_by_id(this.status_img_id);
+		if(i != null){
+			i.z = this.z+1;
+			i.x = this.x+this.width/2-i.get_width()/2;
+			i.y = this.y+this.height-i.get_height()/2;
+		}
 	}
-	ctx.lineTo(x+w, y+h-this.r);
-	ctx.quadraticCurveTo(x+w,y+h,x+w-this.r,y+h);
-	// down
-	if(this.tail_dir == 2){
-		ctx.lineTo(x+w-this.r-this.tail_offset, y+h);
-		ctx.lineTo(this.x0, this.y0);
-		ctx.lineTo(x+w-this.r-this.tail_offset-this.tail_base_length, y+h);
+	CGE_Float_Text.prototype.update.call(this);
+}
+
+CGE_Speech_Bubble.prototype.remove = function(){
+	CGE_Float_Text.prototype.remove.call(this);
+	if(this.status_img_id != null){
+		var i = this.sprites_data.get_image_by_id(this.status_img_id);
+		if(i != null){
+			i.remove();
+		}
 	}
-	ctx.lineTo(x+this.r, y+h);
-	ctx.quadraticCurveTo(x,y+h,x,y+h-this.r);
-	// left
-	if(this.tail_dir == 3){
-		ctx.lineTo(x, y+h-this.r-this.tail_offset);
-		ctx.lineTo(this.x0, this.y0);
-		ctx.lineTo(x, y+h-this.r-this.tail_offset-this.tail_base_length);
-	}
-	ctx.lineTo(x, y+this.r);
-	
-	ctx.fillStyle = this.bg_color;
-	ctx.fill();
-	ctx.stroke();
-	ctx.globalAlpha = this.opacity;
-	CGE_Float_Text.prototype.draw.call(this, ctx);
 }
 
 /* ======================================
@@ -1136,12 +1172,13 @@ function CGE_Window(id, sprites_data, width, height, x, y, z, windowskin, width_
 		width = width_image;
 	if(height < height_image)
 		height = height_image;
-	CGE_Area.call(this,x,y,width,height);
+	CGE_Area.call(this,x,y,width,height,sprites_data);
 	this.z = z;
 	this.windowskin = windowskin;
 	this.width_image = width_image;
 	this.height_image = height_image;
 	this.opacity = 1.0;
+	this.visible = true;
 	this.type = "CGE_Window";
 }
 
@@ -1150,46 +1187,241 @@ CGE_Window.prototype.draw = function(ctx){
 		this.img = new Image();
 		this.img.src = this.windowskin;
 	}
-	var width_image = this.width_image/3;
-	var height_image = this.height_image/3;
-	ctx.globalAlpha = this.opacity;
-	// Draw Background
-	var x_image = width_image;
-	var y_image = height_image;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y+height_image, this.width-2*width_image, this.height-2*height_image);
-	// Darw Border
-	// top
-	var x_image = width_image;
-	var y_image = 0;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y, this.width-2*width_image, height_image);
-	// bottom
-	var x_image = width_image;
-	var y_image = 2*height_image;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y+this.height-height_image, this.width-2*width_image, height_image);
-	// left
-	var x_image = 0;
-	var y_image = height_image;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y+height_image, width_image, this.height-2*height_image);
-	// right
-	var x_image = 2*width_image;
-	var y_image = height_image;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y+height_image, width_image, this.height-2*height_image);
-	// Draw corners
-	var x_image = 0;
-	var y_image = 0;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image, height_image);
-	var x_image = 2*width_image;
-	var y_image = 0;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y, width_image, height_image);
-	var x_image = 0;
-	var y_image = 2*height_image;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y+this.height-height_image, width_image, height_image);
-	var x_image = 2*width_image;
-	var y_image = 2*height_image;
-	ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y+this.height-height_image, width_image, height_image);
+	if(this.visible){
+		var width_image = this.width_image/3;
+		var height_image = this.height_image/3;
+		ctx.globalAlpha = this.opacity;
+		// Draw Background
+		var x_image = width_image;
+		var y_image = height_image;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y+height_image, this.width-2*width_image, this.height-2*height_image);
+		// Darw Border
+		// top
+		var x_image = width_image;
+		var y_image = 0;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y, this.width-2*width_image, height_image);
+		// bottom
+		var x_image = width_image;
+		var y_image = 2*height_image;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+width_image, this.y+this.height-height_image, this.width-2*width_image, height_image);
+		// left
+		var x_image = 0;
+		var y_image = height_image;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y+height_image, width_image, this.height-2*height_image);
+		// right
+		var x_image = 2*width_image;
+		var y_image = height_image;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y+height_image, width_image, this.height-2*height_image);
+		// Draw corners
+		var x_image = 0;
+		var y_image = 0;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y, width_image, height_image);
+		var x_image = 2*width_image;
+		var y_image = 0;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y, width_image, height_image);
+		var x_image = 0;
+		var y_image = 2*height_image;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x, this.y+this.height-height_image, width_image, height_image);
+		var x_image = 2*width_image;
+		var y_image = 2*height_image;
+		ctx.drawImage(this.img, x_image, y_image,width_image, height_image, this.x+this.width-width_image, this.y+this.height-height_image, width_image, height_image);
+	}
 }
 
 CGE_Window.prototype.prepare_save = function(){
 	this.sprites_data = null;
 	this.img = null;
+}
+
+/* ======================================
+			WINDOW SELECT <- WINDOW
+			----------------------------------------------------------
+			Object representing a window with border and a cursor
+====================================== */ 
+CGE_Window_Select.prototype = new CGE_Window();
+CGE_Window_Select.prototype.constructor = CGE_Window_Select;
+function CGE_Window_Select(id, sprites_data, width, height, x, y, z, windowskin, width_image, height_image, cursor_image_source, cursor_width, cursor_height, cursor_posi, cursor_sizes){
+	CGE_Window.call(this,id, sprites_data, width, height, x, y, z, windowskin, width_image, height_image);
+	this.type = "CGE_Window_Select";
+	this.select_index  = 1;
+	this.active = true;
+	this.cursor_positions = cursor_posi;
+	this.cursor_sizes = cursor_sizes;
+	this.cursor_id = this.id+"_cursor";
+	if(id != null){
+		var img = new CGE_Image(this.cursor_id, this.sprites_data, cursor_image_source, cursor_width, cursor_height, 0, 0, this.z+1);
+		this.sprites_data.add_image(img);
+	}
+}
+
+CGE_Window_Select.prototype.update = function(){
+	var c = this.sprites_data.get_image_by_id(this.cursor_id);
+	if(c != null){
+		if(this.select_index != 0){
+			c.visible = this.visible;
+			c.x = this.x + this.cursor_positions[this.select_index-1][0];
+			c.y = this.y + this.cursor_positions[this.select_index-1][1];
+			c.z = this.z + this.cursor_positions[this.select_index-1][2] + 1;
+			c.zoom_x = this.cursor_sizes[this.select_index-1][0]/c.get_width();
+			c.zoom_y = this.cursor_sizes[this.select_index-1][1]/c.get_height();
+		}else{
+			c.visible = false;
+		}
+	}
+}
+
+
+CGE_Window_Select.prototype.remove = function(){
+	CGE_Window.prototype.remove.call(this);
+	if(this.cursor_id != null){
+		var i = this.sprites_data.get_image_by_id(this.cursor_id);
+		if(i != null){
+			i.remove();
+		}
+	}
+}
+
+/* ======================================
+			WINDOW LIST <- WINDOW
+			----------------------------------------------------------
+			Object representing a window with a scrollable text-list
+====================================== */ 
+CGE_Window_List.prototype = new CGE_Window_Select();
+CGE_Window_List.prototype.constructor = CGE_Window_List;
+function CGE_Window_List(id ,list ,max_elements ,sprites_data, width, height, x, y, z, windowskin, width_image, height_image, cursor_image_source, cursor_width, cursor_height,cursor_offset, element_width, element_height, spacing, border,scroll_button_source, scroll_image_width, scroll_image_height, i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height){
+	this.list = list;
+	cursor_posi = [];
+	cursor_sizes = [];
+	this.max_elements = max_elements;
+	this.element_width = element_width;
+	this.element_height = element_height;
+	this.cursor_offset = cursor_offset;
+	this.border = border;
+	for(var i=0; i < (this.max_elements[0]*this.max_elements[1]); i++){
+		var ex = this.border[0]+(parseInt(i/this.max_elements[1]))*(spacing[0]+element_width)-cursor_offset[0];
+		var ey = this.border[1]+(i%this.max_elements[1])*(element_height+spacing[1])-cursor_offset[1];
+		cursor_posi[i] = [ex, ey, z+2];
+		cursor_sizes[i] = [element_width+cursor_offset[0]*2, element_height+cursor_offset[1]*2];
+	}
+	CGE_Window_Select.call(this, id, sprites_data, width, height, x, y, z, windowskin, width_image, height_image, cursor_image_source, cursor_width, cursor_height, cursor_posi, cursor_sizes);
+	this.type = "CGE_Window_List";
+	this.scroll_x = 0;
+	this.scroll_y = 0;
+	this.element_image_ids = [];
+	this.i_source = i_source;
+	this.i_cols = i_cols;
+	this.i_rows = i_rows;
+	this.i_width = i_width;
+	this.i_height = i_height;
+	this.f_source = f_source;
+	this.f_cols = f_cols;
+	this.f_rows = f_rows;
+	this.f_width = f_width;
+	this.f_height = f_height;
+	this.select_index = 1;
+	this.scroll_button_ids = [];
+	this.scroll_button_source = scroll_button_source;
+	this.scroll_image_width = scroll_image_width;
+	this.scroll_image_height = scroll_image_height;
+	if(id != null){
+		this.refresh_elements();
+	}
+}
+
+CGE_Window_List.prototype.remove_element_images = function(){
+	for(var i=0; i < this.element_image_ids.length; i++){
+		var img = this.sprites_data.get_image_by_id(this.element_image_ids[i]);
+		if(img != null){
+			img.remove();
+		}
+	}
+	for(var i=0; i < this.scroll_button_ids.length; i++){
+		var img = this.sprites_data.get_image_by_id(this.scroll_button_ids[i]);
+		if(img != null){
+			img.remove();
+		}
+	}
+	this.element_image_ids = [];
+	this.scroll_button_ids = [];
+}
+
+CGE_Window_List.prototype.remove = function(){
+	CGE_Window_Select.prototype.remove.call(this);
+	this.remove_element_images();
+}
+
+CGE_Window_List.prototype.refresh_elements = function(){
+	this.remove_element_images();
+	for(var i=0; i < (this.max_elements[0]*this.max_elements[1]); i++){
+		var x_index = parseInt(i/this.max_elements[1])+this.scroll_x;
+		var y_index = (i%this.max_elements[1])+this.scroll_y;
+		if(this.list[x_index] != null && this.list[x_index][ y_index] != null){
+			var x = this.x+this.cursor_positions[i][0];
+			var y = this.y+this.cursor_positions[i][1];
+			var z = this.z+this.cursor_positions[i][2]-1;
+			var w =  null;
+			var h =  null;
+			var id = this.id+"_element_"+i;
+			this.element_image_ids.push(id);
+			var img = new CGE_Text(id, this.list[x_index][ y_index], this.sprites_data, w, h, x, y, z,this.i_source, this.i_cols, this.i_rows, this.i_width, this.i_height,this.f_source, this.f_cols, this.f_rows, this.f_width, this.f_height);
+			img.autobreak = false;
+			this.sprites_data.add_image(img);
+		}
+	}
+	if(this.scroll_x > 0){
+		var x = this.x;
+		var y = this.y+this.height/2-this.scroll_image_height/4;
+		var z = this.z+1;
+		var img = new CGE_Sprite(this.id+"_scroll_left", this.sprites_data, this.scroll_button_source, this.scroll_image_width, this.scroll_image_height , 2, 2, x, y, z);
+		img.row_index = 1;
+		img.col_index = 1;
+		this.sprites_data.add_image(img);
+		this.scroll_button_ids.push(img.id);
+	}
+	if(this.scroll_y > 0){
+		var x = this.x+this.width/2-this.scroll_image_width/4;
+		var y = this.y;
+		var z = this.z+1;
+		var img = new CGE_Sprite(this.id+"_scroll_top", this.sprites_data, this.scroll_button_source, this.scroll_image_width, this.scroll_image_height , 2, 2, x, y, z);
+		img.row_index = 0;
+		img.col_index = 0;
+		this.sprites_data.add_image(img);
+		this.scroll_button_ids.push(img.id);
+	}
+	if(this.scroll_x < this.list.length-this.max_elements[0]){
+		var x = this.x+this.width-this.scroll_image_width/2;
+		var y = this.y+this.height/2-this.scroll_image_height/4;
+		var z = this.z+1;
+		var img = new CGE_Sprite(this.id+"_scroll_right", this.sprites_data, this.scroll_button_source, this.scroll_image_width, this.scroll_image_height , 2, 2, x, y, z);
+		img.row_index = 0;
+		img.col_index = 1;
+		this.sprites_data.add_image(img);
+		this.scroll_button_ids.push(img.id);
+	}
+	if(this.scroll_y < this.list[0].length-this.max_elements[1]){
+		var x = this.x+this.width/2-this.scroll_image_width/4;
+		var y = this.y+this.height-this.scroll_image_height/2;
+		var z = this.z+1;
+		var img = new CGE_Sprite(this.id+"_scroll_bottom", this.sprites_data, this.scroll_button_source, this.scroll_image_width, this.scroll_image_height , 2, 2, x, y, z);
+		img.row_index = 1;
+		img.col_index = 0;
+		this.sprites_data.add_image(img);
+		this.scroll_button_ids.push(img.id);
+	}
+}
+
+CGE_Window_List.prototype.update = function(){
+	CGE_Window_Select.prototype.update.call(this);
+	for(var i=0; i < this.element_image_ids.length; i++){
+		var img = this.sprites_data.get_image_by_id(this.element_image_ids[i]);
+		if(img != null){
+			img.visible = this.visible;
+			var x = this.x+this.cursor_positions[i][0]+this.cursor_offset[0];
+			var y = this.y+this.cursor_positions[i][1]+this.cursor_offset[1];
+			var z = this.z+this.cursor_positions[i][2]-1;
+			img.x = x;
+			img.y = y;
+			img.z = z;
+		}
+	}
 }
