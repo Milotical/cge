@@ -39,6 +39,17 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 	this.ctx = canv[0].getContext('2d');
 	
 	// AJAX holt sich neue scene_start, scene_update und scene_end function (und gegebenenfalls verwendete Funktionen) und scene_data
+	var scene_id = this.new_scene_id;
+	var scene = this;
+	$.post("src/LoadScene.php", { sceneID : scene_id } ,
+		function(data){
+			scene.main.debug_m(data);
+			eval(data);
+			scene.alive = true; 			// set alive
+			scene.start();					// starts itself
+		}, "text"
+	);
+	
 	if(this.new_scene_id == "map"){
 		if(this.main.map_data.initialised){
 			this.main.map_data.reload();
@@ -71,15 +82,15 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 		};
 		
 	}
-	if(this.new_scene_id == "title"){
+	if(this.new_scene_id == "titleX"){
 		this.start = function(){
-			var img = {"id" : "OO", "source" : "Omel.png", "width" : 215, "height" : 222, "x" : 500, "y" : 0, "z" : 1};
+			var img = {"id" : "OO", "source" : "res/img/Omel.png", "width" : 215, "height" : 222, "x" : 500, "y" : 0, "z" : 1};
 			this.add_image(img);
 			
-			/*var img = {"id" : "k", "source" : "knubel.png", "width" : 35, "height" : 34, "x" : 0, "y" : 0, "z" : 0};
+			/*var img = {"id" : "k", "source" : "res/style/knubel.png", "width" : 35, "height" : 34, "x" : 0, "y" : 0, "z" : 0};
 			this.add_image(img);
 			*/
-			var img = {"id" : "cursor", "source" : "mouse.png", "width" : 32, "height" : 24, "x" : 0, "y" : 0, "z" : 100};
+			var img = {"id" : "cursor", "source" : "res/style/mouse.png", "width" : 32, "height" : 24, "x" : 0, "y" : 0, "z" : 100};
 			this.add_image(img);
 			
 			var event_data = {"id" : 11, "parallel" : false, "chara" : 0};
@@ -106,38 +117,39 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 			event_data["effects"] = [["teleport",-1, function(m, x){ return m.input_controller.mouse_x; }, function(m, y){ return m.input_controller.mouse_y; } ]];
 			this.add_event(event_data);
 			
-			/*var img = new CGE_Text("t", "Das ist ein Test", this.main.sprites_data, 100, 100, 50, 50, 20,"icons.png", 4, 3, 88, 66);
+			/*var img = new CGE_Text("t", "Das ist ein Test", this.main.sprites_data, 100, 100, 50, 50, 20,"res/style/icons.png", 4, 3, 88, 66);
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);*/
-			/*var img = new CGE_Text("t2", "Ein [i]Testtext [s=30]zum[/s] [b]ausprobieren[/i] [c=0,0,255]der verschiedenen[/b] Formartierungsmöglichkeiten[/c] und [u=5]Zeilenumbrüchen.[/u] Auch Icons funktionieren hoffentlich noch: [s=15][p=1][p=2][p=0][/s]", this.main.sprites_data, 200, null, 10, 50, 20,"icons.png", 4, 3, 88, 66);
+			/*var img = new CGE_Text("t2", "Ein [i]Testtext [s=30]zum[/s] [b]ausprobieren[/i] [c=0,0,255]der verschiedenen[/b] Formartierungsmöglichkeiten[/c] und [u=5]Zeilenumbrüchen.[/u] Auch Icons funktionieren hoffentlich noch: [s=15][p=1][p=2][p=0][/s]", this.main.sprites_data, 200, null, 10, 50, 20,"res/style/icons.png", 4, 3, 88, 66);
 			img.size = 12;
 			img.color = "red";
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			
-			var img = new CGE_Speech_Bubble("t4", "Hallo, /n Ich bin ein dicker Drache mit großem Hunger!", this.main.sprites_data, 200, 100, 200, 550, 70,100, 300, 20,"icons.png", 4, 3, 88, 66);
+			var img = new CGE_Speech_Bubble("t4", "Hallo, /n Ich bin ein dicker Drache mit großem Hunger!", this.main.sprites_data, 200, 100, 200, 550, 70,100, 300, 20,"res/style/icons.png", 4, 3, 88, 66);
 			img.size = 12;
 			img.color = "blue";
 			img.status_img_id = "k";
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			
-			var img = new CGE_Text("t3", "Ein kleiner Testtext in eigenem Font, /n 13 + 17 = 30 oder?/n Wie siehts mit Umlauten aus: Ä Ö Ü ä ö ü ß", this.main.sprites_data, 300, null, 200, 50, 20,"icons.png", 4, 3, 88, 66,"testfont.png",16,16, 352, 352);
+			var img = new CGE_Text("t3", "Ein kleiner Testtext in eigenem Font, /n 13 + 17 = 30 oder?/n Wie siehts mit Umlauten aus: Ä Ö Ü ä ö ü ß", this.main.sprites_data, 300, null, 200, 50, 20,"icons.png", 4, 3, 88, 66,"res/style/testfont.png",16,16, 352, 352);
 			img.size = 22;
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);*/
 			
-			/*/var img = new CGE_Window("w", this.main.sprites_data, 220, 400, 0, 10, 10, "Testskin.png", 96, 96);
+			/*/var img = new CGE_Window("w", this.main.sprites_data, 220, 400, 0, 10, 10, "res/style/Testskin.png", 96, 96);
 			//this.main.sprites_data.add_image(img);
 			//this.images.push(img.id);
 			*/
 			/*
-			var img = new CGE_Window_Select("ws", this.main.sprites_data, 200, 400, 10, 10, 10, "Testskin.png", 96, 96, "cursor_rect.png", 35, 34, [[0,0,0],[0,50,0]], [[100,100],[200,100]]);
+			var img = new CGE_Window_Select("ws", this.main.sprites_data, 200, 400, 10, 10, 10, "res/style/Testskin.png", 96, 96, "cursor_rect.png", 35, 34, [[0,0,0],[0,50,0]], [[100,100],[200,100]]);
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			*/
+			
 			var list = [["Element0","Element1", "Element2", "Element3"], ["Element4", "Element5", "Element6", "Element7"], ["Element8", "Element9", "a[p=1,2]", "Element11"]];
-			var img = new CGE_Window_List("wl" ,list ,[2,2] ,this.main.sprites_data, 400, 400, 10, 10, 10, "Testskin.png", 96, 96, "cursor_rect.png", 35, 34, [5,5], 150, 30, [10,20], [20,30],"scroll_buttons.png",64,64, "icons.png", 4, 3, 88, 66);
+			var img = new CGE_Window_List("wl" ,list ,[2,2] ,this.main.sprites_data, 400, 400, 10, 10, 10, "res/style/Testskin.png", 96, 96, "res/style/cursor_rect.png", 35, 34, [5,5], 150, 30, [10,20], [20,30],"res/style/scroll_buttons.png",64,64, "res/style/icons.png", 4, 3, 88, 66);
 			this.main.sprites_data.add_image(img);
 			this.images.push(img.id);
 			
@@ -152,6 +164,7 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 		this.end = function(){
 			
 		};
+		
 	}
 	// ...................		
 	

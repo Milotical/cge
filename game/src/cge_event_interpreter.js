@@ -163,6 +163,55 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 			chara.moves = [];
 			event.effect_index++;
 			break;
+		case "change_select_index" :
+			if(para[0] == -1)
+				var win = this.main.sprites_data.get_image_by_id(event.chara);
+			else	
+				var win = this.main.sprites_data.get_image_by_id(para[0]);
+			win.select_index = para[1](win.select_index);
+			event.effect_index++;
+			break;
+		case "if" :
+			var stack = 0;
+			if(!this.check_conditions(event, para[0])){
+				while(event.effect_index < event.effects.length){
+					event.effect_index++;
+					if(event.effects[event.effect_index][0] == "if")
+						stack++;
+					if(event.effects[event.effect_index][0] == "end"){
+						if(stack <= 0){
+							break;
+						}else{
+							stack--;
+						}
+					}
+					if(event.effects[event.effect_index][0] == "else" && stack <= 0){
+						event.effect_index++;
+						break;
+					}
+				}
+			}else{
+				event.effect_index++;
+			}
+			break;
+		case "else" :
+			var stack = 0;
+			while(event.effect_index < event.effects.length){
+				event.effect_index++;
+				if(event.effects[event.effect_index][0] == "if")
+						stack++;
+				if(event.effects[event.effect_index][0] == "end"){
+					if(stack <= 0){
+						break;
+					}else{
+						stack--;
+					}
+				}
+			}
+			break;
+		case "end" :
+			event.effect_index++;
+			break;
 		case "finish" :
 			event.finished = true;
 			break;
@@ -188,6 +237,13 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 				this.main.canv.style.cursor = "default";
 			event.effect_index++;
 			break;
+		case "change_resolution" :
+			this.main.canv.width = para[0](this.main.canv.width, this.main.canv.height);
+			this.main.canv.height = para[1](this.main.canv.width, this.main.canv.height);
+			this.main.canv_buffer.width = this.main.canv.width;
+			this.main.canv_buffer.height = this.main.canv.height;
+			event.effect_index++;
+			break;
 		case "execute_function" :
 			para[0]();
 			event.effect_index++;
@@ -202,6 +258,24 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 		event.finished = true;
 		event.effect_index = 0;
 	}
+}
+
+
+CGE_Event_Interpreter.prototype.check_conditions = function(event, cond){
+	for(var j=0; j < cond.length; j++){
+		var r = true;
+		for(var i=0; i < cond[j].length; i++){
+			if(!this.check_condition(event, cond[j][i])){
+				r = false;
+				break;
+			}
+		}
+		if(r == true){
+			return true;
+		}
+		r = true;
+	}
+	return false;
 }
 
 // -----------------------------------------------------------------------------------
@@ -225,6 +299,12 @@ CGE_Event_Interpreter.prototype.check_condition = function(event, cond){
 			if(para[2] == null)
 				return (chara.facing == para[1]);
 			return para[2](chara.facing, para[1]);
+		case "select_index" :
+			if(para[0] == -1)
+				var win = this.main.sprites_data.get_image_by_id(event.chara);
+			else	
+				var win = this.main.sprites_data.get_image_by_id(para[0]);
+			return para[1](win.select_index);
 		default :
 			alert("Warning: Condition with unknown ID '"+cond_id+"' was called.");
 	}

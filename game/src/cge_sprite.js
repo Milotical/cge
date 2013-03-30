@@ -31,7 +31,8 @@ CGE_Sprites_Data.prototype.get_image_by_id = function(id){
 // -----------------------------------------------------------------------------------
 CGE_Sprites_Data.prototype.remove_image_id = function(image_id){
 	var image = this.get_image_by_id(image_id);
-	this.remove_image(image);
+	if(image != null)
+		image.remove();
 }
 
 // -----------------------------------------------------------------------------------
@@ -1180,6 +1181,7 @@ function CGE_Window(id, sprites_data, width, height, x, y, z, windowskin, width_
 	this.opacity = 1.0;
 	this.visible = true;
 	this.type = "CGE_Window";
+	this.id = id;
 }
 
 CGE_Window.prototype.draw = function(ctx){

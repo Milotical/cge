@@ -1,22 +1,22 @@
 <html>
 	<head>
-		<script type="text/javascript" src="jquery/jquery-1.6.2.min.js"></script>
-		<script type="text/javascript" src="jquery/jquery-ui-1.8.16.custom.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="jquery/jquery-ui-1.8.16.custom.css"/>
-		<script type="text/javascript" src="source/cge_main.js"></script>
-		<script type="text/javascript" src="source/cge_map_data.js"></script>
-		<script type="text/javascript" src="source/cge_sprite.js"></script>
-		<script type="text/javascript" src="source/cge_scene_data.js"></script>
-		<script type="text/javascript" src="source/cge_character_moves.js"></script>
-		<script type="text/javascript" src="source/cge_events.js"></script>
-		<script type="text/javascript" src="source/cge_event_interpreter.js"></script>
-		<script type="text/javascript" src="source/cge_input.js"></script>
+		<script type="text/javascript" src="src/jquery/jquery-1.6.2.min.js"></script>
+		<script type="text/javascript" src="src/jquery/jquery-ui-1.8.16.custom.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="src/jquery/jquery-ui-1.8.16.custom.css"/>
+		<script type="text/javascript" src="src/cge_main.js"></script>
+		<script type="text/javascript" src="src/cge_map_data.js"></script>
+		<script type="text/javascript" src="src/cge_sprite.js"></script>
+		<script type="text/javascript" src="src/cge_scene_data.js"></script>
+		<script type="text/javascript" src="src/cge_character_moves.js"></script>
+		<script type="text/javascript" src="src/cge_events.js"></script>
+		<script type="text/javascript" src="src/cge_event_interpreter.js"></script>
+		<script type="text/javascript" src="src/cge_input.js"></script>
 		<script type="text/javascript">
 			
 			$(document).ready(function(){
 				var system_info = [];
 				system_info["resolution"] = [640, 480];
-				system_info["start_scene"] = "map";
+				system_info["start_scene"] = "title";
 				system_info["start_map"] = 0;
 				
 				cge_start_game(system_info);

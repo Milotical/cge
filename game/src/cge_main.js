@@ -237,7 +237,7 @@ CGE_Game.prototype.create_canvas_element = function(){
 	var canvas_height = this.resolution[1];
 	div.html("");
 	// creating canvas elements (define style of canvas)
-	div.append('<canvas id="'+this.html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:1px;width:100%;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
+	div.append('<canvas id="'+this.html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:1px;width:100%;height:100%;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
 	div.append('<canvas id="'+this.html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');
 	div.append('<br /><div id="'+this.html_id+'_fps">fps: </div>');
 	div.append('<br /><div id="'+this.html_id+'_debug" style="color:red;overflow:scroll;width:800px;height:100px;"></div>');

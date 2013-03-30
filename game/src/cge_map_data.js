@@ -48,7 +48,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
 		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
 		this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
-		this.tileset_name = "Testset.png";
+		this.tileset_name = "res/tilesets/Testset.png";
 		this.tileset_grid_size = 32;
 		this.tileset_zoom_factor = 1.0;
 		this.tileset_row_width = 8;
@@ -57,12 +57,12 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
 		
 		var charas_data = [];
-		charas_data[0] = {"id" : "player","source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
+		charas_data[0] = {"id" : "player","source" : "res/chara/Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
 		charas_data[0]["moves"] = [];//[["wait",[10]],["walk",[1,1,"frames"]],["stand"]];
 		charas_data[0]["blocking_classes"] = ["std"];
 		
 		for(var i=1; i < 0; i++){
-			charas_data[i] = {"id" : i,"source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 2};
+			charas_data[i] = {"id" : i,"source" : "res/chara/Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 2};
 			charas_data[i]["moves"] = [["walk",[5, "random", "frames"],0], ["stand",[],0], ["wait",[30],0]];
 			charas_data[i]["blocking_classes"] = ["std"];
 		}
@@ -115,7 +115,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		events_data[9]["trigger"] = "keynewpress_13";
 		events_data[9]["effects"] = [["save_game"], ["kill_game"]];
 		
-		events_data[10] = {"id" : 10, "parallel" : false, "chara" : 0};
+		events_data[10] = {"id" : 12, "parallel" : false, "chara" : 0};
 		events_data[10]["conditions"] = [];
 		events_data[10]["trigger"] = "keynewpress_50";
 		events_data[10]["effects"] = [["change_map",2],["teleport","player",function(x){ return 0; },function(y){ return 0; }]];
@@ -138,7 +138,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
 		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[6,6,6,6,6,6,6,6,6,6,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
 		this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
-		this.tileset_name = "Testset.png";
+		this.tileset_name = "res/tilesets/Testset.png";
 		this.tileset_grid_size = 32;
 		this.tileset_zoom_factor = 1.0;
 		this.tileset_row_width = 8;
@@ -146,7 +146,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
 		this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
 		
-		charas_data[0] = {"id" : "player","source" : "Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
+		charas_data[0] = {"id" : "player","source" : "res/chara/Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
 		charas_data[0]["moves"] = [];
 		charas_data[0]["blocking_classes"] = ["std"];
 		
