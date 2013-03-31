@@ -12,6 +12,7 @@ var game;
 
 function cge_start_game(system_info){
 	var game = new CGE_Game("game_div", system_info);
+	game.load_counter = 0;
 	
 	// create the canvas element
 	game.create_canvas_element();
@@ -46,16 +47,23 @@ function cge_load_game(str){
 	var game = new CGE_Game("game_div", system_info);
 	// create the canvas element
 	game.create_canvas_element();
-	
 	if(save_data != null){
+		game.load_counter = save_data.load_counter+1;
+	
 		game.scroll_x = save_data.scroll_x;
 		game.scroll_y = save_data.scroll_y;
 		game.scene_data.new_scene_id = save_data.scene_data.new_scene_id;
-		game.scene_data.order_new_scene_data(save_data.scene_data.scene_id);
+		//game.scene_data.order_new_scene_data(save_data.scene_data.scene_id);
 		game.map_data.loaded = save_data.map_data.loaded;
-		if(game.map_data.loaded)
-			game.map_data.load_new_map(save_data.map_data.map_id);
+		
+		//if(game.map_data.loaded)
+		//	game.map_data.load_new_map(save_data.map_data.map_id);
 		game.map_data.map_id = save_data.map_data.map_id;
+		game.scene_data.alive = save_data.scene_data.alive;
+		game.scene_data.start = save_data.scene_data.start;
+		game.scene_data.update = save_data.scene_data.update;
+		game.scene_data.end = save_data.scene_data.end;
+		
 		game.map_data.images = [];
 		game.map_data.events = {};
 		game.sprites_data.images = [];
@@ -67,8 +75,11 @@ function cge_load_game(str){
 		game.trigger_data.id_events = {};
 		game.event_interpreter.active_event = null;
 		game.event_interpreter.parallel_events = [];
-		game.scene_data.ctx = game.ctx_buffer;
 		
+		game.scene_data.ctx = game.ctx_buffer;
+		game.map_data.initialised = save_data.map_data.initialised;
+		game.map_data.active = save_data.map_data.active;
+	
 		for(var i=0; i < save_data.map_data.images.length; i++){
 			var save_chara = save_data.map_data.images[i];
 			var chara = eval("new "+save_chara.type+"()");
@@ -90,7 +101,6 @@ function cge_load_game(str){
 		for(var i=0; i < save_data.sprites_data.images.length; i++){
 			var save_image = save_data.sprites_data.images[i];
 			var img = eval("new "+save_image.type+"()");
-			//var img = new CGE_Image();
 			for(var c in save_image){
 				img[c] = save_image[c];
 			}
@@ -148,12 +158,15 @@ function cge_load_game(str){
 		game.map_data.map_width = save_data.map_data.map_width;
 		game.map_data.map_height = save_data.map_data.map_height;
 		game.scene_data.images = save_data.scene_data.images;
-	
+		game.set_buffer_size(game.map_data.map_width, game.map_data.map_height);
+		
 		game.reload_save();
 		delete save_data;
+		
 	}else{
 		alert("Error: Save-Data invalid. Game was reseted.");
 	}
+	
 	// cross browser anim-Frame function
 	var animFrame = window.requestAnimationFrame ||
 		window.webkitRequestAnimationFrame ||
@@ -161,7 +174,9 @@ function cge_load_game(str){
 		window.oRequestAnimationFrame      ||
 		window.msRequestAnimationFrame     ||
 		null ;
-
+	
+	game.r = Math.random();
+	
 	var recursive_update = function() {
 		game.update();
 		if(game.alive)

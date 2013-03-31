@@ -11,7 +11,7 @@ function CGE_Map_Data(main_object){
 	this.images = [];													// array of corresponding images
 	this.events ={};													// array of corresponding events
 	this.loaded = true;												// defines if map is displayed
-	
+	this.start_map = function(){};
 	this.map_id;
 }	
 	
@@ -24,13 +24,27 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 	this.images = [];
 	this.events = {};
 	this.map_id = new_map_id;
-	this.initialised = true;
 	
 	var charas_data = [];
 	var events_data = [];
 	// AJAX call for map data
+	var map_id = this.map_id;
+	var map_data = this;
+	var main = this.main;
+	$.post("src/LoadMap.php", { mapID : map_id } ,
+		function(data){
+			//main.debug_m(data);
+			eval(data);
+			map_data.start_map();
+			main.set_buffer_size(map_data.map_width, map_data.map_height);
+			map_data.loaded = true;
+			map_data.initialised = true;
+		}, "text"
+	);
+	
+	
 	// ................
-	if(new_map_id == 1){
+	/*if(new_map_id == 11){
 		this.layers = [];
 		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
 		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
@@ -43,7 +57,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
 		this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
 	}
-	if(new_map_id == 0){
+	if(new_map_id == 10){
 		this.layers = [];
 		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
 		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
@@ -133,7 +147,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		this.main.input_controller.add_trigger_key(39);
 		this.main.input_controller.add_trigger_key(40);
 	}
-	if(new_map_id == 2){
+	if(new_map_id == 12){
 		this.layers = [];
 		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
 		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[6,6,6,6,6,6,6,6,6,6,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
@@ -203,7 +217,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		
 	}
 	
-	for(var chara in charas_data){
+	/*for(var chara in charas_data){
 		this.add_chara(charas_data[chara]);
 	}
 	for(var event in events_data){
@@ -211,7 +225,7 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 	}
 	// ..................
 	this.main.set_buffer_size(this.map_width, this.map_height);
-	this.loaded = true;
+	this.loaded = true;*/
 }
 
 // -----------------------------------------------------------------------------------

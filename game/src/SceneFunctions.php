@@ -7,9 +7,55 @@
 		echo "};";
 		
 		echo "scene.update = function(){";
+		updateScene();
+		echo "};";
+		
+		echo "scene.end = function(){";
+		endScene();
+		echo "};";
+	}
+	
+	function executeMap(){
+		echo 'map_data.start_map = function(){';
+		startMap();
+		echo '}';
+	}
+	
+	function standardUpdate(){
 		echo "    this.main.sprites_data.update();";
 		echo "    this.main.sprites_data.draw_images(this.ctx);";
-		echo "};";
+	}
+	
+	function standardEnd(){
+		echo '    this.main.trigger_data.update("end_scene");';
+	}
+	
+	function loadMap(){
+		echo '    if(this.main.map_data.initialised){';
+		echo '    	    this.main.map_data.reload();';
+		echo '    }else{';
+		echo '    	    this.main.map_data.load_new_map(this.main.start_map_id);';
+		echo '    }';
+	}
+	
+	function unloadMap(){
+		echo '    this.main.map_data.unload();';
+	}
+	
+	function mapUpdate(){
+		echo '    if(this.main.map_data.initialised){';
+		echo '        this.main.sprites_data.update();';
+		echo '        this.main.sprites_data.draw_images(this.ctx, null, -1);';
+		echo '        this.main.map_data.draw_tiled_map(this.ctx);';
+		echo '        this.main.sprites_data.draw_images(this.ctx, this.main.map_data.layers.length);';
+		echo '    }';
+	}
+	
+	function mapEnd(){
+		echo '    this.main.scroll_x = 0;';
+		echo '    this.main.scroll_y = 0;';
+		echo '    this.main.trigger_data.update("end_scene");';
+		unloadMap();
 	}
 	
 	function addImage($id, $source, $x, $y, $z){
@@ -24,6 +70,20 @@
 			}else{
 				echo 'alert("File not found: '.$source.'")';
 			}
+	}
+	
+	function addChara($id, $source, $x, $y, $z, $facing=2, $moves="[]", $blocking_classes='["std"]', $rows = 4, $cols = 4){
+		if(file_exists("../".$source)){
+			list($w, $h) = getimagesize("../".$source);
+			echo 'var img = {"id" : "'.$id.'", "source" : "'.$source.'", "width" : '.$w.', "height" : '.$h.', "x" : '.$x.', "y" : '.$y.', "z" : '.$z.', "face" : '.$facing.', "rows" : '.$rows.', "cols" : '.$cols.', "moves" : '.$moves.', "blocking_classes" : '.$blocking_classes.'};';
+			echo 'this.add_chara(img);';
+		}else if(file_exists("../res/img/missing_chara.png")){
+			list($w, $h) = getimagesize("../res/chara/missing_chara.png");
+			echo 'var img = {"id" : "'.$id.'", "source" : "res/chara/missing_chara.png", "width" : '.$w.', "height" : '.$h.', "x" : '.$x.', "y" : '.$y.', "z" : '.$z.', "face" : '.$facing.', "rows" : '.$rows.', "cols" : '.$cols.', "moves" : '.$moves.', "blocking_classes" : '.$blocking_classes.'};';
+			echo 'this.add_chara(img);';
+		}else{
+			echo 'alert("File not found: '.$source.'")';
+		}
 	}
 	
 	function addListWindow($id, $elements, $max_elements, $width, $height, $x, $y, $z, $element_width, $element_height, $spacing="[10,10]", $border="[20,20]", $cursor_offset="[5,5]", $use_custom_font=false){

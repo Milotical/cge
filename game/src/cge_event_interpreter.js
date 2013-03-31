@@ -221,14 +221,20 @@ CGE_Event_Interpreter.prototype.interpret_event = function(event){
 			break;
 		case "save_game" :
 			var save_data = this.main.save_to_string();
-			// ...send to server ...
+			var save_id = para[0];
+			$.post("src/SaveGame.php", { saveID : save_id, saveData : save_data } );
 			event.effect_index++;
 			break;
-		case "load_game" :	
-			var save_data = "";
-			// ...get save from server...
-			cge_load_game(save_data);
-			this.main.alive = false;
+		case "load_game" :
+			var save_id = para[0];
+			var main = this.main;
+			$.post("src/LoadGame.php", { saveID : save_id } ,
+				function(data){
+					cge_load_game(data);
+					//main.debug_m(data);
+				}, "text"
+			);
+			main.alive = false;
 			break;
 		case "set_mouse_display" :
 			if(para[0] == false)

@@ -4,6 +4,9 @@
 			case "title" :
 				include("../scenes/SceneTitle.php");
 				break;
+			case "map" :
+				include("../scenes/SceneMap.php");
+				break;
 		}
 	}
 ?>

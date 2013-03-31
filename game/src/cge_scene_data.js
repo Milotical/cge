@@ -43,14 +43,14 @@ CGE_Scene_Data.prototype.order_new_scene_data = function(){
 	var scene = this;
 	$.post("src/LoadScene.php", { sceneID : scene_id } ,
 		function(data){
-			scene.main.debug_m(data);
+			//scene.main.debug_m(data);
 			eval(data);
 			scene.alive = true; 			// set alive
 			scene.start();					// starts itself
 		}, "text"
 	);
 	
-	if(this.new_scene_id == "map"){
+	if(this.new_scene_id == "mapX"){
 		if(this.main.map_data.initialised){
 			this.main.map_data.reload();
 		}else{
@@ -179,6 +179,7 @@ CGE_Scene_Data.prototype.delete_all_images = function(){
 }
 
 CGE_Scene_Data.prototype.add_image = function(image_data){
+		
 	var img = new CGE_Image(image_data["id"], this.main.sprites_data, image_data["source"], image_data["width"], image_data["height"], image_data["x"], image_data["y"], image_data["z"]);
 	this.main.sprites_data.add_image(img);
 	this.images.push(img.id);
