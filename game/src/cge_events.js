@@ -8,12 +8,19 @@ function CGE_Trigger_Data(main_object){
 	this.map_events = {};
 	this.scene_events = {};
 	this.id_events = {};
+	this.timer = {};
 	this.main = main_object;
 }
 	
 CGE_Trigger_Data.prototype.get_event_by_id = function(id){
 	return this.id_events[id];
 };
+
+CGE_Trigger_Data.prototype.update_timer = function(){
+	for(var t in this.timer){
+		this.timer[t].update(this);
+	}
+}
 
 // -----------------------------------------------------------------------------------
 // Add event to a specific trigger
@@ -278,4 +285,39 @@ CGE_Event.prototype.prepare_save = function(){
 
 CGE_Event.prototype.reload_save = function(main){
 	this.interpreter = main.event_interpreter;
+}
+
+/* ======================================
+			CGE TIMER
+			----------------------------------------------------------
+====================================== */
+function CGE_Timer(id, duration, trigger){
+	if(duration == null)
+		duration = 60000;
+	if(trigger == null)
+		trigger = false;
+	this.id = id;
+	var new_date = new Date();
+	this.start_time = new_date.getTime();
+	this.trigger = trigger;
+	this.duration = duration;
+	this.finished = false;
+}
+
+CGE_Timer.prototype.update = function(trigger_data){
+	if(!this.finished){
+		if(this.elapsed_time() >= this.duration){
+			this.finished = true;
+			if(this.trigger){
+				trigger_data.update("timer_end", [this]);
+				trigger_data.update("timer_"+this.id);
+			}
+		}
+	}
+}
+
+CGE_Timer.prototype.elapsed_time = function(){
+	var new_date = new Date();
+	var cur_time = new_date.getTime();
+	return (cur_time-this.start_time);
 }

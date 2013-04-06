@@ -1,0 +1,4 @@
+id;name;description;effects;
+0;Unknown-Name;The item was not found;[e1,e2,e3];
+1;Sword;Attack of holder increased by 1.;[];
+2;Shield;Defense of holder increased by 1.;[];

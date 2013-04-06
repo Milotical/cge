@@ -120,6 +120,14 @@ CGE_Sprites_Data.prototype.reload_save = function(main){
 	this.main = main;
 }
 
+CGE_Sprites_Data.prototype.get_unique_id = function(id){
+	var i = 0;
+	while(this.get_image_by_id(id+i) != null){
+		i++;
+	}
+	return (id+i);
+}
+
 // =================================================================================================
 
 /* ======================================
@@ -143,8 +151,10 @@ CGE_Spriteset.prototype.add_sprite = function(sprite){
 // removes sprite from spriteset
 // -----------------------------------------------------------------------------------
 CGE_Spriteset.prototype.remove_sprite = function(sprite){
-	delete this.sprites[sprite.id];
-	this.sprites = this.sprites.filter(function(){return true});
+	var a = this.sprites;
+	var index = a.indexOf(sprite);
+	this.sprites.splice(index, 1);
+	//this.sprites = this.sprites.filter(function(){return true});
 }
 
 // -----------------------------------------------------------------------------------
@@ -180,7 +190,9 @@ CGE_Spriteset.prototype.check_collision = function(chara, new_r, dir){
 		b = this.sprites_data.get_image_by_id(this.sprites[i]).get_hitbox();
 		s = this.sprites_data.get_image_by_id(this.sprites[i]);
 		if(!(new_r[0]+c.width <= s.x || new_r[0] >= s.x+b.width || new_r[1]+c.height <= s.y || new_r[1] >= s.y+b.height) && chara != s){
-			this.sprites_data.main.trigger_data.update("collision",[chara, this.sprites[i], dir]);
+			this.sprites_data.main.trigger_data.update("collision",[chara, this.sprites[i], dir, this]);
+			this.sprites_data.main.trigger_data.update("collider_"+chara.id,[this.sprites[i], dir]);
+			this.sprites_data.main.trigger_data.update("collided_"+this.sprites[i].id,[chara, dir]);
 			return_value = true;
 		}
 	}
@@ -207,6 +219,8 @@ function CGE_Area(x,y,w,h,sprites_data){
 	this.spritesets = [];
 	this.type = "CGE_Area";
 	this.variables = {};
+	
+	this.show = false;
 }
 	
 CGE_Area.prototype.set_x = function(new_x){
@@ -253,7 +267,14 @@ CGE_Area.prototype.reload_save = function(main){
 // frame update template
 // -----------------------------------------------------------------------------------
 CGE_Area.prototype.update = function(){ }
-CGE_Area.prototype.draw = function(ctx){ }
+CGE_Area.prototype.draw = function(ctx){ 
+	if(this.show){
+		ctx.fillStyle="rgb(0,255,0)";
+		ctx.globalAlpha = 0.5;
+		ctx.fillRect(this.x,this.y,this.width,this.height); 
+		ctx.globalAlpha = 1;
+	}
+}
 	
 // =================================================================================================
 
@@ -397,6 +418,7 @@ function CGE_Anim_Sprite(id, sprites_data, image_source, width, height, rows, co
 	this.row_index = this.frame_sequence[0][1];
 	
 	this.type = "CGE_Anim_Sprite";
+	this.anim_trigger = false;
 }
 	
 // -----------------------------------------------------------------------------------
@@ -423,8 +445,9 @@ CGE_Anim_Sprite.prototype.update = function(ctx){
 				this.col_index = new_sequence_frame[0];
 				this.row_index = new_sequence_frame[1];
 			}else{
+				if(this.anim_trigger)
+					this.sprites_data.main.trigger_data.update("finished_anim_"+this.id, [this]);
 				if(this.clear_after_finished){
-					// .. trigger ...
 					this.remove();
 				}
 			  this.sleep = true;
@@ -892,7 +915,6 @@ CGE_Text.prototype.draw = function(ctx){
 						var x_image = (n%this.f_cols)*this.width_font_image;
 						var y_image = parseInt(n/this.f_cols)*this.height_font_image;
 						ctx.globalAlpha = this.opacity;
-						
 						ctx.drawImage(this.font_img, x_image, y_image,this.width_font_image, this.height_font_image, this.x+x, this.y+y-up+down-this.size, display_width, display_height);
 						x += this.width_font_image;
 					}
@@ -968,6 +990,7 @@ function CGE_Float_Text(id, text, sprites_data, width, height, x, y, z,i_source,
 	this.letter_duration = letter_duration;
 	this.type = "CGE_Float_Text";
 	this.skip_frames = 0;
+	this.complete_trigger = false;
 }
 
 CGE_Float_Text.prototype.show_complete_text = function(){
@@ -978,31 +1001,36 @@ CGE_Float_Text.prototype.completed = function(){
 	return this.frame_index > this.full_text.length*this.letter_duration;
 }
 
+CGE_Float_Text.prototype.complete = function(){
+	this.frame_index =  this.full_text.length*this.letter_duration+1;
+}
+
 CGE_Float_Text.prototype.update = function(){
-	if(!this.completed()){
-		if(this.skip_frames == 0){
-			var letter_index = parseInt(this.frame_index/this.letter_duration);
-			if(this.full_text[letter_index-1] == "/" && this.full_text[letter_index] == "n"){
-				letter_index += 2;
-				this.frame_index += 2*this.letter_duration;
-			}
-			if(this.full_text[letter_index-1] == "["){
-				if(this.full_text[letter_index] == "p")
-					this.skip_frames = this.letter_duration*2;
-				letter_index += 2;
-				this.frame_index += 2*(this.letter_duration);
-				while((this.full_text[letter_index-2] != "]" && !this.completed())){
-					letter_index++;
-					this.frame_index += (this.letter_duration);
-				}
-			}
-			this.frame_index = parseInt(this.frame_index);
-			this.text = this.full_text.slice(0, letter_index);
-			this.refresh();
-			this.frame_index++;
-		}else{
-			this.skip_frames--;
+	if(this.completed() && this.complete_trigger){
+		this.sprites_data.main.trigger_data.update("text_complete_"+this.id,[this]);
+	}
+	if(this.skip_frames == 0){
+		var letter_index = parseInt(this.frame_index/this.letter_duration);
+		if(this.full_text[letter_index-1] == "/" && this.full_text[letter_index] == "n"){
+			letter_index += 2;
+			this.frame_index += 2*this.letter_duration;
 		}
+		if(this.full_text[letter_index-1] == "["){
+			if(this.full_text[letter_index] == "p")
+				this.skip_frames = this.letter_duration*2;
+			letter_index += 2;
+			this.frame_index += 2*(this.letter_duration);
+			while((this.full_text[letter_index-2] != "]" && !this.completed())){
+				letter_index++;
+				this.frame_index += (this.letter_duration);
+			}
+		}
+		this.frame_index = parseInt(this.frame_index);
+		this.text = this.full_text.slice(0, letter_index);
+		this.refresh();
+		this.frame_index++;
+	}else{
+		this.skip_frames--;
 	}
 }
 
@@ -1039,7 +1067,7 @@ function CGE_Speech_Bubble(id, text, sprites_data, width, height, r, x0, y0, x, 
 	this.x0 = x0;
 	this.y0 = y0;
 	this.tail_base_length = 40;
-	this.tail_offset = 0;
+	this.tail_offset = 40;
 	this.tail_dir = 2;
 	this.tail_style = "auto"; // autoX, autoY, fix
 	this.type = "CGE_Speech_Bubble";
@@ -1159,6 +1187,97 @@ CGE_Speech_Bubble.prototype.remove = function(){
 			i.remove();
 		}
 	}
+}
+
+
+/* ======================================
+			CGE CHOICE BUBBLE <- FLOAT TEXT
+			----------------------------------------------------------
+			Object representing a speech bubble
+====================================== */ 
+CGE_Choice_Bubble.prototype = new CGE_Speech_Bubble();
+CGE_Choice_Bubble.prototype.constructor = CGE_Choice_Bubble;
+function CGE_Choice_Bubble(id, text, choices, sprites_data, width, height, r, x0, y0, x, y, z, choices_borders, choices_spacing, c_source, c_width, c_height, c_offsets, i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height, letter_duration){
+	this.choices = choices;
+	this.c_source = c_source;
+	this.c_width = c_width;
+	this.c_height = c_height;
+	this.c_offsets = c_offsets;
+	this.choices_borders = choices_borders;
+	this.choices_spacing = choices_spacing;
+	this.select_index = 0;
+	this.choice_image_ids = [];
+	CGE_Speech_Bubble.call(this, id, text, sprites_data, width, height, r, x0, y0, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height, letter_duration);
+	this.complete();
+	for(var i=0; i < choices.length; i++){
+		var x = this.x + this.choices_borders[0];
+		var y  = this.y + this.choices_borders[1] + this.choices_spacing * i;
+		var z = this.z + 1;
+		var id = this.id+"_choice_"+i;
+		var img = new CGE_Text(id, choices[i], this.sprites_data, null, null, x, y, z,i_source, i_cols, i_rows, i_width, i_height,f_source, f_cols, f_rows, f_width, f_height);
+		this.choice_image_ids.push(id);
+		this.sprites_data.add_image(img);
+		if(this.sprites_data.main.scene_data.scene_id == "map"){
+			this.sprites_data.main.map_data.images.push(img);
+		}else{
+			this.sprites_data.main.scene_data.images.push(img.id);
+		}
+	}
+	if(c_source != null){
+		var x = this.x + this.choices_borders[0] + this.c_offsets[0];
+		var y  = this.y + this.choices_borders[1] + this.choices_spacing * this.select_index  + this.c_offsets[1];
+		var z = this.z + 2;
+		var id = this.id+"_cursor";
+		var img = new CGE_Image(id, this.sprites_data, this.c_source, this.c_width, this.c_height, x, y, z);
+		this.cursor_image_id = id;
+		this.sprites_data.add_image(img);
+		if(this.sprites_data.main.scene_data.scene_id == "map"){
+			this.sprites_data.main.map_data.images.push(img);
+		}else{
+			this.sprites_data.main.scene_data.images.push(img.id);
+		}
+	}
+}
+
+CGE_Choice_Bubble.prototype.update = function(){
+	CGE_Speech_Bubble.prototype.update.call(this);
+	for(var i=0; i < this.choice_image_ids.length; i++){
+		var x = this.x + this.choices_borders[0];
+		var y  = this.y + this.choices_borders[1] + this.choices_spacing * i;
+		var z = this.z + 1;
+		var id = this.id+"_choice_"+i;
+		var img = this.sprites_data.get_image_by_id(id);
+		if(img != null){
+			img.x = x;
+			img.y = y;
+			img.z = z;
+		}
+	}
+	if(this.cursor_image_id != null){
+		var x = this.x + this.choices_borders[0] + this.c_offsets[0];
+		var y  = this.y + this.choices_borders[1] + this.choices_spacing * this.select_index  + this.c_offsets[1];
+		var z = this.z + 2;
+		var id = this.id+"_cursor";
+		var img =  this.sprites_data.get_image_by_id(id);
+		if(img != null){
+			img.x = x;
+			img.y = y;
+			img.z = z;
+		}
+	}
+}
+
+CGE_Choice_Bubble.prototype.remove = function(){
+	CGE_Speech_Bubble.prototype.remove.call(this);
+	for(var i=0; i < this.choice_image_ids.length; i++){
+		var img = this.sprites_data.get_image_by_id(this.choice_image_ids[i]);
+		if(img != null)
+			img.remove();
+	}
+	var id = this.id+"_cursor";
+	var img =  this.sprites_data.get_image_by_id(id);
+	if(img != null)
+		img.remove();
 }
 
 /* ======================================

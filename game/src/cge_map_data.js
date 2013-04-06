@@ -11,22 +11,22 @@ function CGE_Map_Data(main_object){
 	this.images = [];													// array of corresponding images
 	this.events ={};													// array of corresponding events
 	this.loaded = true;												// defines if map is displayed
-	this.start_map = function(){};
-	this.map_id;
-}	
+	this.start_map = function(){};							// dummy for function called when map was loaded
+	this.map_id;														   // current map id
+}
 	
 // -----------------------------------------------------------------------------------
 // called of new map is loaded
 // -----------------------------------------------------------------------------------
 CGE_Map_Data.prototype.load_new_map = function(new_map_id){
+	this.main.trigger_data.update("end_map");
 	this.main.input_controller.refresh();
 	this.unload();
 	this.images = [];
 	this.events = {};
 	this.map_id = new_map_id;
+	this.map_variables = {};
 	
-	var charas_data = [];
-	var events_data = [];
 	// AJAX call for map data
 	var map_id = this.map_id;
 	var map_data = this;
@@ -42,190 +42,6 @@ CGE_Map_Data.prototype.load_new_map = function(new_map_id){
 		}, "text"
 	);
 	
-	
-	// ................
-	/*if(new_map_id == 11){
-		this.layers = [];
-		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
-		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
-		this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
-		this.tileset_name = "Testset.png";
-		this.tileset_grid_size = 32;
-		this.tileset_zoom_factor = 1.0;
-		this.tileset_row_width = 8;
-		this.tileset_passable = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
-		this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
-		this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
-	}
-	if(new_map_id == 10){
-		this.layers = [];
-		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
-		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
-		this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
-		this.tileset_name = "res/tilesets/Testset.png";
-		this.tileset_grid_size = 32;
-		this.tileset_zoom_factor = 1.0;
-		this.tileset_row_width = 8;
-		this.tileset_passable = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
-		this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
-		this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
-		
-		var charas_data = [];
-		charas_data[0] = {"id" : "player","source" : "res/chara/Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
-		charas_data[0]["moves"] = [];//[["wait",[10]],["walk",[1,1,"frames"]],["stand"]];
-		charas_data[0]["blocking_classes"] = ["std"];
-		
-		for(var i=1; i < 0; i++){
-			charas_data[i] = {"id" : i,"source" : "res/chara/Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : Math.random()*640, "y" : Math.random()*480, "z" : 1, "face" : 2};
-			charas_data[i]["moves"] = [["walk",[5, "random", "frames"],0], ["stand",[],0], ["wait",[30],0]];
-			charas_data[i]["blocking_classes"] = ["std"];
-		}
-		
-		var events_data = [];
-		
-		events_data[0] = {"id" : 0, "parallel" : true, "chara" : "player"};
-		events_data[0]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[0]["trigger"] = "keypress_37";
-		events_data[0]["effects"] = [["player_move", "player", "walk", [0,3,"inf"], 1, true]];
-		events_data[1] = {"id" : 1, "parallel" : true, "chara" : "player"};
-		events_data[1]["conditions"] = [[["facing","player",3]]];
-		events_data[1]["trigger"] = "keyrelease_37";
-		events_data[1]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[2] = {"id" : 2, "parallel" : true, "chara" : "player"};
-		events_data[2]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[2]["trigger"] = "keypress_38";
-		events_data[2]["effects"] = [["player_move", "player", "walk", [0,0,"inf"], 1, true]];
-		events_data[3] = {"id" : 3, "parallel" : true, "chara" : "player"};
-		events_data[3]["conditions"] = [[["facing","player",0]]];
-		events_data[3]["trigger"] = "keyrelease_38";
-		events_data[3]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[4] = {"id" : 4, "parallel" : true, "chara" : "player"};
-		events_data[4]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[4]["trigger"] = "keypress_39";
-		events_data[4]["effects"] = [["player_move", "player", "walk", [0,1,"inf"], 1, true]];
-		events_data[5] = {"id" : 5, "parallel" : true, "chara" : "player"};
-		events_data[5]["conditions"] = [[["facing","player",1]]];
-		events_data[5]["trigger"] = "keyrelease_39";
-		events_data[5]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[6] = {"id" : 6, "parallel" : true, "chara" : "player"};
-		events_data[6]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[6]["trigger"] = "keypress_40";
-		events_data[6]["effects"] = [["player_move", "player", "walk", [0,2,"inf"], 1, true]];
-		events_data[7] = {"id" : 7, "parallel" : true, "chara" : "player"};
-		events_data[7]["conditions"] = [[["facing","player",2]]];
-		events_data[7]["trigger"] = "keyrelease_40";
-		events_data[7]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[8] = {"id" : 8, "parallel" : true, "chara" : "player"};
-		events_data[8]["conditions"] = [];
-		events_data[8]["trigger"] = "auto";
-		events_data[8]["effects"] = [["scroll", function(sx, e){ return 320-e.get_chara().x-e.get_chara().get_width()/2; }, function(sy, e){ return 240-e.get_chara().y-e.get_chara().get_height()/2; }]];
-	
-		events_data[9] = {"id" : 9, "parallel" : true, "chara" : "player"};
-		events_data[9]["conditions"] = [];
-		events_data[9]["trigger"] = "keynewpress_13";
-		events_data[9]["effects"] = [["save_game"], ["kill_game"]];
-		
-		events_data[10] = {"id" : 12, "parallel" : false, "chara" : 0};
-		events_data[10]["conditions"] = [];
-		events_data[10]["trigger"] = "keynewpress_50";
-		events_data[10]["effects"] = [["change_map",2],["teleport","player",function(x){ return 0; },function(y){ return 0; }]];
-		
-		events_data[11] = {"id" : 11, "parallel" : false, "chara" : 0};
-		events_data[11]["conditions"] = [];
-		events_data[11]["trigger"] = "keynewpress_49";
-		events_data[11]["effects"] = [["change_scene","title"]];
-		
-		this.main.input_controller.add_trigger_key(13);
-		this.main.input_controller.add_trigger_key(49);
-		this.main.input_controller.add_trigger_key(50);
-		this.main.input_controller.add_trigger_key(37);
-		this.main.input_controller.add_trigger_key(38);
-		this.main.input_controller.add_trigger_key(39);
-		this.main.input_controller.add_trigger_key(40);
-	}
-	if(new_map_id == 12){
-		this.layers = [];
-		this.layers[0] = [[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9],[9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9]];
-		this.layers[1] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],[6,6,6,6,6,6,6,6,6,6,0,0,0,0,0,0,0,0,0,0,6],[0,7,0,6,6,0,0,0,0,0,0,0,0,0,0,6,0,0,0,0,6]];
-		this.layers[2] = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],[0,0,7,7,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0]];
-		this.tileset_name = "res/tilesets/Testset.png";
-		this.tileset_grid_size = 32;
-		this.tileset_zoom_factor = 1.0;
-		this.tileset_row_width = 8;
-		this.tileset_passable = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0],[1,1,1,1],[1,1,1,1],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
-		this.map_width = 21*this.tileset_zoom_factor*this.tileset_grid_size;
-		this.map_height = 21*this.tileset_zoom_factor*this.tileset_grid_size;
-		
-		charas_data[0] = {"id" : "player","source" : "res/chara/Poyo_chara.png", "width" : 156, "height" :175, "rows" : 4, "chols" : 4, "x" : 434, "y" : 30, "z" : 1, "face" : 2};
-		charas_data[0]["moves"] = [];
-		charas_data[0]["blocking_classes"] = ["std"];
-		
-		events_data[0] = {"id" : 0, "parallel" : false, "chara" : "player"};
-		events_data[0]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[0]["trigger"] = "keypress_37";
-		events_data[0]["effects"] = [["player_move", "player", "walk", [0,3,"inf"], 1, true]];
-		events_data[1] = {"id" : 1, "parallel" : false, "chara" : "player"};
-		events_data[1]["conditions"] = [[["facing","player",3]]];
-		events_data[1]["trigger"] = "keyrelease_37";
-		events_data[1]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[2] = {"id" : 2, "parallel" : false, "chara" : "player"};
-		events_data[2]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[2]["trigger"] = "keypress_38";
-		events_data[2]["effects"] = [["player_move", "player", "walk", [0,0,"inf"], 1, true]];
-		events_data[3] = {"id" : 3, "parallel" : false, "chara" : "player"};
-		events_data[3]["conditions"] = [[["facing","player",0]]];
-		events_data[3]["trigger"] = "keyrelease_38";
-		events_data[3]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[4] = {"id" : 4, "parallel" : false, "chara" : "player"};
-		events_data[4]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[4]["trigger"] = "keypress_39";
-		events_data[4]["effects"] = [["player_move", "player", "walk", [0,1,"inf"], 1, true]];
-		events_data[5] = {"id" : 5, "parallel" : false, "chara" : "player"};
-		events_data[5]["conditions"] = [[["facing","player",1]]];
-		events_data[5]["trigger"] = "keyrelease_39";
-		events_data[5]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[6] = {"id" : 6, "parallel" : false, "chara" : "player"};
-		events_data[6]["conditions"]  = [[["chara_variable","player","walking",function(v){ return v != true; }]]];
-		events_data[6]["trigger"] = "keypress_40";
-		events_data[6]["effects"] = [["player_move", "player", "walk", [0,2,"inf"], 1, true]];
-		events_data[7] = {"id" : 7, "parallel" : false, "chara" : "player"};
-		events_data[7]["conditions"] = [[["facing","player",2]]];
-		events_data[7]["trigger"] = "keyrelease_40";
-		events_data[7]["effects"] = [["player_move", "player", "stand", [], 1, false]];
-		
-		events_data[8] = {"id" : 8, "parallel" : true, "chara" : "player"};
-		events_data[8]["conditions"] = [];
-		events_data[8]["trigger"] = "auto";
-		events_data[8]["effects"] = [["scroll", function(sx, e){ return 320-e.get_chara().x-e.get_chara().get_width()/2; }, function(sy, e){ return 240-e.get_chara().y-e.get_chara().get_height()/2; }]];
-	
-		events_data[9] = {"id" : 9, "parallel" : true, "chara" : "player"};
-		events_data[9]["conditions"] = [];
-		events_data[9]["trigger"] = "keynewpress_13";
-		events_data[9]["effects"] = [["save_game"], ["kill_game"]];
-		
-		events_data[10] = {"id" : 10, "parallel" : true, "chara" : 0};
-		events_data[10]["conditions"] = [];
-		events_data[10]["trigger"] = "keynewpress_50";
-		events_data[10]["effects"] = [["change_map",0],["teleport","player",function(x){ return 0; },function(y){ return 0; }]];
-		
-	}
-	
-	/*for(var chara in charas_data){
-		this.add_chara(charas_data[chara]);
-	}
-	for(var event in events_data){
-		this.add_event(events_data[event]);
-	}
-	// ..................
-	this.main.set_buffer_size(this.map_width, this.map_height);
-	this.loaded = true;*/
 }
 
 // -----------------------------------------------------------------------------------
@@ -276,6 +92,16 @@ CGE_Map_Data.prototype.unload = function(){
 CGE_Map_Data.prototype.reload = function(){
 	for (var i in this.images){
 		this.main.sprites_data.add_image(this.images[i]);
+		if(this.images[i].spritesets != null){
+			for(var j=0; j < this.images[i].spritesets.length; j++){
+				this.main.sprites_data.spritesets[this.images[i].spritesets[j]].add_sprite(this.images[i]);
+			}
+		}
+		if(this.images[i].col_spritesets != null){
+			for(var j=0; j < this.images[i].col_spritesets.length; j++){
+				this.main.sprites_data.spritesets[this.images[i].col_spritesets[j]].add_sprite(this.images[i]);
+			}
+		}
 	}
 	for(var i in this.events){
 		for(var j in this.events[i]){
@@ -362,4 +188,16 @@ CGE_Map_Data.prototype.reload_save = function(main){
 	if(this.loaded){
 		this.reload();		
 	}
+}
+
+CGE_Map_Data.prototype.remove_image = function(img){
+	var a = this.images;
+	var index = a.indexOf(img);
+	this.images.splice(index, 1);
+}
+
+CGE_Map_Data.prototype.remove_image_by_id = function(id){
+	var img = this.main.sprites_data.get_image_by_id(id);
+	if(img != null)
+		this.remove_image(img);
 }

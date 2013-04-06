@@ -7,9 +7,8 @@
 
 // -----------------------------------------------------------------------------------
 // Initialises the cge_game engine
+// call this to start the game
 // -----------------------------------------------------------------------------------
-var game;
-
 function cge_start_game(system_info){
 	var game = new CGE_Game("game_div", system_info);
 	game.load_counter = 0;
@@ -18,46 +17,43 @@ function cge_start_game(system_info){
 	game.create_canvas_element();
 	
 	// cross browser anim-Frame function
-	var animFrame = window.requestAnimationFrame ||
-		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame    ||
-		window.oRequestAnimationFrame      ||
-		window.msRequestAnimationFrame     ||
-		null ;
+	var animFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || null ;
 
 	var recursive_update = function() {
 		game.update();
 		if(game.alive)
 			animFrame( recursive_update );
-		else
-			game.ctx.clearRect ( 0 , 0 , game.resolution[0] , game.resolution[1] );
+		else{
+			for(var i=0; i < game.ctx.length; i++)
+				game.ctx[i].clearRect ( 0 , 0 , game.resolution[0] , game.resolution[1] );
+		}
 	};
 
 	// start the mainloop
 	animFrame( recursive_update);
 }
 
+// -----------------------------------------------------------------------------------
+// Initialises the cge_game engine by reading data from a string
+// called to load a SAV-file
+// -----------------------------------------------------------------------------------
 function cge_load_game(str){
 	var save_data = eval(str);
 	
 	var system_info = [];
-	system_info["resolution"] = [640, 480];
-	system_info["start_scene"] = "map";
-	system_info["start_map"] = 0;
+	system_info["resolution"] = save_data.resolution;
+	system_info["start_scene"] = "title";
+	system_info["start_map"] = save_data.start_map_id;
 	var game = new CGE_Game("game_div", system_info);
 	// create the canvas element
 	game.create_canvas_element();
+	
 	if(save_data != null){
 		game.load_counter = save_data.load_counter+1;
-	
 		game.scroll_x = save_data.scroll_x;
 		game.scroll_y = save_data.scroll_y;
 		game.scene_data.new_scene_id = save_data.scene_data.new_scene_id;
-		//game.scene_data.order_new_scene_data(save_data.scene_data.scene_id);
 		game.map_data.loaded = save_data.map_data.loaded;
-		
-		//if(game.map_data.loaded)
-		//	game.map_data.load_new_map(save_data.map_data.map_id);
 		game.map_data.map_id = save_data.map_data.map_id;
 		game.scene_data.alive = save_data.scene_data.alive;
 		game.scene_data.start = save_data.scene_data.start;
@@ -142,6 +138,14 @@ function cge_load_game(str){
 				game.map_data.events[i].push(event);
 			}
 		}
+		for(var t in save_data.trigger_data.timer){
+			var s_timer = save_data.sprites_data.timer[t];
+			var timer = new CGE_Timer();
+			for(var c in s_timer){
+				timer[c] = s_timer[c];
+			}
+			game.trigger_data.timer[timer.id] = timer;
+		}
 		for(var c in save_data.input_controller){
 			game.input_controller[c] = save_data.input_controller[c];
 		}
@@ -159,6 +163,10 @@ function cge_load_game(str){
 		game.map_data.map_height = save_data.map_data.map_height;
 		game.scene_data.images = save_data.scene_data.images;
 		game.set_buffer_size(game.map_data.map_width, game.map_data.map_height);
+		game.global_variables = save_data.global_variables;
+		game.scene_data.scene_variables = save_data.scene_data.scene_variables;
+		game.map_data.map_variables = save_data.map_data.map_variables;
+		game.number_of_screens = save_data.number_of_screens;
 		
 		game.reload_save();
 		delete save_data;
@@ -168,12 +176,7 @@ function cge_load_game(str){
 	}
 	
 	// cross browser anim-Frame function
-	var animFrame = window.requestAnimationFrame ||
-		window.webkitRequestAnimationFrame ||
-		window.mozRequestAnimationFrame    ||
-		window.oRequestAnimationFrame      ||
-		window.msRequestAnimationFrame     ||
-		null ;
+	var animFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || null ;
 	
 	game.r = Math.random();
 	
@@ -181,8 +184,10 @@ function cge_load_game(str){
 		game.update();
 		if(game.alive)
 			animFrame( recursive_update );
-		else
-			game.ctx.clearRect ( 0 , 0 , game.resolution[0] , game.resolution[1] );
+		else{
+			for(var i=0; i < game.ctx.length; i++)
+				game.ctx[i].clearRect ( 0 , 0 , game.resolution[0] , game.resolution[1] );
+		}
 	};
 
 	// start the mainloop
@@ -207,16 +212,20 @@ function CGE_Game(html_id, system_info){
 		system_info["start_map"] = 0;
 	if(system_info["start_scene"] == null)
 		system_info["start_scene"] = "test";
+	if(system_info["number_of_screens"] == null)	
+		system_info["number_of_screens"] = 2;
 	
 	this.html_id = html_id; 													// id of the html-div-element (sub elements like canvas are created inside of this)
 	this.resolution = system_info["resolution"]; 				// array defining the resolution (e.g. [640, 480])
 	this.start_map_id = system_info["start_map"];		// start map id
+	this.number_of_screens = system_info["number_of_screens"]
 	this.alive = true;																// defines if game is running (if set to false the game is terminated at the end of the frame)
 	this.data_objects = {};
+	this.database = {};
 	this.global_variables = {};
 	
-	this.scroll_x = 0;
-	this.scroll_y = 0;
+	this.scroll_x = [0,0,0,0];
+	this.scroll_y = [0,0,0,0];
 	
 	// Creating data Objects and Interpreter
 	// (order is important!)
@@ -231,9 +240,9 @@ function CGE_Game(html_id, system_info){
 	this.scene_data.new_scene_id = system_info["start_scene"];
 	
 	// Canvas-Context-Objects
-	this.ctx;
+	this.ctx=[];
 	this.ctx_buffer;
-	this.canv;
+	this.canv=[];
 	this.canv_buffer;
 	
 	// Initilaising frame counter (for fps-display)
@@ -252,7 +261,9 @@ CGE_Game.prototype.create_canvas_element = function(){
 	var canvas_height = this.resolution[1];
 	div.html("");
 	// creating canvas elements (define style of canvas)
-	div.append('<canvas id="'+this.html_id+'_canvas_visible" class="game_canvas" style="border-style:solid;border-width:1px;width:100%;height:100%;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
+	for(var i=0; i < this.number_of_screens; i++)
+		div.append('<canvas id="'+this.html_id+'_canvas_visible_'+i+'" class="game_canvas" style="border-style:solid;border-width:1px;width:'+(99/this.number_of_screens)+'%;height:100%;">SORRY, your Browser doesn\'t supports canvas...</canvas>');
+	
 	div.append('<canvas id="'+this.html_id+'_canvas" class="game_canvas" style="visibility:hidden;width:0px;height:0px;"></canvas>');
 	div.append('<br /><div id="'+this.html_id+'_fps">fps: </div>');
 	div.append('<br /><div id="'+this.html_id+'_debug" style="color:red;overflow:scroll;width:800px;height:100px;"></div>');
@@ -263,18 +274,26 @@ CGE_Game.prototype.create_canvas_element = function(){
 	this.canv_buffer = canv[0];
 	this.ctx_buffer = canv[0].getContext('2d');
 	// set visible canvas parameters
-	canv = $('#'+this.html_id+'_canvas_visible');
-	canv.attr("width",canvas_width+"px");
-	canv.attr("height",canvas_height+"px");
-	this.canv = canv[0];
-	this.ctx = canv[0].getContext('2d');
+	for(var i=0; i < this.number_of_screens; i++){
+		canv = $('#'+this.html_id+'_canvas_visible_'+i);
+		canv.attr("width",canvas_width+"px");
+		canv.attr("height",canvas_height+"px");
+		this.canv.push(canv[0]);
+		this.ctx.push(canv[0].getContext('2d'));
+	}
 }
 
+// -----------------------------------------------------------------------------------
+// adds gebug message
+// -----------------------------------------------------------------------------------
 CGE_Game.prototype.debug_m = function(msg){
 	var div = $('#'+this.html_id+"_debug");
 	div.prepend(msg+"<br />");
 }
 
+// -----------------------------------------------------------------------------------
+// chnage size of canvas element
+// -----------------------------------------------------------------------------------
 CGE_Game.prototype.set_buffer_size = function(w, h){
 	this.canv_buffer.width = w;
 	this.canv_buffer.height = h;
@@ -287,8 +306,10 @@ CGE_Game.prototype.set_buffer_size = function(w, h){
 CGE_Game.prototype.update = function(){
 	// clear canvas elements
 	this.ctx_buffer.clearRect ( 0 , 0 , this.canv_buffer.width , this.canv_buffer.height );
-	this.ctx.clearRect ( 0 , 0 , this.resolution[0] , this.resolution[1] );
 	this.ctx_buffer.globalAlpha = 1.0;
+	for(var i=0; i < this.number_of_screens; i++){
+		this.ctx[i].clearRect ( 0 , 0 , this.resolution[0] , this.resolution[1] );
+	}
 	
 	// calculating and displaying fps
 	var new_date = new Date();
@@ -304,6 +325,7 @@ CGE_Game.prototype.update = function(){
 	// checking if scene is alive
 	if(this.scene_data.alive){
 		// frame update of auto-event-trigger
+		this.trigger_data.update_timer();
 		this.trigger_data.update("auto");
 		this.scene_data.update(); // frame update for scene
 	}else{
@@ -317,13 +339,18 @@ CGE_Game.prototype.update = function(){
 	}
 	
 	// copy content from buffer canvas to visible canvas
-	this.ctx.drawImage(this.canv_buffer, this.scroll_x, this.scroll_y);
+	for(var i=0; i < this.number_of_screens; i++)
+		this.ctx[i].drawImage(this.canv_buffer, this.scroll_x[i], this.scroll_y[i]);
 	
 	this.input_controller.update();
 	this.event_interpreter.update();
 
 }
 
+// -----------------------------------------------------------------------------------
+// returns a string containing all information about the current state
+// of the game. (used for saving into a SAV file)
+// -----------------------------------------------------------------------------------
 CGE_Game.prototype.save_to_string = function(){
 	var r = "";
 	
@@ -338,8 +365,7 @@ CGE_Game.prototype.save_to_string = function(){
 	r = this.toSource();
 	
 	this.reload_save();
-	
-	this.debug_m(r);
+	//this.debug_m(r);
 	return r;
 }
 
@@ -352,8 +378,4 @@ CGE_Game.prototype.reload_save = function(){
 	this.input_controller.main = this;
 	this.move_interpreter.main = this;
 }
-
-
-
-
 

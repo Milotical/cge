@@ -13,6 +13,14 @@
 		
 		addEvent("confirm","keynewpress_13" ,'[["if",  [[["select_index",-1 ,function(ix){ return ix == 1;}]]]  ], ["change_scene","map"], ["else"], ["load_game", 1], ["end"]]', "[]", "win");
 		addTriggerKey(13);
+		
+		addEvent("load_data", "start_scene", '[["load_database", ["items"], ["items.csv"]]]');
+		
+		?>
+		/*var img = new CGE_Choice_Bubble("cb", "Was geht?", ["nix", "alles"], this.main.sprites_data, 200, 100, 20, 0, 0, 200, 200, 10, [30,60], 10, "res/style/cursor.png", 35, 34, [-30,0], "res/style/icons.png", 4, 3, 88, 66, null, null, null, null, null, 1);
+		this.main.sprites_data.add_image(img);
+		this.images.push(img.id);*/
+		<?php
 	}
 	
 	function updateScene(){

@@ -56,8 +56,8 @@ CGE_Move_Interpreter.prototype.update = function(chara, move){
 			this.move_update(chara, move);
 			break;
 		case "turn": // p = [direction, (direction_parameter)]
-			var dir = this.get_direction_from_direction_parameter(move.para[0], move.para[1], move);
-			chara.facing = this.get_facing_from_direction(dir);;
+			var dir = this.get_direction_from_direction_parameter(move.para[0], move.para[1], chara);
+			chara.facing = this.get_facing_from_direction(dir);
 			chara.load_sequence("stand");
 			move.ready = true;
 			break;
@@ -220,9 +220,15 @@ CGE_Move_Interpreter.prototype.get_direction_from_direction_parameter = function
 				dir = [(dx)/r, (dy)/r];
 				break;
 			case "towards_chara" :
-				var chara2 = this.main.map_data.images[dir_para2];
-				var dx = chara2.x-chara.x;
-				var dy = chara2.y-chara.y;
+			
+				var chara2 = this.main.sprites_data.get_image_by_id(dir_para2);
+				var dx = (chara2.x+chara2.get_width()/2)-(chara.x+chara.get_width()/2);
+				var dy = (chara2.y+chara2.get_height()/2)-(chara.y+chara.get_height()/2);
+				
+				//var chara2 = this.main.map_data.images[dir_para2];
+				//var dx = chara2.x-chara.x;
+				//var dy = chara2.y-chara.y;
+				
 				var r = Math.sqrt(dx*dx+dy*dy);
 				dir = [(dx)/r, (dy)/r];
 				break;
@@ -552,6 +558,7 @@ CGE_Move_Interpreter.prototype.check_collision = function(new_r, chara, velocity
 		}
 		if(map_collision){
 			this.main.trigger_data.update("collision", [chara, "map"]);
+			this.main.trigger_data.update("collider_"+chara.id,["map", dir]);
 		}
 	}
 	// Character Collision

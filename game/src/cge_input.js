@@ -11,13 +11,17 @@ function CGE_Input_Controller(main_object){
 	this.gathered_keys = [];		// keys pressed (assynchronous)
 	
 	this.trigger_keys = [];			// keys checked for event triggering
-	this.mouse_x = 0;
+	
+	// mouse cursor coordinates
+	// (gives correct pixel values, even in fullscreen)
+	this.mouse_x = 0;				
 	this.mouse_y = 0;
 	
-	var o = this;
+	
 	// -----------------------------------------------------------------------------------
 	// adding action listeners
 	// -----------------------------------------------------------------------------------
+	var o = this;
 	$(document).unbind("keydown");
 	$(document).unbind("keyup");
 	
@@ -44,8 +48,8 @@ function CGE_Input_Controller(main_object){
 		o.gathered_keys["click"] = false;
 	});
 	$(document).mousemove( function(e){
-		var canv = $("#"+o.main.html_id+"_canvas_visible");
-		var offset = $("#"+o.main.html_id+"_canvas_visible").offset();
+		var canv = $("#"+o.main.html_id+"_canvas_visible_0");
+		var offset = $("#"+o.main.html_id+"_canvas_visible_0").offset();
 		o.mouse_x = (e.pageX-offset.left)/canv.width()*o.main.resolution[0];
 		o.mouse_y = (e.pageY-offset.top)/canv.height()*o.main.resolution[1];
 	});
@@ -71,6 +75,7 @@ CGE_Input_Controller.prototype.remove_trigger_key = function(key){
 
 // -----------------------------------------------------------------------------------
 // frame update
+// (called in main loop)
 // (also triggers events)
 // -----------------------------------------------------------------------------------
 CGE_Input_Controller.prototype.update = function(){
