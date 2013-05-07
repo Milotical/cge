@@ -103,6 +103,93 @@ class Window{
 		include($this->mBasePath . "template/window.php");
 	}
 	
+	public function printHead(){
+		$style = '';
+		
+		$wId = $this->id;
+		$wTitle = $this->title;
+		$wContent = $this->content;
+		
+		if(isset($this->top)){
+			$style .= 'top: ' . $this->top . 'px;';
+		}
+		
+		if(isset($this->left)){
+			$style .= 'left: ' . $this->left . 'px;';
+		}
+		
+		if(isset($this->right)){
+			$style .= 'right: ' . $this->right . 'px;';
+		}
+		
+		if(isset($this->bottom)){
+			$style .= 'bottom: ' . $this->bottom . 'px;';
+		}
+		
+		if(isset($this->width)){
+			$style .= 'width: ' . $this->width . 'px;';
+		}
+		
+		if(isset($this->height)){
+			$style .= 'height: ' . $this->height . 'px;';
+		}
+		
+		if(isset($this->maxWidth)){
+			$style .= 'max-width: ' . $this->maxWidth . 'px;';
+		}
+		
+		if(isset($this->maxHeight)){
+			$style .= 'max-height: ' . $this->maxHeight . 'px;';
+		}
+		
+		if(isset($this->minWidth)){
+			$style .= 'min-width: ' . $this->minWidth . 'px;';
+		}
+		
+		if(isset($this->minHeight)){
+			$style .= 'min-height: ' . $this->minHeight . 'px;';
+		}
+		
+			if(!$this->width){
+			$wAutoSizeWidth = true;
+		}else{
+			$wAutoSizeWidth = false;
+		}
+		
+		if(!$this->height){
+			$wAutoSizeHeight = true;
+		}else{
+			$wAutoSizeHeight = false;
+		}
+		
+		$wContentWrapperHeight = $this->height - 38;
+
+		if($wContentWrapperHeight <= 0){
+			$wContentWrapperHeight = "auto";
+		}else{
+			$wContentWrapperHeight .= "px";
+		}
+		
+		$wStyles = ' style="' . $style . '"';
+		$wHeaderColorClass = "";
+		if(isset($this->headerColor)){
+			$wHeaderColorClass = " cge_EditorWindowHeader_" . $this->headerColor;
+		}
+		
+		$wControls = $this->windowControls;
+		
+		include($this->mBasePath . "template/windowHead.php");
+	}
+	
+	public function printFoot(){
+		$style = '';
+		
+		$wId = $this->id;
+		$wAnchor = $this->mPositionAnchor;
+		
+		include($this->mBasePath . "template/windowFoot.php");
+	}
+	
 	public function setPositionAnchor($pAnchor, $pMargin = 26){
 		$this->mPositionAnchor = $pAnchor;
 	}

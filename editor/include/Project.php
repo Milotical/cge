@@ -11,6 +11,7 @@ class Project{
 	private $mScene = array();
 
 	private $mTileset = array();
+	private $mTilesetRes = array();
 	private $mMap = array();
 	
 	function __construct($pName, $pDirectory = "../projects"){
@@ -47,22 +48,14 @@ class Project{
 		}
 	}
 	
-	public function scanMaps(){
-		$cge_mapDirPath = $this->mDirectory . "/" . $this->mSceneDir . "/" . $this->mMapDir;
-		
-		if(is_dir($cge_mapDirPath)){
-			$mapDir = opendir($cge_mapDirPath);
+	public function scanTilesetRes(){
+		$cge_tilesetDirPath = $this->mDirectory . "/" . $this->mResDir . "/" . $this->mTilesetDir;
+		if(is_dir($cge_tilesetDirPath)){
+			$tilesetDir = opendir($cge_tilesetDirPath);
 			
-			while(($file = readdir($mapDir)) !== false){	
-				if(strstr($file, ".php")){
-					
-					$cge_activeMapData = null;
-					include($cge_mapDirPath . "/" . $file);
-					if($cge_activeMapData != null ){
-						array_push($this->mMap, $cge_activeMapData);
-					}else{
-						//TODO: Throw error: Corrupt tileset file!
-					}
+			while(($file = readdir($tilesetDir)) !== false){
+				if(strstr($file, ".png") || strstr($file, ".jpg") || strstr($file, ".gif")){
+					array_push($this->mTilesetRes, $file);
 				}
 			}
 		}else{
@@ -70,8 +63,32 @@ class Project{
 		}
 	}
 	
+	public function scanMaps(){
+		$cge_mapDirPath = $this->getMapDirPath();
+		
+		$this->mMap = json_decode(file_get_contents($cge_mapDirPath . '/structure.json'), true);
+		return $this->mMap;
+	}
+	
+	public function getMapDirPath(){
+		return $this->mDirectory . "/" . $this->mSceneDir . "/" . $this->mMapDir;
+	}
+	
+	public function getTilesetDirPath($stripDir = false){
+		if(!$stripDir){
+			return $this->mDirectory . "/" . $this->mResDir . "/" . $this->mTilesetDir;
+		}else{
+			$returnDir = str_replace("../../", "../", $this->mDirectory);
+			return $returnDir . "/" . $this->mResDir . "/" . $this->mTilesetDir;
+		}
+	}
+	
 	public function getTilesets(){
 		return $this->mTileset;
+	}
+	
+	public function getTilesetRes(){
+		return $this->mTilesetRes;
 	}
 	
 	public function getMaps(){

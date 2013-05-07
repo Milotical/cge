@@ -234,6 +234,19 @@ class Tileset{
 			//TODO: Throw warning
 		}
 	}
+	
+	public static function getTilesetByIdNew($pTilesetId, $pTilesetPath){
+		$mTilesetList = json_decode(file_get_contents($pTilesetPath . '/tileset.json'), true);
+		return $mTilesetList[$pTilesetId];
+	}
+	
+	public static function getBackgroundOffsetX($pTileset, $pTileX){
+		return $pTileset["tileWidth"] * $pTileX;
+	}
+	
+	public static function getBackgroundOffsetY($pTileset, $pTileY){
+		return $pTileset["tileHeight"] * $pTileY;
+	}
 }
 
 ?>

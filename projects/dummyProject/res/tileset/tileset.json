@@ -1,0 +1,19 @@
+{
+	"cge_MyTestset": 
+		{
+			"file": "Testset.png",
+			"width": 256,
+			"height": 416,
+			"tileWidth": 32,
+			"tileHeight": 32
+		},
+		
+	"cge_ZeldaTileset":
+		{
+			"file": "zeldaTileset.png",
+			"width": 384,
+			"height": 256,
+			"tileWidth": 16,
+			"tileHeight": 16
+		}
+}

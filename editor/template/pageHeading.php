@@ -14,12 +14,13 @@
 	<script src="script/editor.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/window.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/tileset.js" type="text/javascript" charset="utf-8"></script>
+	<script src="script/map.js" type="text/javascript" charset="utf-8"></script>
 	
 	<script type="text/javascript">
 		$(window).load(function(){
 			<?php echo $cge_startScript; ?>
 
-
+			cge_EditorTitle = "<?php cge_print("title"); ?>";
 		});
 	</script>
 	
@@ -45,3 +46,4 @@
 </div>
 
 <div id="cge_editorWindowWrapper">
+	<div id="cge_editorMapWrapper"></div>

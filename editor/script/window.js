@@ -11,7 +11,7 @@ function cge_loadWinodw(pWindowName, opts){
 	
 	if($("#" + pWindowName).length <= 0){
 		cge_setLoading(true);
-		$.get("ajax/getWindow.php", {w: pWindowName, 'o[]': opts}, function(data){
+		$.get("ajax/getWindow.php", {w: pWindowName, o: opts}, function(data){
 			cge_setLoading(false);
 			$("#cge_editorWindowWrapper").append(data);
 			cge_enableWindowFunctions();

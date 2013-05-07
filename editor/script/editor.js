@@ -1,4 +1,5 @@
 var cge_loading = 0;
+var cge_EditorTitle = "";
 
 $(document).ready(function(){
 	cge_enableWindowFunctions();
@@ -40,8 +41,30 @@ function cge_unloadProject(){
 	});
 }
 
+function cge_leadingZero(pNr){
+	if(pNr <= 9){
+		return "0" + pNr;
+	}else{
+		return pNr;
+	}
+}
+
 function cge_pushLog(pMessage){
-	//TODO: Implement this!
+	var d = new Date();
+	var h = cge_leadingZero(d.getHours());
+	var m = cge_leadingZero(d.getMinutes());
+	var s = cge_leadingZero(d.getSeconds());
+	 
+	$("#cge_EditorLogContent").prepend("<span class=\"cge_LogDebug cge_Log\">[" + h + ":" + m + ":" + s + "] " + pMessage + "</span>");
+}
+
+function cge_pushError(pMessage){
+	var d = new Date();
+	var h = cge_leadingZero(d.getHours());
+	var m = cge_leadingZero(d.getMinutes());
+	var s = cge_leadingZero(d.getSeconds());
+	 
+	$("#cge_EditorLogContent").prepend("<span class=\"cge_LogError cge_Log\">[" + h + ":" + m + ":" + s + "] " + pMessage + "</span>");
 }
 
 function cge_setLoading(pBool){
@@ -55,7 +78,7 @@ function cge_setLoading(pBool){
 	
 	if(cge_isLoading()){
 		loadingWrapper.show();
-		loadingWrapper.animate({height: 10});
+		loadingWrapper.animate({height: 5});
 		cge_startLoadingAnimation();
 	}else{
 		loadingWrapper.animate({height: 0}, function(){

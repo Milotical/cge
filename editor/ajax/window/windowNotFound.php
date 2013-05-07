@@ -1,22 +1,30 @@
 <?php
-
-$content = '' . cge_getString('WindowNotFound') . '';
-
 $tId = $_GET["w"];
-$tName = "Error details";
+$tName = "Error Details";
 $tContent = 'Window id: "' . $_GET["w"] . '"<br />
 Caused by: "editor/ajax/getWindow.php"<br />
 Time: ' . date("d.m.Y") . ' at ' . date("H:i:s");
 
 if(isset($_GET["o"])){
 	$tContent .= '<br />
-Options: ' . implode(", ", $_GET["o"]);
+Options: ';
+	$first = true;
+	foreach($_GET["o"] as $key => $val){
+		if($first){
+			$first = false;
+		}else{
+			$tContent .= '; ';
+		}
+		$tContent .= '"' . $key . '" => ' . $val;
+	}
 }
-eval('$content .= \'' . file_get_contents($cge_editorBasePath . "template/toggle.php") . '\';');
 
-$tilesetWindow = new Window($_GET["w"], cge_getString('Error'), $content, $cge_editorBasePath);
+$tilesetWindow = new Window($_GET["w"], cge_getString('Error'), "", $cge_editorBasePath);
 $tilesetWindow->setWidth(600);
 $tilesetWindow->setHeaderColor("red");
 $tilesetWindow->setPositionAnchor('center');
-$tilesetWindow->printWindow();
+$tilesetWindow->printHead();
+cge_print('WindowNotFound');
+require_once($cge_editorBasePath . "template/toggle.php");
+$tilesetWindow->printFoot();
 ?>

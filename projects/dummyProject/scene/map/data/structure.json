@@ -1,0 +1,46 @@
+{
+	"root": [
+		{
+			"id": "cge_testmap",
+			"name": "Test Map",
+			"file": "Test Map/mapData.json"
+		},
+		{
+			"id": "cge_secondmap",
+			"name": "Second Map",
+			"file": "Second Map/mapData.json"
+		},
+		[
+			{
+				"folderName": "Test Folder"
+			},
+			{
+				"id": "cge_thirdmap",
+				"name": "Some third map",
+				"file": "Test Map/mapData.php"
+			}
+		],
+		[
+			{
+				"folderName": "Empty Folder"
+			},
+			{
+			}
+		],
+		[
+			{
+				"folderName": "Folder with Nesting"
+			},
+			[
+				{
+					"folderName": "Test Folder 2"
+				},
+				{
+					"id": "cge_thirdmap",
+					"name": "Some fourth map",
+					"file": "Test Map/mapData.php"
+				}
+			]
+		]
+	]
+}

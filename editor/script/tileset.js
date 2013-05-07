@@ -7,6 +7,8 @@ var cge_tileSelectioEndY;
 var cge_tilesetTileWidth;
 var cge_tilesetTileHeight;
 
+var cge_tilesetTileCountX = -1;
+
 var cge_tileSelection = false;
 
 function cge_tilesetToggleGrid(){
@@ -33,6 +35,7 @@ function cge_unbindTilesetEvents(){
 function cge_bindTilesetEvents(){
 	cge_tilesetTileWidth = parseInt($("div.cge_tilesetActive span.cge_tilesizeX").text());
 	cge_tilesetTileHeight = parseInt($("div.cge_tilesetActive span.cge_tilesizeY").text());
+	cge_tilesetTileCountX = parseInt($("div.cge_tilesetActive span.cge_tilesetTileCountX").text());
 	
 	cge_tilesetStartX = null;
 	cge_tilesetStartY = null;
@@ -98,6 +101,9 @@ function cge_tileSelectionRedraw(){
 	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").width((width*cge_tilesetTileWidth + cge_tilesetTileWidth - 2) + "px");
 	$("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").height((height*cge_tilesetTileHeight + cge_tilesetTileHeight - 2) + "px");
 
+	$("div.cge_MapSelectionHelper").width((width*cge_tilesetTileWidth + cge_tilesetTileWidth - 2) + "px");
+	$("div.cge_MapSelectionHelper").height((height*cge_tilesetTileHeight + cge_tilesetTileHeight - 2) + "px");
+	
 	$("div.cge_tilesetSelectionIndicator").click(function(){
 		cge_tileSelectioStartX = null;
 		cge_tileSelectioStartY = null;
@@ -105,8 +111,13 @@ function cge_tileSelectionRedraw(){
 		cge_tileSelectioEndX = null;
 		cge_tileSelectioEndY = null;
 		
+//		cge_pushLog("Selection size: " + cge_getTilesetSelectionWidth() + " - " + cge_getTilesetSelectionHeight());
+		
 		$(this).remove();
 	});
+	
+//	cge_pushLog("Selection size: " + cge_getTilesetSelectionWidth() + " - " + cge_getTilesetSelectionHeight());
+	$(".cge_MapSelectionHelperPreview").css("background-position", cge_getBGOffsetX(0) + "px " + cge_getBGOffsetY(0) + "px");
 }
 
 function cge_stopTileSelection(){
@@ -119,6 +130,7 @@ function cge_changeSelectedTileset(pNewTileset){
 		$("div.cge_tilesetActive").removeClass("cge_tilesetActive");
 		$("#cge_tilesetContainer_" + pNewTileset).addClass("cge_tilesetActive");
 		cge_checkWindowOverlap('cge_ProjectTileset');
+		
 		cge_bindTilesetEvents();
 	}else{
 		cge_setLoading(true);
@@ -129,13 +141,56 @@ function cge_changeSelectedTileset(pNewTileset){
 			$("div.cge_tilesetActive").removeClass("cge_tilesetActive");
 			$("#cge_ProjectTileset div.cge_EditorWindowContent").append(data);
 			cge_checkWindowOverlap('cge_ProjectTileset');
+			
+			$("div.cge_MapSelectionHelper").width("0");
+			$("div.cge_MapSelectionHelper").height("0");
+
+			
 			cge_bindTilesetEvents();
 		});
 	}
 }
 
 function cge_editActiveTileset(){
-	var tilesetName = $("div.cge_tilesetActive").children(".cge_tilesetFile").text();
+	var tilesetName = $("div.cge_tilesetActive").children(".cge_tilesetId").text();
 	
 	cge_loadWinodw("cge_editTileset", [tilesetName, "blah"]);
+}
+
+function cge_getTilesetSelectionWidth(){
+	var offset = cge_getTilesetSelectionStartX();
+	var start = offset;
+	var end = offset + (parseInt($("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").width()) + 2)/cge_tilesetTileWidth
+	return end - start;
+}
+
+function cge_getTilesetSelectionHeight(){
+	var offset = cge_getTilesetSelectionStartY();
+	var start = offset;
+	var end = offset + (parseInt($("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").height()) + 2)/cge_tilesetTileHeight;
+	return end - start;
+}
+
+function cge_getTilesetSelectionStartX(){
+	return parseInt($("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").css("left"))/cge_tilesetTileWidth;
+}
+
+function cge_getTilesetSelectionStartY(){
+	return parseInt($("div.cge_tilesetContainer div.cge_tilesetSelectionIndicator").css("top"))/cge_tilesetTileHeight;
+}
+
+function cge_getBGOffsetX(pOffset){
+	return - (parseInt(cge_getTilesetSelectionStartX()) + parseInt(pOffset)) * cge_tilesetTileWidth;
+}
+
+function cge_getBGOffsetY(pOffset){
+	return - (parseInt(cge_getTilesetSelectionStartY()) + parseInt(pOffset)) * cge_tilesetTileHeight;
+}
+
+function cge_TileIdToX(pTileId, pTileWidth, pTileHeight){
+	return pTileId - (cge_TileIdToY(pTileId, pTileWidth) * pTileWidth);
+}
+
+function cge_TileIdToY(pTileId, pTileWidth){
+	return Math.floor(pTileId / pTileWidth);
 }

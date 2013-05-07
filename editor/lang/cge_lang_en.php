@@ -2,13 +2,16 @@
 function cge_getString($string){
 	global $cge_defaultLog;
 	
-	$strings = array("title" => "Canvas Game Engine",
+	$strings = array("title" => "Canvas Game Editor",
 					 "lang" => "English",
 					 "Version" => "Version",
 					 "version" => "version",
 					 "File" => "File",
 					 "Send Feedback" => "Send Feedback",
-					 "WindowNotFound" => "The requested window could not be found."
+					 "WindowNotFound" => "The requested window could not be found.",
+					 "LayerTextDefault" => "Please load or create a map.",
+					 "LayerToggle" => "Toggle layer visibility",
+					 "NewLayer" => "New Layer"
 	);
 	
 	if(isset($strings[$string])){
