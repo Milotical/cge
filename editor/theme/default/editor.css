@@ -20,6 +20,18 @@ body{
 /*
  * Specific css
  */
+#cge_ResourceTable tr{
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
+	cursor: default;
+}
+
+#cge_ResourceTable tbody tr:hover{
+	background-color: #a8dff4;
+}
+
 #cge_editorMapWrapper{
 	position: relative;
 	height: 100%;
@@ -200,6 +212,98 @@ ul.cge_MapListFolder{
 	background: url('icon/folder.png') no-repeat;
 	cursor: pointer;
 }
+
+/*
+ * Resource Manager
+ */
+#cge_ResourceManagerBC{
+	border: 1px solid #CCCCCC;
+	padding: 3px;
+	margin-bottom: 5px;
+	font-size: 11px;
+	cursor: default;
+}
+
+a.cge_ResourceManagerBCLink, a.cge_ResourceManagerBCLink:link, a.cge_ResourceManagerBCLink:visited, a.cge_ResourceManagerBCLink:hover, a.cge_ResourceManagerBCLink:active{
+	color: #000000 !important;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+#cge_ResourceManagerPreviewWrapper{
+	width: 15%;
+}
+
+#cge_ResourceManagerContentWrapper{
+	width: 85%;
+	overflow: auto;
+}
+
+#cge_ResourceManagerContent{
+	padding: 0 0 0 10px;
+}
+
+#cge_ResourceManagerPreviewWrapper, #cge_ResourceManagerContentWrapper{
+	float: left;
+	height: 460px;
+	overflow: auto;
+}
+
+#cge_ResourceManagerPreviewImageWrapper{
+}
+
+div.cge_ResourceManagerPreviewZoom img{
+	max-width: none !important;
+	max-height: none !important;
+	cursor: -moz-zoom-out !important;
+}
+
+#cge_ResourceManagerPreviewImageWrapper img{
+	max-width: 100%;
+	max-height: 450px;
+	display: none;
+	cursor: -moz-zoom-in;
+}
+
+span.cge_ResourceManagerExtension{
+	color: #666666;
+	font-size: 14px;
+}
+
+tr.cge_ResourceManageFileSelected{
+	background-color: #33B5E5 !important;
+}
+
+/*
+ * Table
+ */
+table{
+	width: 100%;
+	border-collapse: collapse;
+	font: 16px/18px nevis, "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
+
+table thead{
+	background-color: #EEEEEE;
+	border: 1px solid #CCCCCC;
+	border-width: 1px 0;
+}
+
+table thead tr th{
+	text-align: left;
+	padding: 5px 3px;
+	font-weight: normal;
+	font-size: 16px;
+}
+
+table tbody tr{
+	border-bottom: 1px solid #CCCCCC;
+}
+
+table tbody tr td{
+	padding: 5px 3px;
+}
+
 /*
  * Navigation
  */
@@ -656,6 +760,16 @@ a.cge_btn{
 	-o-transition: background-color 0.5s;
 }
 
+a.cge_icon{
+	display: inline-block;
+	cursor: default;
+	
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+	-o-transition: background-color 0.5s;
+}
+
 a.cge_btn:hover{
 	background-color: #C6C6C6;
 }
@@ -752,6 +866,21 @@ a.cge_arrowDown{
 
 a.cge_layer{
 	background-image: url('icon/layer.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_image{
+	background-image: url('icon/image.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_data{
+	background-image: url('icon/data.png');
+	background-repeat: no-repeat;
+}
+
+a.cge_save{
+	background-image: url('icon/save.png');
 	background-repeat: no-repeat;
 }
 

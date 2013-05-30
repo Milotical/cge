@@ -1,3 +1,7 @@
+/**
+ * tileset.js
+ * @version 1.0
+ */
 var cge_tileSelectioStartX;
 var cge_tileSelectioStartY;
 
@@ -111,12 +115,9 @@ function cge_tileSelectionRedraw(){
 		cge_tileSelectioEndX = null;
 		cge_tileSelectioEndY = null;
 		
-//		cge_pushLog("Selection size: " + cge_getTilesetSelectionWidth() + " - " + cge_getTilesetSelectionHeight());
-		
 		$(this).remove();
 	});
 	
-//	cge_pushLog("Selection size: " + cge_getTilesetSelectionWidth() + " - " + cge_getTilesetSelectionHeight());
 	$(".cge_MapSelectionHelperPreview").css("background-position", cge_getBGOffsetX(0) + "px " + cge_getBGOffsetY(0) + "px");
 }
 

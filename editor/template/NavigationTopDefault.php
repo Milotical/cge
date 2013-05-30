@@ -15,6 +15,8 @@ $nav->addItem("View", cge_getString("View"), "javascript:()", "");
 	
 $nav->addItem("Window", "Window", "javascript:()", "");
 	$nav->addSubMenuToItem("Window", cge_getString("Project List"), "cge_loadWinodw('cge_ProjectListWindow')", "", "cge_EditorWindowHandler_cge_ProjectListWindow");
+	$nav->addSubMenuToItem("Window", cge_getString("Map List"), "cge_openWindow('cge_MapListWindow')", "", "cge_EditorWindowHandler_cge_MapListWindow");
+	$nav->addSubMenuToItem("Window", cge_getString("Resource Manager"), "cge_openWindow('cge_ResourceManager')", "", "cge_EditorWindowHandler_cge_ResourceManager");
 	$nav->addSubMenuToItem("Window", cge_getString("Tileset"), "cge_openWindow('cge_ProjectTileset')", "", "cge_EditorWindowHandler_cge_ProjectTileset");
 	$nav->addSubMenuToItem("Window", cge_getString("Layer"), "cge_openWindow('cge_MapLayer')", "", "cge_EditorWindowHandler_cge_MapLayer");
 	$nav->addSubMenuToItem("Window", cge_getString("Debug"), "cge_openWindow('cge_Debug')", "", "cge_EditorWindowHandler_cge_Debug");

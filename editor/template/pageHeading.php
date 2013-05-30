@@ -15,6 +15,7 @@
 	<script src="script/window.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/tileset.js" type="text/javascript" charset="utf-8"></script>
 	<script src="script/map.js" type="text/javascript" charset="utf-8"></script>
+	<script src="script/resource.js" type="text/javascript" charset="utf-8"></script>
 	
 	<script type="text/javascript">
 		$(window).load(function(){

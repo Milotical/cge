@@ -18,7 +18,11 @@ if(!isset($_SESSION["cge_loadedProject"])){
 	$cge_startScript .= '
 			cge_loadWinodw(\'cge_Debug\');';
 	$cge_startScript .= '
+			cge_loadWinodw(\'cge_ResourceManager\');';
+	$cge_startScript .= '
 			cge_MapToggleGrid();';
+	$cge_startScript .= '
+			cge_LoadedProjectDir = \'' . $cge_LoadedProject->getResPath() . '\';';
 }
 
 include("template/pageHeading.php");

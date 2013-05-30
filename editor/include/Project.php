@@ -91,6 +91,10 @@ class Project{
 		return $this->mTilesetRes;
 	}
 	
+	public function getResPath(){
+		return $this->mDirectory . "/" . $this->mResDir;
+	}
+	
 	public function getMaps(){
 		return $this->mMap;
 	}

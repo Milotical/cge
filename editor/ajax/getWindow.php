@@ -40,6 +40,10 @@ if(isset($_GET["w"])){
 		case "cge_Debug":
 			include_once("window/debug.php");
 		break;
+
+		case "cge_ResourceManager":
+			include_once("window/resourceManager.php");
+		break;
 		
 		default:
 			include_once("window/windowNotFound.php");

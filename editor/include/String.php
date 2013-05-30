@@ -7,5 +7,9 @@ class cge_String{
 	public static function stripExtension($pFilename){
 		return preg_replace("/\.[^$]*/","",$filename);
 	}
+	
+	public static function getDate($date){
+		return date("d.m.y", $date);
+	}
 }
 ?>

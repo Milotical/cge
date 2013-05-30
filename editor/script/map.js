@@ -1,3 +1,7 @@
+/**
+ * map.js
+ * @version 1.0
+ */
 var cge_LoadedLayerId = -1;
 var cge_LoadedMap = "";
 var cge_MapEditing = false;
@@ -6,10 +10,18 @@ var cge_MapEditorLastHovered = -1;
 var cge_LoadedMapWidth = -1;
 var cge_LoadedMapHeight = -1;
 
+
+/**
+ * Toggle a folder in the map list window.
+ * @param pId id of the folder to toggle
+ */
 function cge_EditorMapListToggle(pId){
 	$("#cge_mapList" + pId).children().filter(":not(span)").toggle();
 }
 
+/**
+ * Open the window for a new map layer.
+ */
 function cge_MapNewLayer(){
 	if(cge_LoadedMap != ""){
 		cge_loadWinodw("cge_MapNewLayer", null);
@@ -19,11 +31,17 @@ function cge_MapNewLayer(){
 	}
 }
 
+/**
+ * Toggles the grid of tha map editor.
+ */
 function cge_MapToggleGrid(){
 	$("#cge_editorMapWrapper").toggleClass("cge_DisplayMapGrid");
 	$(".cge_NavViewMapGrid").toggleClass("cge_checkmark");
 }
 
+/**
+ * Creates the Markup of a new map layer and place it in the map edtior.
+ */
 function cge_MapNewLayerCreate(){	
 	var newIdNr = $("div.cge_MapLayerActiveWrapper div.cge_MapLayerRow").length;
 	
@@ -59,15 +77,22 @@ function cge_EditorCopyMapLayer(pLayerId){
 	$("#" + cge_LoadedMap + "_Layer" + (parseInt(newIdNr) - 1)).after(copyMapLayer);
 }
 
+/**
+ * Load a map into the map editor.
+ * @param pMapId the id of the map to load
+ */
 function cge_EditorLoadMap(pMapId){
 	cge_setLoading(true);
 	$.get("ajax/map.php", {id: pMapId}, function(data){
+		//Remove the currently loaded map
 		$("div.cge_MapLoaded").remove();
 		
 		cge_setLoading(false);
 		
+		//Update the mapId
 		cge_LoadedMap = pMapId;
 		
+		//Add the maps markup to the dom
 		$("#cge_editorMapWrapper").append(data);
 		
 		$("#cge_editorMapWrapper").disableSelection();
@@ -91,6 +116,9 @@ function cge_EditorLoadMap(pMapId){
 	});
 }
 
+/**
+ * Load the layer functionality and cut the markup it into the layer window.
+ */
 function cge_EditorLoadMapLayer(){
 	$("#cge_MapLayer div.cge_MapLayerActiveWrapper").hide();
 	$("#cge_MapLayer div.cge_MapLayerActiveWrapper").remove();
@@ -105,6 +133,11 @@ function cge_EditorLoadMapLayer(){
 	});
 }
 
+/**
+ * Toggle a map layer in the editor.
+ * @param pLayerId id of the layer to be edited
+ * @param pMapId id of the loaded map
+ */
 function cge_EditorToggleLayer(pLayerId, pMapId){
 	var control = $("#" + pMapId + "_Layer" + pLayerId + "_LayerRow a:first");
 	
@@ -117,6 +150,12 @@ function cge_EditorToggleLayer(pLayerId, pMapId){
 	}
 }
 
+
+/**
+ * Select a map layer
+ * @param pLayerId id of the selected layer
+ * @param pMapId id of the loaded map
+ */
 function cge_EditorSelectLayer(pLayerId, pMapId){
 	cge_LoadedLayerId = pLayerId;
 	
@@ -127,6 +166,10 @@ function cge_EditorSelectLayer(pLayerId, pMapId){
 	cge_pushLog("Selected layer: " + pLayerId);
 }
 
+/**
+ * Hover a tile in the map editor
+ * @param pTileId id of the hovered tile
+ */
 function cge_MapEditorHoverTile(pTileId){
 	cge_MapEditorLastHovered = pTileId;
 	cge_MapEditorEditTile(pTileId);
@@ -138,6 +181,10 @@ function cge_MapEditorHoverTile(pTileId){
 	$("div.cge_MapSelectionHelper").css("top", helperTop + "px");
 }
 
+/**
+ * Change the data of a given tile.
+ * @param pTileId id of the tile that shall be changed
+ */
 function cge_MapEditorEditTile(pTileId){
 	if(cge_MapEditing && cge_LoadedLayerId >= 0){
 		var tilesetX = cge_getTilesetSelectionWidth();
@@ -159,12 +206,22 @@ function cge_MapEditorEditTile(pTileId){
 	}
 }
 
+/**
+ * Fill all tiles of a given layer.
+ * @param pLayerId id of the layer that shall be filled
+ * @param pOffsetX x-offset of the tile that shall be painted
+ * @param pOffsetY y-offset of the tile that shall be painted
+ */
 function cge_MapEditorFillLayerTiles(pLayerId, pOffsetX, pOffsetY){
 	$("#" + cge_LoadedMap + "_Layer" + pLayerId + " div.cge_MapTile").each(function(){
 		$(this).css("background-position", -(parseInt(pOffsetX * cge_tilesetTileWidth)) + "px " + -(parseInt(pOffsetY * cge_tilesetTileHeight)) + "px");
 	});
 }
 
+/**
+ * Start editing tiles in the map editor for the selected layer and loaded map.
+ * Should be fired onmousedown.
+ */
 function cge_EditorStartMapEditing(){
 	cge_MapEditing = true;
 	cge_pushLog("cge_MapEditing: " + cge_MapEditing + ".");
@@ -176,6 +233,10 @@ function cge_EditorStartMapEditing(){
 	});
 }
 
+/**
+ * Stop the editing of tiles.
+ * Should be fired onmouseup.
+ */
 function cge_EditorStopMapEditing(){
 	$(window).unbind('mouseup.mapEditing');
 	cge_MapEditing = false;
@@ -183,6 +244,10 @@ function cge_EditorStopMapEditing(){
 	cge_pushLog("cge_MapEditing: " + cge_MapEditing + ".");
 }
 
+/**
+ * Toggles the visibility of the selection helper (in the map editor).
+ * @param pVisibility 
+ */
 function cge_MapToggleSelectionHelper(pVisibility){
 	if(pVisibility && $("div.cge_MapSelectionHelper").width() > 0){		
 		$("div.cge_MapSelectionHelper").show();
@@ -191,6 +256,11 @@ function cge_MapToggleSelectionHelper(pVisibility){
 	}
 }
 
+/**
+ * Unbinds and then rebinds the onclick events of a layer in the layer window.
+ * This is necessary when shifting the id's and moving layer up and down.
+ * @param pLayerId id of the layer
+ */
 function cge_MapRebindLayerClick(pLayerId){
 	$("#" + cge_LoadedMap + "_Layer" + pLayerId + "_LayerRow a:first").unbind("click.visibility");
 	$("#" + cge_LoadedMap + "_Layer" + pLayerId + "_LayerRow a.cge_MapLayerNameSelect").unbind("click.selection");
@@ -204,12 +274,21 @@ function cge_MapRebindLayerClick(pLayerId){
 	});
 }
 
+/**
+ * Rempas all the ids of the tiles within a layer to match the layers id.
+ * Important when a layer is moved up or down.
+ * @param pLayerId id of the layer that changed it's id
+ */
 function cge_remapLayerTileId(pLayerId){
 	$("#" + cge_LoadedMap + "_Layer" + pLayerId + " div.cge_MapTile").each(function(i){
 		$(this).attr("id", cge_LoadedMap + "_Layer" + pLayerId + "_Tile" + i);
 	});
 }
 
+/**
+ * Move a layer in it's order.
+ * @param pMoveUp true to move up and false to move down
+ */
 function cge_MapMoveLayer(pMoveUp){
 	if(cge_LoadedLayerId >= 0){
 		var selectedLayer = $("#" + cge_LoadedMap + "_Layer" + cge_LoadedLayerId + "_LayerRow");
